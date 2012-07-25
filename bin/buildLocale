@@ -1,0 +1,423 @@
+#!/usr/bin/env node
+
+var fs = require('fs'),
+    Path = require('path'),
+    seq = require('seq'),
+    uglifyJs = require('uglify-js'),
+    uglifyAst = require('uglifyast'),
+    passError = require('passerror'),
+    time = require('time'),
+    cjson = require('cjson'),
+    libxmljs = require('libxmljs'),
+    _ = require('underscore'),
+    cldrPluralRuleToJavaScriptAst = require('../lib/cldrPluralRuleToJavaScriptAst'),
+    commandLineOptions = require('optimist')
+        .usage('$0 [--cldrpath <pathToCldr>] [-o <outputFileName>] --locale localeId,localeId...')
+        .options('o', {
+            describe: 'Output file name (defaults to STDOUT)'
+        })
+        .options('cldrpath', {
+            default: '/usr/share/cldr',
+            describe: 'Path to your CLDR files'
+        })
+        .options('locale', {
+            describe: 'Comma seperated list of locales to build',
+            type: 'string',
+            demand: true
+        })
+        .argv,
+    targetLocaleIds = _.flatten(_.flatten([commandLineOptions.locale]).map(function (localeId) {return localeId.split(",");})),
+    localeDataByTargetLocaleId = {},
+    isTargetLocaleById = {};
+
+targetLocaleIds.forEach(function (targetLocaleId) {
+    isTargetLocaleById[targetLocaleId] = true;
+});
+
+function zeroPad(str, length) {
+    str = String(str);
+    while (str.length < length) {
+        str = "0" + str;
+    }
+    return str;
+}
+
+var difficultTimeZoneIdToEnglishDisplayName = {
+    "Antarctica/DumontDUrville": "Dumont d'Urville",
+    "America/St_Thomas": "St. Thomas",
+    "America/St_Vincent": "St. Vincent",
+    "America/St_Lucia": "St. Lucia",
+    "America/St_Johns": "St. John's",
+    "America/St_Kitts": "St. Kitts"
+};
+
+function timeZoneIdToEnglishDisplayName(timeZoneId) {
+    if (timeZoneId in difficultTimeZoneIdToEnglishDisplayName) {
+        return difficultTimeZoneIdToEnglishDisplayName[timeZoneId];
+    }
+    return timeZoneId.split("/").pop().replace(/_/g, ' ');
+}
+
+var nextYear = new Date().getFullYear() + 1,
+    nextJanuary1st = new time.Date(nextYear, 0, 1),
+    nextJuly1st = new time.Date(nextYear, 6, 1),
+    territoryIdByTimeZoneId = {},
+    numTimeZonesByTerritoryId = {},
+    utcStandardOffsetSecondsByTimeZoneId = {},
+    timeZoneIds = [];
+
+fs.readFileSync(Path.resolve('/usr/share/zoneinfo/', 'zone.tab'), 'ascii').split(/\r\n?|\n\r?/).forEach(function (line) {
+    if (/^#|^\s*$/.test(line)) {
+        return;
+    }
+    var fields = line.split("\t");
+    if (fields.length < 3) {
+        console.warn('Skipping ' + line, fields);
+    }
+    var territoryId = fields[0],
+        timeZoneId = fields[2];
+
+    // Try instantiating a time.Date object with this time zone.
+    // If this throws an exception, node-time's set of time zones is somehow different
+    // from /usr/share/zoneinfo/zone.tab:
+    new time.Date(nextJanuary1st.getTime(), timeZoneId);
+
+    numTimeZonesByTerritoryId[territoryId] = (numTimeZonesByTerritoryId[territoryId] || 0) + 1;
+    territoryIdByTimeZoneId[timeZoneId] = territoryId;
+    timeZoneIds.push(timeZoneId);
+
+    time.tzset(timeZoneId);
+    var localtimeNextJanuary1st = time.localtime(nextJanuary1st.getTime() / 1000),
+        localtimeNextJuly1st = time.localtime(nextJuly1st.getTime() / 1000),
+        utcStandardOffsetSeconds;
+    if (localtimeNextJanuary1st.isDaylightSavings) {
+        utcStandardOffsetSeconds = localtimeNextJuly1st.gmtOffset;
+    } else {
+        utcStandardOffsetSeconds = localtimeNextJanuary1st.gmtOffset;
+    }
+    utcStandardOffsetSecondsByTimeZoneId[timeZoneId] = utcStandardOffsetSeconds;
+});
+
+function getLocaleData(localeId, cb) {
+    var localeData = {
+        dateFormats: {}
+    };
+
+    fs.readFile(Path.resolve(commandLineOptions.cldrpath, "common", "main", localeId + '.xml'), 'utf-8', passError(cb, function (xmlString) {
+        var document = libxmljs.parseXmlString(xmlString);
+
+        localeData.localeDisplayNames = {};
+        document.find('//languages/language').forEach(function (node) {
+            var localeId = node.attr('type').value();
+            if (isTargetLocaleById[localeId]) {
+                localeData.localeDisplayNames[localeId] = node.text();
+            }
+        });
+
+        localeData.relativeDayDisplay = {};
+        document.find("/ldml/dates/calendars/calendar[\@type='gregorian']/fields/field[\@type = 'day']/relative").forEach(function (relativeNode) {
+            localeData.relativeDayDisplay[relativeNode.attr('type').value()] = relativeNode.text();
+        });
+
+        localeData.numberSymbols = {};
+        ['decimal', 'group', 'percentSign'].forEach(function (numberSymbolName) {
+            document.find("/ldml/numbers/symbols/" + numberSymbolName).forEach(function (numberSymbolNode) {
+                localeData.numberSymbols[numberSymbolName] = numberSymbolNode.text();
+            });
+        });
+
+        localeData.monthNames = {};
+        document.find("/ldml/dates/calendars/calendar[@type='gregorian']/months/monthContext/monthWidth/month").forEach(function (monthNode) {
+            // Avoid dashes in width and context (so that dot notation can be used in JavaScript)
+            var width = monthNode.parent().attr('type').value().replace(/-/g, ''),
+                context = monthNode.parent().parent().attr('type').value().replace(/-/g, '');
+            localeData.monthNames[context] = localeData.monthNames[context] || {};
+            localeData.monthNames[context][width] = localeData.monthNames[context][width] || [];
+            localeData.monthNames[context][width][parseInt(monthNode.attr('type').value(), 10) - 1] = monthNode.text();
+        });
+
+        localeData.dayNames = {};
+        document.find("/ldml/dates/calendars/calendar[@type='gregorian']/days/dayContext/dayWidth/day").forEach(function (dayNode) {
+            var width = dayNode.parent().attr('type').value().replace(/-/g, ''),
+                context = dayNode.parent().parent().attr('type').value().replace(/-/g, ''),
+                dayNo = {
+                    sun: 0,
+                    mon: 1,
+                    tue: 2,
+                    wed: 3,
+                    thu: 4,
+                    fri: 5,
+                    sat: 6
+                }[dayNode.attr('type').value()];
+            localeData.dayNames[context] = localeData.dayNames[context] || {};
+            localeData.dayNames[context][width] = localeData.dayNames[context][width] || [];
+            localeData.dayNames[context][width][dayNo] = dayNode.text();
+        });
+
+        ['date', 'time'].forEach(function (dateOrTime) {
+            var dateOrTimeCapitalized = dateOrTime.replace(/^(\w)/, function (ch) {return ch.toUpperCase();});
+
+            localeData.dateFormats = localeData.dateFormats || {};
+            localeData.dateFormats.basic = localeData.dateFormats.basic || {};
+            document.find("/ldml/dates/calendars/calendar[@type='gregorian']/" + dateOrTime + "Formats/" + dateOrTime + "FormatLength/" + dateOrTime + "Format/pattern").forEach(function (formatNode) {
+                var type = formatNode.parent().parent().attr('type').value();
+                localeData.dateFormats.basic[type + dateOrTimeCapitalized] = formatNode.text();
+            });
+        });
+
+        localeData.dateTimePatterns = {};
+
+        document.find("/ldml/dates/calendars/calendar[@type='gregorian']/dateTimeFormats/dateTimeFormatLength").forEach(function (dateTimeFormatLengthNode) {
+            var dateTimeFormatType = dateTimeFormatLengthNode.attr('type').value(),
+                patternNodes = dateTimeFormatLengthNode.find("dateTimeFormat/pattern");
+            if (patternNodes.length !== 1) {
+                throw new Error('Expected exactly one dateTimeFormat/pattern in $date_time_format_length_node');
+            }
+            localeData.dateTimePatterns[dateTimeFormatType] = patternNodes[0].text();
+        });
+
+        var dateTimeDefaultLengthNode = document.find("/ldml/dates/calendars/calendar[@type='gregorian']/dateTimeFormats/default")[0];
+        if (dateTimeDefaultLengthNode) {
+           localeData.defaultDateTimePatternName = dateTimeDefaultLengthNode.attr('choice').value();
+        }
+
+        document.find("/ldml/dates/calendars/calendar[@type='gregorian']/dateTimeFormats/availableFormats/dateFormatItem").forEach(function (dateTimeFormatNode) {
+           localeData.dateFormats.cldr = localeData.dateFormats.cldr || {};
+           localeData.dateFormats.cldr[dateTimeFormatNode.attr('id').value()] = dateTimeFormatNode.text();
+        });
+
+
+        var intervalFormatFallbackNode = document.get("/ldml/dates/calendars/calendar[@type='gregorian']/dateTimeFormats/intervalFormats/intervalFormatFallback");
+        if (intervalFormatFallbackNode) {
+           localeData.intervalFallbackFormat = intervalFormatFallbackNode.text();
+        }
+
+        document.find("/ldml/dates/calendars/calendar[\@type='gregorian']/dateTimeFormats/intervalFormats/intervalFormatItem").forEach(function (intervalFormatNode) {
+           localeData.intervalFormats = localeData.intervalFormats || {};
+           var intervalFormat = {};
+           intervalFormatNode.childNodes().forEach(function (greatestDifferenceNode) {
+               var idAttribute = greatestDifferenceNode.attr('id');
+               if (!idAttribute) {
+                   // Skip whitespace nodes
+                   return;
+               }
+               intervalFormat[idAttribute.value()] = greatestDifferenceNode.text();
+           });
+           localeData.intervalFormats[intervalFormatNode.attr('id').value()] = intervalFormat;
+        });
+
+        // Extract unit patterns:
+
+        ['day', 'hour', 'minute', 'month', 'week', 'year'].forEach(function (unit) {
+            document.find("/ldml/units/unit[@type='" + unit + "']/unitPattern").forEach(function (unitPatternNode) {
+                localeData.units = localeData.units || {};
+                localeData.units[unit] = localeData.units[unit] || {};
+                localeData.units[unit][unitPatternNode.attr('count').value()] = unitPatternNode.text();
+            });
+        });
+
+        document.find("/ldml/listPatterns/listPattern/listPatternPart").forEach(function (listPatternPartNode) {
+            localeData.listPatterns = localeData.listPatterns || {};
+            localeData.listPatterns[listPatternPartNode.attr('type').value()] = listPatternPartNode.text();
+        });
+
+        localeData.timeZoneDisplayNames = {};
+
+        document.find("/ldml/dates/timeZoneNames/zone").forEach(function (zoneNode) {
+            var timeZoneId = zoneNode.attr('type').value(),
+                exemplarCityNodes = zoneNode.find("exemplarCity"),
+                tzNameLocale;
+            if (exemplarCityNodes.length > 0) {
+                tzNameLocale = exemplarCityNodes[0].text();
+            } else {
+                var genericDisplayNameNodes = zoneNode.find("long/generic");
+                if (genericDisplayNameNodes.length > 0) {
+                    tzNameLocale = genericDisplayNameNodes[0].text();
+                } else {
+                    var longDisplayNameNodes = zoneNode.find("long/standard");
+                    if (longDisplayNameNodes.length > 0) {
+                        tzNameLocale = longDisplayNameNodes[0].text();
+                    }
+                }
+            }
+            if (tzNameLocale) {
+                localeData.timeZoneDisplayNames[timeZoneId] = tzNameLocale;
+            }
+        });
+
+        localeData.territoryDisplayNames = {};
+
+        document.find("/ldml/localeDisplayNames/territories/territory").forEach(function (territoryNode) {
+            localeData.territoryDisplayNames[territoryNode.attr('type').value()] = territoryNode.text();
+        });
+
+        cb(null, localeData);
+    }));
+}
+
+var doExtractByLocaleId = {root: true},
+    localeDataByLocaleId = {};
+
+function expandLocaleIdToPrioritizedList(localeId) {
+    if (!localeId) {
+        return [];
+    }
+    var localeIds = [localeId];
+    while (/_[^_]+$/.test(localeId)) {
+        localeId = localeId.replace(/_[^_]+$/, '');
+        localeIds.push(localeId);
+    }
+    return localeIds;
+}
+
+targetLocaleIds.forEach(function (targetLocaleId) {
+    expandLocaleIdToPrioritizedList(targetLocaleId).forEach(function (localeId) {
+        doExtractByLocaleId[localeId] = true;
+    });
+});
+
+seq(Object.keys(doExtractByLocaleId))
+    .parEach(function (localeId) {
+        var cb = this;
+        getLocaleData(localeId, passError(cb, function (localeData) {
+            localeDataByLocaleId[localeId] = localeData;
+            cb();
+        }));
+    })
+    .seq(function () {
+        var cb = this;
+
+        // Extract plural rules:
+        fs.readFile(Path.resolve(commandLineOptions.cldrpath, 'common', 'supplemental', 'plurals.xml'), 'utf-8', passError(cb, function (xmlString) {
+            var document = libxmljs.parseXmlString(xmlString);
+            Object.keys(doExtractByLocaleId).forEach(function (localeId) {
+                var matchLocalesXPathExpr =
+                    "@locales = '" + localeId + "' or " +
+                    "starts-with(@locales, '" + localeId + "') or " +
+                    "contains(@locales, ' " + localeId + " ') or " +
+                    "(contains(@locales, ' " + localeId + "') and substring-after(@locales, ' " + localeId + "') = '')";
+
+                var statementAsts = [],
+                    pluralRulesNodes = document.find("/supplementalData/plurals/pluralRules[" + matchLocalesXPathExpr + "]");
+                if (pluralRulesNodes.length > 0) {
+                    pluralRulesNodes[0].find("pluralRule").forEach(function (pluralRuleNode) {
+                        statementAsts.push(
+                            [
+                                'if',
+                                cldrPluralRuleToJavaScriptAst(pluralRuleNode.text()),
+                                ['return', ['string', pluralRuleNode.attr('count').value()]]
+                            ]
+                        );
+                    });
+                    statementAsts.push(['return', ['string', 'other']]);
+                    var functionAst = ['function', null, ['n'], statementAsts];
+                    localeDataByLocaleId[localeId].getQuantity = new Function("n", uglifyJs.uglify.gen_code(['toplevel', statementAsts]));
+//                    console.warn(localeDataByLocaleId[localeId].getQuantity.toString().replace(/^function anonymous/, 'function'));
+                }
+            });
+            cb();
+        }));
+    })
+/*
+
+    for my $locale (sub_locales $target_locale) {
+        die "No plural rules found for locale $target_locale" if $locale eq 'root';
+
+        # For some reason XML::XPath doesn't support the tokenize function, so the NMTOKEN matching code is "slightly" ugly:
+
+        my $match_locales_xpath_expr = qq{
+            \@locales = '$locale' or
+            starts-with(\@locales, '$locale ') or
+            contains(\@locales, ' $locale ') or
+            (contains(\@locales, ' $locale') and substring-after(\@locales, ' $locale') = '')
+        };
+
+        if (my @plural_rules_nodes = $plurals_xpath->findnodes("/supplementalData/plurals/pluralRules[$match_locales_xpath_expr]")) {
+            my $function_body = '';
+            my %if_statements;
+            for my $plural_rule_node ($plural_rules_nodes[0]->findnodes("pluralRule")) {
+                $function_body .= "\tif (".CLDRPluralRule->new($plural_rule_node->string_value())->to_javascript_condition('n').") {\n".
+                    "\t\treturn '".$plural_rule_node->getAttribute('count')."';\n".
+                    "\t}\n";
+            }
+            $function_body .= "\treturn 'other';\n";
+            $locale_data{$target_locale}->{'getQuantityCode'} = "function (n) {\n".$function_body."}";
+            last;
+        }
+    }
+*/
+
+
+    .seq(function () {
+        timeZoneIds.forEach(function (timeZoneId) {
+            localeDataByLocaleId.root.timeZoneDisplayNames = localeDataByLocaleId.root.timeZoneDisplayNames || {};
+            if (!(timeZoneId in localeDataByLocaleId.root.timeZoneDisplayNames)) {
+                localeDataByLocaleId.root.timeZoneDisplayNames[timeZoneId] = timeZoneIdToEnglishDisplayName(timeZoneId);
+            }
+        });
+        targetLocaleIds.forEach(function (targetLocaleId) {
+            var localeDatasInPrioritizedOrder = expandLocaleIdToPrioritizedList(targetLocaleId).concat(['root']).map(function (localeId) {
+                return localeDataByLocaleId[localeId];
+            });
+            var localeData = cjson.extend.apply(cjson, [true, {}].concat(localeDatasInPrioritizedOrder.reverse()));
+
+            localeData.timeZoneInfo = Object.keys(localeData.timeZoneDisplayNames).sort(function (a, b) {
+                return utcStandardOffsetSecondsByTimeZoneId[a] - utcStandardOffsetSecondsByTimeZoneId[b];
+            }).map(function (timeZoneId) {
+                var utcStandardOffsetSeconds = utcStandardOffsetSecondsByTimeZoneId[timeZoneId];
+                return {
+                    id: timeZoneId,
+                    utcOffsetSeconds: utcStandardOffsetSeconds,
+                    displayName: localeData.timeZoneDisplayNames[timeZoneId],
+                    territoryId: territoryIdByTimeZoneId[timeZoneId]
+                };
+            });
+
+            localeData.territoryInfo = Object.keys(localeData.territoryDisplayNames).sort().map(function (territoryId) {
+                return {
+                    id: territoryId,
+                    displayName: localeData.territoryDisplayNames[territoryId],
+                    hasTimeZones: numTimeZonesByTerritoryId[territoryId] > 0
+                };
+            });
+
+            localeData.defaultDateTimePattern = localeData.dateTimePatterns[localeData.defaultDateTimePatternName];
+
+            ['short', 'medium', 'long', 'full'].forEach(function (length) {
+               localeData.dateFormats.basic[length + 'DateTime'] = localeData.dateTimePatterns[length]
+                   .replace(/\{0\}/g, localeData.dateFormats.basic[length + 'Time'])
+                   .replace(/\{1\}/g, localeData.dateFormats.basic[length + 'Date']);
+            });
+
+            delete localeData.dateTimePatterns;
+            delete localeData.timeZoneDisplayNames;
+            delete localeData.territoryDisplayNames;
+            localeDataByTargetLocaleId[targetLocaleId] = localeData;
+        });
+        this();
+    })
+    .seq(function () {
+        var statementAsts = [
+            ["var",[["LOCALEID",["dot",["name","one"],"localeId"]]]]
+        ];
+        targetLocaleIds.forEach(function (targetLocaleId) {
+            statementAsts.push(['if',
+                                 ['binary', '===', ['name', 'LOCALEID'], ['string', targetLocaleId]],
+                                 ['block',
+                                     Object.keys(localeDataByTargetLocaleId[targetLocaleId]).map(function (propertyName) {
+                                         return ['stat',
+                                             ['assign', true, ['dot', ['dot', ['name', 'one'], 'locale'], propertyName], uglifyAst.objToAst(localeDataByTargetLocaleId[targetLocaleId][propertyName])]
+                                         ];
+                                     })
+                                 ]
+                                ]);
+        });
+        var javaScriptString = fs.readFileSync(Path.resolve(__dirname, '../lib/locale.js'), 'utf-8') +
+                               uglifyJs.uglify.gen_code(['toplevel', statementAsts], {beautify: true});
+        if ('o' in commandLineOptions) {
+            fs.writeFile(commandLineOptions.o, javaScriptString, 'utf-8', this);
+        } else {
+            console.log(javaScriptString);
+            this();
+        }
+    });
