@@ -6,6 +6,7 @@
         "libxmljs": "=0.5.4",
         "optimist": "=0.3.4",
         "passerror": "=0.0.1",
+        "pegjs": "=0.7.0",
         "seq": "=0.3.5",
         "time": "=0.8.2",
         "uglifyast": "=0.0.3",
