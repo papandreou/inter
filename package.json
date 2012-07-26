@@ -1,6 +1,6 @@
 {
     "name": "buildlocale",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "dependencies": {
         "cjson": "=0.0.6",
         "libxmljs": "=0.5.4",
