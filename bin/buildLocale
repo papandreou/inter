@@ -127,30 +127,45 @@ function getLocaleData(localeId, cb) {
             });
         });
 
+        localeData.eraNames = {};
+        ['eraNames', 'eraAbbr'].forEach(function (eraType) {
+            var typeInOutput = {eraNames: 'wide', eraAbbr: 'abbreviated'}[eraType];
+            localeData.eraNames[typeInOutput] = [];
+            document.find("/ldml/dates/calendars/calendar[@type='gregorian']/eras/" + eraType + "/era").forEach(function (eraNode) {
+                var type = parseInt(eraNode.attr('type').value(), 10);
+                localeData.eraNames[typeInOutput][type] = localeData.eraNames[typeInOutput][type] || eraNode.text();
+            });
+        });
+
+        localeData.quarterNames = {};
+        document.find("/ldml/dates/calendars/calendar[@type='gregorian']/quarters/quarterContext/quarterWidth/quarter").forEach(function (quarterNode) {
+            // Avoid dashes in width and context (so that dot notation can be used in JavaScript)
+            var context = quarterNode.parent().parent().attr('type').value().replace(/-/g, ''),
+                width = quarterNode.parent().attr('type').value().replace(/-/g, ''),
+                quarterNo = parseInt(quarterNode.attr('type').value(), 10) - 1;
+            localeData.quarterNames[context] = localeData.quarterNames[context] || {};
+            localeData.quarterNames[context][width] = localeData.quarterNames[context][width] || [];
+            localeData.quarterNames[context][width][quarterNo] = localeData.quarterNames[context][width][quarterNo] || quarterNode.text();
+        });
+
         localeData.monthNames = {};
         document.find("/ldml/dates/calendars/calendar[@type='gregorian']/months/monthContext/monthWidth/month").forEach(function (monthNode) {
             // Avoid dashes in width and context (so that dot notation can be used in JavaScript)
-            var width = monthNode.parent().attr('type').value().replace(/-/g, ''),
-                context = monthNode.parent().parent().attr('type').value().replace(/-/g, '');
+            var context = monthNode.parent().parent().attr('type').value().replace(/-/g, ''),
+                width = monthNode.parent().attr('type').value().replace(/-/g, '');
             localeData.monthNames[context] = localeData.monthNames[context] || {};
             localeData.monthNames[context][width] = localeData.monthNames[context][width] || [];
             var monthNo = parseInt(monthNode.attr('type').value(), 10) - 1;
             localeData.monthNames[context][width][monthNo] = localeData.monthNames[context][width][monthNo] || monthNode.text();
         });
 
+
         localeData.dayNames = {};
+        var dayNoByCldrId = {sun: 0, mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6};
         document.find("/ldml/dates/calendars/calendar[@type='gregorian']/days/dayContext/dayWidth/day").forEach(function (dayNode) {
             var width = dayNode.parent().attr('type').value().replace(/-/g, ''),
                 context = dayNode.parent().parent().attr('type').value().replace(/-/g, ''),
-                dayNo = {
-                    sun: 0,
-                    mon: 1,
-                    tue: 2,
-                    wed: 3,
-                    thu: 4,
-                    fri: 5,
-                    sat: 6
-                }[dayNode.attr('type').value()];
+                dayNo = dayNoByCldrId[dayNode.attr('type').value()];
             localeData.dayNames[context] = localeData.dayNames[context] || {};
             localeData.dayNames[context][width] = localeData.dayNames[context][width] || [];
             localeData.dayNames[context][width][dayNo] = localeData.dayNames[context][width][dayNo] || dayNode.text();
