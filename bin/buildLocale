@@ -194,7 +194,7 @@ function getLocaleData(localeId, cb) {
            localeData.intervalFallbackFormat = intervalFormatFallbackNode.text();
         }
 
-        document.find("/ldml/dates/calendars/calendar[\@type='gregorian']/dateTimeFormats/intervalFormats/intervalFormatItem").forEach(function (intervalFormatNode) {
+        document.find("/ldml/dates/calendars/calendar[@type='gregorian']/dateTimeFormats/intervalFormats/intervalFormatItem").forEach(function (intervalFormatNode) {
            localeData.intervalFormats = localeData.intervalFormats || {};
            var intervalFormat = {};
            intervalFormatNode.childNodes().forEach(function (greatestDifferenceNode) {
@@ -319,41 +319,11 @@ seq(Object.keys(doExtractByLocaleId))
                     statementAsts.push(['return', ['string', 'other']]);
                     var functionAst = ['function', null, ['n'], statementAsts];
                     localeDataByLocaleId[localeId].getQuantity = new Function("n", uglifyJs.uglify.gen_code(['toplevel', statementAsts]));
-//                    console.warn(localeDataByLocaleId[localeId].getQuantity.toString().replace(/^function anonymous/, 'function'));
                 }
             });
             cb();
         }));
     })
-/*
-
-    for my $locale (sub_locales $target_locale) {
-        die "No plural rules found for locale $target_locale" if $locale eq 'root';
-
-        # For some reason XML::XPath doesn't support the tokenize function, so the NMTOKEN matching code is "slightly" ugly:
-
-        my $match_locales_xpath_expr = qq{
-            \@locales = '$locale' or
-            starts-with(\@locales, '$locale ') or
-            contains(\@locales, ' $locale ') or
-            (contains(\@locales, ' $locale') and substring-after(\@locales, ' $locale') = '')
-        };
-
-        if (my @plural_rules_nodes = $plurals_xpath->findnodes("/supplementalData/plurals/pluralRules[$match_locales_xpath_expr]")) {
-            my $function_body = '';
-            my %if_statements;
-            for my $plural_rule_node ($plural_rules_nodes[0]->findnodes("pluralRule")) {
-                $function_body .= "\tif (".CLDRPluralRule->new($plural_rule_node->string_value())->to_javascript_condition('n').") {\n".
-                    "\t\treturn '".$plural_rule_node->getAttribute('count')."';\n".
-                    "\t}\n";
-            }
-            $function_body .= "\treturn 'other';\n";
-            $locale_data{$target_locale}->{'getQuantityCode'} = "function (n) {\n".$function_body."}";
-            last;
-        }
-    }
-*/
-
 
     .seq(function () {
         timeZoneIds.forEach(function (timeZoneId) {
