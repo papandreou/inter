@@ -159,7 +159,6 @@ function getLocaleData(localeId, cb) {
             localeData.monthNames[context][width][monthNo] = localeData.monthNames[context][width][monthNo] || monthNode.text();
         });
 
-
         localeData.dayNames = {};
         var dayNoByCldrId = {sun: 0, mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6};
         document.find("/ldml/dates/calendars/calendar[@type='gregorian']/days/dayContext/dayWidth/day").forEach(function (dayNode) {
@@ -169,6 +168,12 @@ function getLocaleData(localeId, cb) {
             localeData.dayNames[context] = localeData.dayNames[context] || {};
             localeData.dayNames[context][width] = localeData.dayNames[context][width] || [];
             localeData.dayNames[context][width][dayNo] = localeData.dayNames[context][width][dayNo] || dayNode.text();
+        });
+
+        localeData.fieldDisplayNames = {};
+        document.find("/ldml/dates/calendars/calendar[@type='gregorian']/fields/field/displayName").forEach(function (fieldDisplayNameNode) {
+            var fieldName = fieldDisplayNameNode.parent().attr('type').value();
+            localeData.fieldDisplayNames[fieldName] = localeData.fieldDisplayNames[fieldName] || fieldDisplayNameNode.text();
         });
 
         ['date', 'time'].forEach(function (dateOrTime) {
@@ -183,7 +188,6 @@ function getLocaleData(localeId, cb) {
         });
 
         localeData.dateTimePatterns = {};
-
         document.find("/ldml/dates/calendars/calendar[@type='gregorian']/dateTimeFormats/dateTimeFormatLength").forEach(function (dateTimeFormatLengthNode) {
             var dateTimeFormatType = dateTimeFormatLengthNode.attr('type').value(),
                 patternNodes = dateTimeFormatLengthNode.find("dateTimeFormat/pattern");
