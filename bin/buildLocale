@@ -110,19 +110,20 @@ function getLocaleData(localeId, cb) {
         document.find('//languages/language').forEach(function (node) {
             var localeId = node.attr('type').value();
             if (isTargetLocaleById[localeId]) {
-                localeData.localeDisplayNames[localeId] = node.text();
+                localeData.localeDisplayNames[localeId] = localeData.localeDisplayNames[localeId] || node.text();
             }
         });
 
         localeData.relativeDayDisplay = {};
-        document.find("/ldml/dates/calendars/calendar[\@type='gregorian']/fields/field[\@type = 'day']/relative").forEach(function (relativeNode) {
-            localeData.relativeDayDisplay[relativeNode.attr('type').value()] = relativeNode.text();
+        document.find("/ldml/dates/calendars/calendar[@type='gregorian']/fields/field[@type = 'day']/relative").forEach(function (relativeNode) {
+            var type = relativeNode.attr('type').value();
+            localeData.relativeDayDisplay[type] = localeData.relativeDayDisplay[type] || relativeNode.text();
         });
 
         localeData.numberSymbols = {};
         ['decimal', 'group', 'percentSign'].forEach(function (numberSymbolName) {
             document.find("/ldml/numbers/symbols/" + numberSymbolName).forEach(function (numberSymbolNode) {
-                localeData.numberSymbols[numberSymbolName] = numberSymbolNode.text();
+                localeData.numberSymbols[numberSymbolName] = localeData.numberSymbols[numberSymbolName] || numberSymbolNode.text();
             });
         });
 
@@ -133,7 +134,8 @@ function getLocaleData(localeId, cb) {
                 context = monthNode.parent().parent().attr('type').value().replace(/-/g, '');
             localeData.monthNames[context] = localeData.monthNames[context] || {};
             localeData.monthNames[context][width] = localeData.monthNames[context][width] || [];
-            localeData.monthNames[context][width][parseInt(monthNode.attr('type').value(), 10) - 1] = monthNode.text();
+            var monthNo = parseInt(monthNode.attr('type').value(), 10) - 1;
+            localeData.monthNames[context][width][monthNo] = localeData.monthNames[context][width][monthNo] || monthNode.text();
         });
 
         localeData.dayNames = {};
@@ -151,7 +153,7 @@ function getLocaleData(localeId, cb) {
                 }[dayNode.attr('type').value()];
             localeData.dayNames[context] = localeData.dayNames[context] || {};
             localeData.dayNames[context][width] = localeData.dayNames[context][width] || [];
-            localeData.dayNames[context][width][dayNo] = dayNode.text();
+            localeData.dayNames[context][width][dayNo] = localeData.dayNames[context][width][dayNo] || dayNode.text();
         });
 
         ['date', 'time'].forEach(function (dateOrTime) {
@@ -161,7 +163,7 @@ function getLocaleData(localeId, cb) {
             localeData.dateFormats.basic = localeData.dateFormats.basic || {};
             document.find("/ldml/dates/calendars/calendar[@type='gregorian']/" + dateOrTime + "Formats/" + dateOrTime + "FormatLength/" + dateOrTime + "Format/pattern").forEach(function (formatNode) {
                 var type = formatNode.parent().parent().attr('type').value();
-                localeData.dateFormats.basic[type + dateOrTimeCapitalized] = formatNode.text();
+                localeData.dateFormats.basic[type + dateOrTimeCapitalized] = localeData.dateFormats.basic[type + dateOrTimeCapitalized] || formatNode.text();
             });
         });
 
@@ -173,19 +175,19 @@ function getLocaleData(localeId, cb) {
             if (patternNodes.length !== 1) {
                 throw new Error('Expected exactly one dateTimeFormat/pattern in $date_time_format_length_node');
             }
-            localeData.dateTimePatterns[dateTimeFormatType] = patternNodes[0].text();
+            localeData.dateTimePatterns[dateTimeFormatType] = localeData.dateTimePatterns[dateTimeFormatType] || patternNodes[0].text();
         });
 
-        var dateTimeDefaultLengthNode = document.find("/ldml/dates/calendars/calendar[@type='gregorian']/dateTimeFormats/default")[0];
+        var dateTimeDefaultLengthNode = document.get("/ldml/dates/calendars/calendar[@type='gregorian']/dateTimeFormats/default");
         if (dateTimeDefaultLengthNode) {
-           localeData.defaultDateTimePatternName = dateTimeDefaultLengthNode.attr('choice').value();
+            localeData.defaultDateTimePatternName = dateTimeDefaultLengthNode.attr('choice').value();
         }
 
         document.find("/ldml/dates/calendars/calendar[@type='gregorian']/dateTimeFormats/availableFormats/dateFormatItem").forEach(function (dateTimeFormatNode) {
            localeData.dateFormats.cldr = localeData.dateFormats.cldr || {};
-           localeData.dateFormats.cldr[dateTimeFormatNode.attr('id').value()] = dateTimeFormatNode.text();
+           var id = dateTimeFormatNode.attr('id').value();
+           localeData.dateFormats.cldr[id] = localeData.dateFormats.cldr[id] || dateTimeFormatNode.text();
         });
-
 
         var intervalFormatFallbackNode = document.get("/ldml/dates/calendars/calendar[@type='gregorian']/dateTimeFormats/intervalFormats/intervalFormatFallback");
         if (intervalFormatFallbackNode) {
@@ -201,9 +203,11 @@ function getLocaleData(localeId, cb) {
                    // Skip whitespace nodes
                    return;
                }
-               intervalFormat[idAttribute.value()] = greatestDifferenceNode.text();
+               var id = idAttribute.value();
+               intervalFormat[id] = intervalFormat[id] || greatestDifferenceNode.text();
            });
-           localeData.intervalFormats[intervalFormatNode.attr('id').value()] = intervalFormat;
+           var id = intervalFormatNode.attr('id').value();
+           localeData.intervalFormats[id] = intervalFormat;
         });
 
         // Extract unit patterns:
@@ -212,13 +216,15 @@ function getLocaleData(localeId, cb) {
             document.find("/ldml/units/unit[@type='" + unit + "']/unitPattern").forEach(function (unitPatternNode) {
                 localeData.units = localeData.units || {};
                 localeData.units[unit] = localeData.units[unit] || {};
-                localeData.units[unit][unitPatternNode.attr('count').value()] = unitPatternNode.text();
+                var count = unitPatternNode.attr('count').value();
+                localeData.units[unit][count] = localeData.units[unit][count] || unitPatternNode.text();
             });
         });
 
         document.find("/ldml/listPatterns/listPattern/listPatternPart").forEach(function (listPatternPartNode) {
             localeData.listPatterns = localeData.listPatterns || {};
-            localeData.listPatterns[listPatternPartNode.attr('type').value()] = listPatternPartNode.text();
+            var type = listPatternPartNode.attr('type').value();
+            localeData.listPatterns[type] = localeData.listPatterns[type] || listPatternPartNode.text();
         });
 
         localeData.timeZoneDisplayNames = {};
@@ -241,14 +247,15 @@ function getLocaleData(localeId, cb) {
                 }
             }
             if (tzNameLocale) {
-                localeData.timeZoneDisplayNames[timeZoneId] = tzNameLocale;
+                localeData.timeZoneDisplayNames[timeZoneId] = localeData.timeZoneDisplayNames[timeZoneId] || tzNameLocale;
             }
         });
 
         localeData.territoryDisplayNames = {};
 
         document.find("/ldml/localeDisplayNames/territories/territory").forEach(function (territoryNode) {
-            localeData.territoryDisplayNames[territoryNode.attr('type').value()] = territoryNode.text();
+            var territoryId = territoryNode.attr('type').value();
+            localeData.territoryDisplayNames[territoryId] = localeData.territoryDisplayNames[territoryId] || territoryNode.text();
         });
 
         cb(null, localeData);
