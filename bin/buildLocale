@@ -393,20 +393,18 @@ seq(Object.keys(doExtractByLocaleId))
         this();
     })
     .seq(function () {
-        var statementAsts = [
-            ["var",[["LOCALEID",["dot",["name","one"],"localeId"]]]]
-        ];
+        var statementAsts = [];
         targetLocaleIds.forEach(function (targetLocaleId) {
             statementAsts.push(['if',
-                                 ['binary', '===', ['name', 'LOCALEID'], ['string', targetLocaleId]],
-                                 ['block',
-                                     Object.keys(localeDataByTargetLocaleId[targetLocaleId]).map(function (propertyName) {
-                                         return ['stat',
-                                             ['assign', true, ['dot', ['dot', ['name', 'one'], 'locale'], propertyName], uglifyAst.objToAst(localeDataByTargetLocaleId[targetLocaleId][propertyName])]
-                                         ];
-                                     })
-                                 ]
-                                ]);
+                                ['binary', '===', ['name', 'LOCALEID'], ['string', targetLocaleId]],
+                                ['block',
+                                    Object.keys(localeDataByTargetLocaleId[targetLocaleId]).map(function (propertyName) {
+                                        return ['stat',
+                                            ['assign', true, ['dot', ['dot', ['name', 'one'], 'locale'], propertyName], uglifyAst.objToAst(localeDataByTargetLocaleId[targetLocaleId][propertyName])]
+                                        ];
+                                    })
+                                ]
+                               ]);
         });
         var javaScriptString = fs.readFileSync(Path.resolve(__dirname, '../lib/locale.js'), 'utf-8') +
                                uglifyJs.uglify.gen_code(['toplevel', statementAsts], {beautify: true});
