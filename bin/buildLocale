@@ -363,7 +363,7 @@ seq(Object.keys(doExtractByLocaleId))
                 var utcStandardOffsetSeconds = utcStandardOffsetSecondsByTimeZoneId[timeZoneId];
                 return {
                     id: timeZoneId,
-                    utcOffsetSeconds: utcStandardOffsetSeconds,
+                    utcStandardOffsetSeconds: utcStandardOffsetSeconds,
                     displayName: localeData.timeZoneDisplayNames[timeZoneId],
                     territoryId: territoryIdByTimeZoneId[timeZoneId]
                 };
