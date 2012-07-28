@@ -369,7 +369,8 @@ seq(Object.keys(doExtractByLocaleId))
                 };
             }).sort(function (a, b) {
                 return ((typeof b.utcStandardOffsetSeconds === 'number') - (typeof a.utcStandardOffsetSeconds === 'number')) ||
-                    a.utcStandardOffsetSeconds - b.utcStandardOffsetSeconds;
+                    a.utcStandardOffsetSeconds - b.utcStandardOffsetSeconds ||
+                    (a.displayName < b.displayName ? -1 : (b.displayName < a.displayName ? 1 : 0));
             });
 
             localeData.territoryInfo = Object.keys(localeData.territoryDisplayNames).sort().map(function (territoryId) {
