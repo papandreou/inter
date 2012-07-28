@@ -357,8 +357,8 @@ seq(Object.keys(doExtractByLocaleId))
             });
             var localeData = cjson.extend.apply(cjson, [true, {}].concat(localeDatasInPrioritizedOrder.reverse()));
 
-            localeData.timeZoneInfo = Object.keys(localeData.timeZoneDisplayNames).sort(function (a, b) {
-                return utcStandardOffsetSecondsByTimeZoneId[a] - utcStandardOffsetSecondsByTimeZoneId[b];
+            localeData.timeZoneInfo = Object.keys(localeData.timeZoneDisplayNames).filter(function (timeZoneId) {
+                return timeZoneId in utcStandardOffsetSecondsByTimeZoneId && timeZoneId in territoryIdByTimeZoneId;
             }).map(function (timeZoneId) {
                 var utcStandardOffsetSeconds = utcStandardOffsetSecondsByTimeZoneId[timeZoneId];
                 return {
@@ -367,6 +367,9 @@ seq(Object.keys(doExtractByLocaleId))
                     displayName: localeData.timeZoneDisplayNames[timeZoneId],
                     territoryId: territoryIdByTimeZoneId[timeZoneId]
                 };
+            }).sort(function (a, b) {
+                return ((typeof b.utcStandardOffsetSeconds === 'number') - (typeof a.utcStandardOffsetSeconds === 'number')) ||
+                    a.utcStandardOffsetSeconds - b.utcStandardOffsetSeconds;
             });
 
             localeData.territoryInfo = Object.keys(localeData.territoryDisplayNames).sort().map(function (territoryId) {
