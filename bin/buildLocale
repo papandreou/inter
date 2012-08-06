@@ -342,9 +342,7 @@ seq(Object.keys(doExtractByLocaleId))
             });
             cb();
         }));
-    })
 
-    .seq(function () {
         timeZoneIds.forEach(function (timeZoneId) {
             localeDataByLocaleId.root.timeZoneDisplayNames = localeDataByLocaleId.root.timeZoneDisplayNames || {};
             if (!(timeZoneId in localeDataByLocaleId.root.timeZoneDisplayNames)) {
@@ -355,48 +353,54 @@ seq(Object.keys(doExtractByLocaleId))
             var localeDatasInPrioritizedOrder = expandLocaleIdToPrioritizedList(targetLocaleId).concat(['root']).map(function (localeId) {
                 return localeDataByLocaleId[localeId];
             });
+
             var localeData = cjson.extend.apply(cjson, [true, {}].concat(localeDatasInPrioritizedOrder.reverse()));
 
-            localeData.timeZoneInfo = Object.keys(localeData.timeZoneDisplayNames).filter(function (timeZoneId) {
-                return timeZoneId in utcStandardOffsetSecondsByTimeZoneId && timeZoneId in territoryIdByTimeZoneId;
-            }).map(function (timeZoneId) {
-                var utcStandardOffsetSeconds = utcStandardOffsetSecondsByTimeZoneId[timeZoneId];
-                return {
-                    id: timeZoneId,
-                    utcStandardOffsetSeconds: utcStandardOffsetSeconds,
-                    displayName: localeData.timeZoneDisplayNames[timeZoneId],
-                    territoryId: territoryIdByTimeZoneId[timeZoneId]
-                };
-            }).sort(function (a, b) {
-                return ((typeof b.utcStandardOffsetSeconds === 'number') - (typeof a.utcStandardOffsetSeconds === 'number')) ||
-                    a.utcStandardOffsetSeconds - b.utcStandardOffsetSeconds ||
-                    (a.displayName < b.displayName ? -1 : (b.displayName < a.displayName ? 1 : 0));
-            });
+            if (localeData.timeZoneDisplayNames) {
+                localeData.timeZoneInfo = Object.keys(localeData.timeZoneDisplayNames).filter(function (timeZoneId) {
+                    return timeZoneId in utcStandardOffsetSecondsByTimeZoneId && timeZoneId in territoryIdByTimeZoneId;
+                }).map(function (timeZoneId) {
+                    var utcStandardOffsetSeconds = utcStandardOffsetSecondsByTimeZoneId[timeZoneId];
+                    return {
+                        id: timeZoneId,
+                        utcStandardOffsetSeconds: utcStandardOffsetSeconds,
+                        displayName: localeData.timeZoneDisplayNames[timeZoneId],
+                        territoryId: territoryIdByTimeZoneId[timeZoneId]
+                    };
+                }).sort(function (a, b) {
+                    return ((typeof b.utcStandardOffsetSeconds === 'number') - (typeof a.utcStandardOffsetSeconds === 'number')) ||
+                        a.utcStandardOffsetSeconds - b.utcStandardOffsetSeconds ||
+                        (a.displayName < b.displayName ? -1 : (b.displayName < a.displayName ? 1 : 0));
+                });
+                delete localeData.timeZoneDisplayNames;
+            }
 
-            localeData.territoryInfo = Object.keys(localeData.territoryDisplayNames).sort().map(function (territoryId) {
-                return {
-                    id: territoryId,
-                    displayName: localeData.territoryDisplayNames[territoryId],
-                    hasTimeZones: numTimeZonesByTerritoryId[territoryId] > 0
-                };
-            });
+            if (localeData.territoryDisplayNames) {
+                localeData.territoryInfo = Object.keys(localeData.territoryDisplayNames).sort().map(function (territoryId) {
+                    return {
+                        id: territoryId,
+                        displayName: localeData.territoryDisplayNames[territoryId],
+                        hasTimeZones: numTimeZonesByTerritoryId[territoryId] > 0
+                    };
+                });
+                delete localeData.territoryDisplayNames;
+            }
 
-            localeData.defaultDateTimePattern = localeData.dateTimePatterns[localeData.defaultDateTimePatternName];
+            if (localeData.dateTimePatterns && localeData.defaultDateTimePatternName) {
+                localeData.defaultDateTimePattern = localeData.dateTimePatterns[localeData.defaultDateTimePatternName];
+            }
 
-            ['short', 'medium', 'long', 'full'].forEach(function (length) {
-               localeData.dateFormats.basic[length + 'DateTime'] = localeData.dateTimePatterns[length]
-                   .replace(/\{0\}/g, localeData.dateFormats.basic[length + 'Time'])
-                   .replace(/\{1\}/g, localeData.dateFormats.basic[length + 'Date']);
-            });
-
+            if (localeData.dateFormats) {
+                ['short', 'medium', 'long', 'full'].forEach(function (length) {
+                   localeData.dateFormats.basic[length + 'DateTime'] = localeData.dateTimePatterns[length]
+                       .replace(/\{0\}/g, localeData.dateFormats.basic[length + 'Time'])
+                       .replace(/\{1\}/g, localeData.dateFormats.basic[length + 'Date']);
+                });
+            }
             delete localeData.dateTimePatterns;
-            delete localeData.timeZoneDisplayNames;
-            delete localeData.territoryDisplayNames;
             localeDataByTargetLocaleId[targetLocaleId] = localeData;
         });
-        this();
-    })
-    .seq(function () {
+
         var statementAsts = [];
         targetLocaleIds.forEach(function (targetLocaleId) {
             statementAsts.push(['if',
