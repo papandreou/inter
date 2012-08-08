@@ -154,7 +154,7 @@ function getLocaleData(localeId, cb) {
             var context = monthNode.parent().parent().attr('type').value().replace(/-/g, ''),
                 width = monthNode.parent().attr('type').value().replace(/-/g, '');
             localeData.monthNames[context] = localeData.monthNames[context] || {};
-            localeData.monthNames[context][width] = localeData.monthNames[context][width] || [];
+            localeData.monthNames[context][width] = localeData.monthNames[context][width] || {};
             var monthNo = parseInt(monthNode.attr('type').value(), 10) - 1;
             localeData.monthNames[context][width][monthNo] = localeData.monthNames[context][width][monthNo] || monthNode.text();
         });
@@ -166,7 +166,7 @@ function getLocaleData(localeId, cb) {
                 context = dayNode.parent().parent().attr('type').value().replace(/-/g, ''),
                 dayNo = dayNoByCldrId[dayNode.attr('type').value()];
             localeData.dayNames[context] = localeData.dayNames[context] || {};
-            localeData.dayNames[context][width] = localeData.dayNames[context][width] || [];
+            localeData.dayNames[context][width] = localeData.dayNames[context][width] || {};
             localeData.dayNames[context][width][dayNo] = localeData.dayNames[context][width][dayNo] || dayNode.text();
         });
 
@@ -356,6 +356,25 @@ seq(Object.keys(doExtractByLocaleId))
 
             var localeData = cjson.extend.apply(cjson, [true, {}].concat(localeDatasInPrioritizedOrder.reverse()));
 
+            // Convert localeData.(day|Month)Names.<context>.<width> from objects to arrays:
+            ['day', 'month'].forEach(function (dayOrMonth) {
+                if ((dayOrMonth + 'Names') in localeData) {
+                    Object.keys(localeData[dayOrMonth + 'Names']).forEach(function (context) {
+                        Object.keys(localeData[dayOrMonth + 'Names'][context]).forEach(function (width) {
+                            var dayOrMonthArray = new Array(dayOrMonth === 'day' ? 7 : 12);
+                            Object.keys(localeData[dayOrMonth + 'Names'][context][width]).forEach(function (dayOrMonthNoStr) {
+                                dayOrMonthArray[parseInt(dayOrMonthNoStr, 10)] = localeData[dayOrMonth + 'Names'][context][width][dayOrMonthNoStr];
+                            });
+                            localeData[dayOrMonth + 'Names'][context][width] = dayOrMonthArray;
+                            // Convert undefined to null so UglifyJS doesn't barf (some versions of CLDR are buggy):
+                            for (var i = 0 ; i < dayOrMonthArray.length ; i += 1) {
+                                localeData[dayOrMonth + 'Names'][context][width][i] = localeData[dayOrMonth + 'Names'][context][width][i] || null;
+                            }
+                        });
+                    });
+                }
+            });
+
             if (localeData.timeZoneDisplayNames) {
                 localeData.timeZoneInfo = Object.keys(localeData.timeZoneDisplayNames).filter(function (timeZoneId) {
                     return timeZoneId in utcStandardOffsetSecondsByTimeZoneId && timeZoneId in territoryIdByTimeZoneId;
@@ -414,6 +433,7 @@ seq(Object.keys(doExtractByLocaleId))
                                 ]
                                ]);
         });
+
         var javaScriptString = fs.readFileSync(Path.resolve(__dirname, '../lib/locale.js'), 'utf-8') +
                                uglifyJs.uglify.gen_code(['toplevel', statementAsts], {beautify: true});
         if ('o' in commandLineOptions) {
