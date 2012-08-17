@@ -375,6 +375,16 @@ seq(Object.keys(doExtractByLocaleId))
                 }
             });
 
+            if (localeData.localeDisplayNames) {
+                localeData.localeInfo = Object.keys(localeData.localeDisplayNames).map(function (localeId) {
+                    return {
+                        displayName: localeData.localeDisplayNames[localeId],
+                        localeId: localeId
+                    };
+                });
+                delete localeData.localeDisplayNames;
+            }
+
             if (localeData.timeZoneDisplayNames) {
                 localeData.timeZoneInfo = Object.keys(localeData.timeZoneDisplayNames).filter(function (timeZoneId) {
                     return timeZoneId in utcStandardOffsetSecondsByTimeZoneId && timeZoneId in territoryIdByTimeZoneId;
