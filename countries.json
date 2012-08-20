@@ -1,0 +1,2762 @@
+[
+    {
+        "numericCode": "001",
+        "displayName": "World",
+        "longDisplayName": "World",
+        "alpha3Code": null,
+        "alpha2Code": null,
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": true
+    },
+    {
+        "numericCode": "002",
+        "displayName": "Africa",
+        "longDisplayName": null,
+        "alpha3Code": null,
+        "alpha2Code": null,
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": true
+    },
+    {
+        "numericCode": "004",
+        "displayName": "Afghanistan",
+        "longDisplayName": "the Islamic Republic of Afghanistan",
+        "alpha3Code": "AFG",
+        "alpha2Code": "AF",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "005",
+        "displayName": "South America",
+        "longDisplayName": null,
+        "alpha3Code": null,
+        "alpha2Code": null,
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": true
+    },
+    {
+        "numericCode": "008",
+        "displayName": "Albania",
+        "longDisplayName": "the Republic of Albania",
+        "alpha3Code": "ALB",
+        "alpha2Code": "AL",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "009",
+        "displayName": "Oceania",
+        "longDisplayName": null,
+        "alpha3Code": null,
+        "alpha2Code": null,
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": true
+    },
+    {
+        "numericCode": "010",
+        "displayName": "Antarctica",
+        "longDisplayName": null,
+        "alpha3Code": "ATA",
+        "alpha2Code": "AQ",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "011",
+        "displayName": "Western Africa",
+        "longDisplayName": null,
+        "alpha3Code": null,
+        "alpha2Code": null,
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": true
+    },
+    {
+        "numericCode": "012",
+        "displayName": "Algeria",
+        "longDisplayName": "the People’s Democratic Republic of Algeria",
+        "alpha3Code": "DZA",
+        "alpha2Code": "DZ",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "013",
+        "displayName": "Central America",
+        "longDisplayName": null,
+        "alpha3Code": null,
+        "alpha2Code": null,
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": true
+    },
+    {
+        "numericCode": "014",
+        "displayName": "Eastern Africa",
+        "longDisplayName": null,
+        "alpha3Code": null,
+        "alpha2Code": null,
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": true
+    },
+    {
+        "numericCode": "015",
+        "displayName": "Northern Africa",
+        "longDisplayName": null,
+        "alpha3Code": null,
+        "alpha2Code": null,
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": true
+    },
+    {
+        "numericCode": "016",
+        "displayName": "American Samoa",
+        "longDisplayName": null,
+        "alpha3Code": "ASM",
+        "alpha2Code": "AS",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "017",
+        "displayName": "Middle Africa",
+        "longDisplayName": null,
+        "alpha3Code": null,
+        "alpha2Code": null,
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": true
+    },
+    {
+        "numericCode": "018",
+        "displayName": "Southern Africa",
+        "longDisplayName": null,
+        "alpha3Code": null,
+        "alpha2Code": null,
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": true
+    },
+    {
+        "numericCode": "019",
+        "displayName": "Americas",
+        "longDisplayName": null,
+        "alpha3Code": null,
+        "alpha2Code": null,
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": true
+    },
+    {
+        "numericCode": "020",
+        "displayName": "Andorra",
+        "longDisplayName": "the Principality of Andorra",
+        "alpha3Code": "AND",
+        "alpha2Code": "AD",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "021",
+        "displayName": "Northern America",
+        "longDisplayName": null,
+        "alpha3Code": null,
+        "alpha2Code": null,
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": true
+    },
+    {
+        "numericCode": "024",
+        "displayName": "Angola",
+        "longDisplayName": "the Republic of Angola",
+        "alpha3Code": "AGO",
+        "alpha2Code": "AO",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "028",
+        "displayName": "Antigua and Barbuda",
+        "longDisplayName": null,
+        "alpha3Code": "ATG",
+        "alpha2Code": "AG",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "029",
+        "displayName": "Carribbean",
+        "longDisplayName": null,
+        "alpha3Code": null,
+        "alpha2Code": null,
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": true
+    },
+    {
+        "numericCode": "030",
+        "displayName": "Eastern Asia",
+        "longDisplayName": null,
+        "alpha3Code": null,
+        "alpha2Code": null,
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": true
+    },
+    {
+        "numericCode": "031",
+        "displayName": "Azerbaijan",
+        "longDisplayName": "the Republic of Azerbaijan",
+        "alpha3Code": "AZE",
+        "alpha2Code": "AZ",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "032",
+        "displayName": "Argentina",
+        "longDisplayName": "the Argentine Republic",
+        "alpha3Code": "ARG",
+        "alpha2Code": "AR",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "034",
+        "displayName": "Southern Asia",
+        "longDisplayName": null,
+        "alpha3Code": null,
+        "alpha2Code": null,
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": true
+    },
+    {
+        "numericCode": "035",
+        "displayName": "South-Eastern Asia",
+        "longDisplayName": null,
+        "alpha3Code": null,
+        "alpha2Code": null,
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": true
+    },
+    {
+        "numericCode": "036",
+        "displayName": "Australia",
+        "longDisplayName": "the Commonwealth of Australia",
+        "alpha3Code": "AUS",
+        "alpha2Code": "AU",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "039",
+        "displayName": "Southern Europe",
+        "longDisplayName": null,
+        "alpha3Code": null,
+        "alpha2Code": null,
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": true
+    },
+    {
+        "numericCode": "040",
+        "displayName": "Austria",
+        "longDisplayName": "the Republic of Austria",
+        "alpha3Code": "AUT",
+        "alpha2Code": "AT",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "044",
+        "displayName": "Bahamas (The)",
+        "longDisplayName": "the Commonwealth of The Bahamas",
+        "alpha3Code": "BHS",
+        "alpha2Code": "BS",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "048",
+        "displayName": "Bahrain",
+        "longDisplayName": "the Kingdom of Bahrain",
+        "alpha3Code": "BHR",
+        "alpha2Code": "BH",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "050",
+        "displayName": "Bangladesh",
+        "longDisplayName": "the People’s Republic of Bangladesh",
+        "alpha3Code": "BGD",
+        "alpha2Code": "BD",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "051",
+        "displayName": "Armenia",
+        "longDisplayName": "the Republic of Armenia",
+        "alpha3Code": "ARM",
+        "alpha2Code": "AM",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "052",
+        "displayName": "Barbados",
+        "longDisplayName": null,
+        "alpha3Code": "BRB",
+        "alpha2Code": "BB",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "053",
+        "displayName": "Australia and New Zealand",
+        "longDisplayName": null,
+        "alpha3Code": null,
+        "alpha2Code": null,
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": true
+    },
+    {
+        "numericCode": "054",
+        "displayName": "Melanesia",
+        "longDisplayName": null,
+        "alpha3Code": null,
+        "alpha2Code": null,
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": true
+    },
+    {
+        "numericCode": "056",
+        "displayName": "Belgium",
+        "longDisplayName": "the Kingdom of Belgium",
+        "alpha3Code": "BEL",
+        "alpha2Code": "BE",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "057",
+        "displayName": "Micronesia",
+        "longDisplayName": null,
+        "alpha3Code": null,
+        "alpha2Code": null,
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": true
+    },
+    {
+        "numericCode": "060",
+        "displayName": "Bermuda",
+        "longDisplayName": null,
+        "alpha3Code": "BMU",
+        "alpha2Code": "BM",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "061",
+        "displayName": "Polynesia",
+        "longDisplayName": null,
+        "alpha3Code": null,
+        "alpha2Code": null,
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": true
+    },
+    {
+        "numericCode": "064",
+        "displayName": "Bhutan",
+        "longDisplayName": "the Kingdom of Bhutan",
+        "alpha3Code": "BTN",
+        "alpha2Code": "BT",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "068",
+        "displayName": "Bolivia",
+        "longDisplayName": "the Republic of Bolivia",
+        "alpha3Code": "BOL",
+        "alpha2Code": "BO",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "070",
+        "displayName": "Bosnia and Herzegovina",
+        "longDisplayName": null,
+        "alpha3Code": "BIH",
+        "alpha2Code": "BA",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "072",
+        "displayName": "Botswana",
+        "longDisplayName": "the Republic of Botswana",
+        "alpha3Code": "BWA",
+        "alpha2Code": "BW",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "074",
+        "displayName": "Bouvet Island",
+        "longDisplayName": null,
+        "alpha3Code": "BVT",
+        "alpha2Code": "BV",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "076",
+        "displayName": "Brazil",
+        "longDisplayName": "the Federative Republic of Brazil",
+        "alpha3Code": "BRA",
+        "alpha2Code": "BR",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "084",
+        "displayName": "Belize",
+        "longDisplayName": null,
+        "alpha3Code": "BLZ",
+        "alpha2Code": "BZ",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "086",
+        "displayName": "British Indian Ocean Territory (the)",
+        "longDisplayName": null,
+        "alpha3Code": "IOT",
+        "alpha2Code": "IO",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "090",
+        "displayName": "Solomon Islands (the)",
+        "longDisplayName": null,
+        "alpha3Code": "SLB",
+        "alpha2Code": "SB",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "092",
+        "displayName": "Virgin Islands (British)",
+        "longDisplayName": "British Virgin Islands",
+        "alpha3Code": "VGB",
+        "alpha2Code": "VG",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "096",
+        "displayName": "Brunei Darussalam",
+        "longDisplayName": "Brunei Darussalam (GB form); Negara Brunei Darussalam (US form)  ",
+        "alpha3Code": "BRN",
+        "alpha2Code": "BN",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "100",
+        "displayName": "Bulgaria",
+        "longDisplayName": "the Republic of Bulgaria",
+        "alpha3Code": "BGR",
+        "alpha2Code": "BG",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "104",
+        "displayName": "Myanmar",
+        "longDisplayName": "the Union of Myanmar",
+        "alpha3Code": "MMR",
+        "alpha2Code": "MM",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "108",
+        "displayName": "Burundi",
+        "longDisplayName": "the Republic of Burundi",
+        "alpha3Code": "BDI",
+        "alpha2Code": "BI",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "112",
+        "displayName": "Belarus",
+        "longDisplayName": "the Republic of Belarus",
+        "alpha3Code": "BLR",
+        "alpha2Code": "BY",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "116",
+        "displayName": "Cambodia",
+        "longDisplayName": "the Kingdom of Cambodia",
+        "alpha3Code": "KHM",
+        "alpha2Code": "KH",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "120",
+        "displayName": "Cameroon",
+        "longDisplayName": "the Republic of Cameroon",
+        "alpha3Code": "CMR",
+        "alpha2Code": "CM",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "124",
+        "displayName": "Canada",
+        "longDisplayName": null,
+        "alpha3Code": "CAN",
+        "alpha2Code": "CA",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "132",
+        "displayName": "Cape Verde",
+        "longDisplayName": "the Republic of Cape Verde",
+        "alpha3Code": "CPV",
+        "alpha2Code": "CV",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "136",
+        "displayName": "Cayman Islands (the)",
+        "longDisplayName": null,
+        "alpha3Code": "CYM",
+        "alpha2Code": "KY",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "140",
+        "displayName": "Central African Republic (the)",
+        "longDisplayName": "the Central African Republic",
+        "alpha3Code": "CAF",
+        "alpha2Code": "CF",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "142",
+        "displayName": "Asia",
+        "longDisplayName": null,
+        "alpha3Code": null,
+        "alpha2Code": null,
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": true
+    },
+    {
+        "numericCode": "143",
+        "displayName": "Central Asia",
+        "longDisplayName": null,
+        "alpha3Code": null,
+        "alpha2Code": null,
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": true
+    },
+    {
+        "numericCode": "144",
+        "displayName": "Sri Lanka",
+        "longDisplayName": "the Democratic Socialist Republic of Sri Lanka",
+        "alpha3Code": "LKA",
+        "alpha2Code": "LK",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "145",
+        "displayName": "Western Asia",
+        "longDisplayName": null,
+        "alpha3Code": null,
+        "alpha2Code": null,
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": true
+    },
+    {
+        "numericCode": "148",
+        "displayName": "Chad",
+        "longDisplayName": "the Republic of Chad",
+        "alpha3Code": "TCD",
+        "alpha2Code": "TD",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "150",
+        "displayName": "Europe",
+        "longDisplayName": null,
+        "alpha3Code": null,
+        "alpha2Code": null,
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": true
+    },
+    {
+        "numericCode": "151",
+        "displayName": "Eastern Europe",
+        "longDisplayName": null,
+        "alpha3Code": null,
+        "alpha2Code": null,
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": true
+    },
+    {
+        "numericCode": "152",
+        "displayName": "Chile",
+        "longDisplayName": "the Republic of Chile",
+        "alpha3Code": "CHL",
+        "alpha2Code": "CL",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "154",
+        "displayName": "Northern Europe",
+        "longDisplayName": null,
+        "alpha3Code": null,
+        "alpha2Code": null,
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": true
+    },
+    {
+        "numericCode": "155",
+        "displayName": "Western Europe",
+        "longDisplayName": null,
+        "alpha3Code": null,
+        "alpha2Code": null,
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": true
+    },
+    {
+        "numericCode": "156",
+        "displayName": "China",
+        "longDisplayName": "the People’s Republic of China",
+        "alpha3Code": "CHN",
+        "alpha2Code": "CN",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "158",
+        "displayName": "Taiwan (Province of China)",
+        "longDisplayName": null,
+        "alpha3Code": "TWN",
+        "alpha2Code": "TW",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "162",
+        "displayName": "Christmas Island",
+        "longDisplayName": null,
+        "alpha3Code": "CXR",
+        "alpha2Code": "CX",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "166",
+        "displayName": "Cocos (Keeling) Islands (the)",
+        "longDisplayName": null,
+        "alpha3Code": "CCK",
+        "alpha2Code": "CC",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "170",
+        "displayName": "Colombia",
+        "longDisplayName": "the Republic of Colombia",
+        "alpha3Code": "COL",
+        "alpha2Code": "CO",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "174",
+        "displayName": "Comoros",
+        "longDisplayName": "the Union of the Comoros",
+        "alpha3Code": "COM",
+        "alpha2Code": "KM",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "175",
+        "displayName": "Mayotte",
+        "longDisplayName": null,
+        "alpha3Code": "MYT",
+        "alpha2Code": "YT",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "178",
+        "displayName": "Congo",
+        "longDisplayName": "the Republic of the Congo",
+        "alpha3Code": "COG",
+        "alpha2Code": "CG",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "180",
+        "displayName": "Congo (the Democratic Republic of the)",
+        "longDisplayName": "the Democratic Republic of the Congo",
+        "alpha3Code": "COD",
+        "alpha2Code": "CD",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "184",
+        "displayName": "Cook Islands (the)",
+        "longDisplayName": null,
+        "alpha3Code": "COK",
+        "alpha2Code": "CK",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "188",
+        "displayName": "Costa Rica",
+        "longDisplayName": "the Republic of Costa Rica",
+        "alpha3Code": "CRI",
+        "alpha2Code": "CR",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "191",
+        "displayName": "Croatia",
+        "longDisplayName": "the Republic of Croatia",
+        "alpha3Code": "HRV",
+        "alpha2Code": "HR",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "192",
+        "displayName": "Cuba",
+        "longDisplayName": "the Republic of Cuba",
+        "alpha3Code": "CUB",
+        "alpha2Code": "CU",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "196",
+        "displayName": "Cyprus",
+        "longDisplayName": "the Republic of Cyprus",
+        "alpha3Code": "CYP",
+        "alpha2Code": "CY",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "200",
+        "displayName": "Czechoslovakia",
+        "longDisplayName": "the Czechoslovak Socialist Republic",
+        "alpha3Code": "CSK",
+        "alpha2Code": "CS",
+        "isIndependent": false,
+        "isHistorical": true,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "203",
+        "displayName": "Czech Republic (the)",
+        "longDisplayName": "the Czech Republic",
+        "alpha3Code": "CZE",
+        "alpha2Code": "CZ",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "204",
+        "displayName": "Benin",
+        "longDisplayName": "the Republic of Benin",
+        "alpha3Code": "BEN",
+        "alpha2Code": "BJ",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "208",
+        "displayName": "Denmark",
+        "longDisplayName": "the Kingdom of Denmark",
+        "alpha3Code": "DNK",
+        "alpha2Code": "DK",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "212",
+        "displayName": "Dominica",
+        "longDisplayName": "the Commonwealth of Dominica",
+        "alpha3Code": "DMA",
+        "alpha2Code": "DM",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "214",
+        "displayName": "Dominican Republic (the)",
+        "longDisplayName": "the Dominican Republic",
+        "alpha3Code": "DOM",
+        "alpha2Code": "DO",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "218",
+        "displayName": "Ecuador",
+        "longDisplayName": "the Republic of Ecuador",
+        "alpha3Code": "ECU",
+        "alpha2Code": "EC",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "222",
+        "displayName": "El Salvador",
+        "longDisplayName": "the Republic of El Salvador",
+        "alpha3Code": "SLV",
+        "alpha2Code": "SV",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "226",
+        "displayName": "Equatorial Guinea",
+        "longDisplayName": "the Republic of Equatorial Guinea",
+        "alpha3Code": "GNQ",
+        "alpha2Code": "GQ",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "231",
+        "displayName": "Ethiopia",
+        "longDisplayName": "the Federal Democratic Republic of Ethiopia",
+        "alpha3Code": "ETH",
+        "alpha2Code": "ET",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "232",
+        "displayName": "Eritrea",
+        "longDisplayName": null,
+        "alpha3Code": "ERI",
+        "alpha2Code": "ER",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "233",
+        "displayName": "Estonia",
+        "longDisplayName": "the Republic of Estonia",
+        "alpha3Code": "EST",
+        "alpha2Code": "EE",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "234",
+        "displayName": "Faroe Islands (the)",
+        "longDisplayName": null,
+        "alpha3Code": "FRO",
+        "alpha2Code": "FO",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "238",
+        "displayName": "Falkland Islands (the) [Malvinas]",
+        "longDisplayName": null,
+        "alpha3Code": "FLK",
+        "alpha2Code": "FK",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "239",
+        "displayName": "South Georgia and the South Sandwich Islands",
+        "longDisplayName": null,
+        "alpha3Code": "SGS",
+        "alpha2Code": "GS",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "242",
+        "displayName": "Fiji",
+        "longDisplayName": "the Republic of the Fiji Islands",
+        "alpha3Code": "FJI",
+        "alpha2Code": "FJ",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "246",
+        "displayName": "Finland",
+        "longDisplayName": "the Republic of Finland",
+        "alpha3Code": "FIN",
+        "alpha2Code": "FI",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "248",
+        "displayName": "Åland Islands",
+        "longDisplayName": null,
+        "alpha3Code": "ALA",
+        "alpha2Code": "AX",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "250",
+        "displayName": "France",
+        "longDisplayName": "the French Republic",
+        "alpha3Code": "FRA",
+        "alpha2Code": "FR",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "254",
+        "displayName": "French Guiana",
+        "longDisplayName": null,
+        "alpha3Code": "GUF",
+        "alpha2Code": "GF",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "258",
+        "displayName": "French Polynesia",
+        "longDisplayName": null,
+        "alpha3Code": "PYF",
+        "alpha2Code": "PF",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "260",
+        "displayName": "French Southern Territories (the)",
+        "longDisplayName": null,
+        "alpha3Code": "ATF",
+        "alpha2Code": "TF",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "262",
+        "displayName": "Djibouti",
+        "longDisplayName": "the Republic of Djibouti",
+        "alpha3Code": "DJI",
+        "alpha2Code": "DJ",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "266",
+        "displayName": "Gabon",
+        "longDisplayName": "the Gabonese Republic",
+        "alpha3Code": "GAB",
+        "alpha2Code": "GA",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "268",
+        "displayName": "Georgia",
+        "longDisplayName": null,
+        "alpha3Code": "GEO",
+        "alpha2Code": "GE",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "270",
+        "displayName": "Gambia (The)",
+        "longDisplayName": "the Republic of The Gambia",
+        "alpha3Code": "GMB",
+        "alpha2Code": "GM",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "275",
+        "displayName": "Palestinian Territory (the Occupied)",
+        "longDisplayName": "the Occupied Palestinian Territory",
+        "alpha3Code": "PSE",
+        "alpha2Code": "PS",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "276",
+        "displayName": "Germany",
+        "longDisplayName": "the Federal Republic of Germany",
+        "alpha3Code": "DEU",
+        "alpha2Code": "DE",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "278",
+        "displayName": "German Democratic Republic",
+        "longDisplayName": "the German Democratic Republic",
+        "alpha3Code": "DDR",
+        "alpha2Code": "DD",
+        "isIndependent": false,
+        "isHistorical": true,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "280",
+        "displayName": "Germany (the Federal Republic of)",
+        "longDisplayName": "the Federal Republic of Germany",
+        "alpha3Code": "DEU",
+        "alpha2Code": "DE",
+        "isIndependent": false,
+        "isHistorical": true,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "288",
+        "displayName": "Ghana",
+        "longDisplayName": "the Republic of Ghana",
+        "alpha3Code": "GHA",
+        "alpha2Code": "GH",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "292",
+        "displayName": "Gibraltar",
+        "longDisplayName": null,
+        "alpha3Code": "GIB",
+        "alpha2Code": "GI",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "296",
+        "displayName": "Kiribati",
+        "longDisplayName": "the Republic of Kiribati",
+        "alpha3Code": "KIR",
+        "alpha2Code": "KI",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "300",
+        "displayName": "Greece",
+        "longDisplayName": "the Hellenic Republic",
+        "alpha3Code": "GRC",
+        "alpha2Code": "GR",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "304",
+        "displayName": "Greenland",
+        "longDisplayName": null,
+        "alpha3Code": "GRL",
+        "alpha2Code": "GL",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "308",
+        "displayName": "Grenada",
+        "longDisplayName": null,
+        "alpha3Code": "GRD",
+        "alpha2Code": "GD",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "312",
+        "displayName": "Guadeloupe",
+        "longDisplayName": null,
+        "alpha3Code": "GLP",
+        "alpha2Code": "GP",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "316",
+        "displayName": "Guam",
+        "longDisplayName": null,
+        "alpha3Code": "GUM",
+        "alpha2Code": "GU",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "320",
+        "displayName": "Guatemala",
+        "longDisplayName": "the Republic of Guatemala",
+        "alpha3Code": "GTM",
+        "alpha2Code": "GT",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "324",
+        "displayName": "Guinea",
+        "longDisplayName": "the Republic of Guinea",
+        "alpha3Code": "GIN",
+        "alpha2Code": "GN",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "328",
+        "displayName": "Guyana",
+        "longDisplayName": "the Republic of Guyana",
+        "alpha3Code": "GUY",
+        "alpha2Code": "GY",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "332",
+        "displayName": "Haiti",
+        "longDisplayName": "the Republic of Haiti",
+        "alpha3Code": "HTI",
+        "alpha2Code": "HT",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "334",
+        "displayName": "Heard Island and McDonald Islands",
+        "longDisplayName": null,
+        "alpha3Code": "HMD",
+        "alpha2Code": "HM",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "336",
+        "displayName": "Holy See (the) [Vatican City State]",
+        "longDisplayName": null,
+        "alpha3Code": "VAT",
+        "alpha2Code": "VA",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "340",
+        "displayName": "Honduras",
+        "longDisplayName": "the Republic of Honduras",
+        "alpha3Code": "HND",
+        "alpha2Code": "HN",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "344",
+        "displayName": "Hong Kong",
+        "longDisplayName": "Hong Kong Special Administrative Region of China",
+        "alpha3Code": "HKG",
+        "alpha2Code": "HK",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "348",
+        "displayName": "Hungary",
+        "longDisplayName": "the Republic of Hungary",
+        "alpha3Code": "HUN",
+        "alpha2Code": "HU",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "352",
+        "displayName": "Iceland",
+        "longDisplayName": "the Republic of Iceland",
+        "alpha3Code": "ISL",
+        "alpha2Code": "IS",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "356",
+        "displayName": "India",
+        "longDisplayName": "the Republic of India",
+        "alpha3Code": "IND",
+        "alpha2Code": "IN",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "360",
+        "displayName": "Indonesia",
+        "longDisplayName": "the Republic of Indonesia",
+        "alpha3Code": "IDN",
+        "alpha2Code": "ID",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "364",
+        "displayName": "Iran (the Islamic Republic of)",
+        "longDisplayName": "the Islamic Republic of Iran",
+        "alpha3Code": "IRN",
+        "alpha2Code": "IR",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "368",
+        "displayName": "Iraq",
+        "longDisplayName": "the Republic of Iraq",
+        "alpha3Code": "IRQ",
+        "alpha2Code": "IQ",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "372",
+        "displayName": "Ireland",
+        "longDisplayName": null,
+        "alpha3Code": "IRL",
+        "alpha2Code": "IE",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "376",
+        "displayName": "Israel",
+        "longDisplayName": "the State of Israel",
+        "alpha3Code": "ISR",
+        "alpha2Code": "IL",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "380",
+        "displayName": "Italy",
+        "longDisplayName": "the Italian Republic",
+        "alpha3Code": "ITA",
+        "alpha2Code": "IT",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "384",
+        "displayName": "Côte d’Ivoire",
+        "longDisplayName": "the Republic of Côte d’Ivoire",
+        "alpha3Code": "CIV",
+        "alpha2Code": "CI",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "388",
+        "displayName": "Jamaica",
+        "longDisplayName": null,
+        "alpha3Code": "JAM",
+        "alpha2Code": "JM",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "392",
+        "displayName": "Japan",
+        "longDisplayName": null,
+        "alpha3Code": "JPN",
+        "alpha2Code": "JP",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "398",
+        "displayName": "Kazakhstan",
+        "longDisplayName": "the Republic of Kazakhstan",
+        "alpha3Code": "KAZ",
+        "alpha2Code": "KZ",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "400",
+        "displayName": "Jordan",
+        "longDisplayName": "the Hashemite Kingdom of Jordan",
+        "alpha3Code": "JOR",
+        "alpha2Code": "JO",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "404",
+        "displayName": "Kenya",
+        "longDisplayName": "the Republic of Kenya",
+        "alpha3Code": "KEN",
+        "alpha2Code": "KE",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "408",
+        "displayName": "Korea (the Democratic People’s Republic of)",
+        "longDisplayName": "the Democratic People’s Republic of Korea",
+        "alpha3Code": "PRK",
+        "alpha2Code": "KP",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "410",
+        "displayName": "Korea (the Republic of)",
+        "longDisplayName": "the Republic of Korea",
+        "alpha3Code": "KOR",
+        "alpha2Code": "KR",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "414",
+        "displayName": "Kuwait",
+        "longDisplayName": "the State of Kuwait",
+        "alpha3Code": "KWT",
+        "alpha2Code": "KW",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "417",
+        "displayName": "Kyrgyzstan",
+        "longDisplayName": "the Kyrgyz Republic",
+        "alpha3Code": "KGZ",
+        "alpha2Code": "KG",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "418",
+        "displayName": "Lao People’s Democratic Republic (the)",
+        "longDisplayName": "the Lao People’s Democratic Republic",
+        "alpha3Code": "LAO",
+        "alpha2Code": "LA",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "419",
+        "displayName": "Latin America and the Caribbean",
+        "longDisplayName": null,
+        "alpha3Code": null,
+        "alpha2Code": null,
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": true
+    },
+    {
+        "numericCode": "422",
+        "displayName": "Lebanon",
+        "longDisplayName": "the Lebanese Republic",
+        "alpha3Code": "LBN",
+        "alpha2Code": "LB",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "426",
+        "displayName": "Lesotho",
+        "longDisplayName": "the Kingdom of Lesotho",
+        "alpha3Code": "LSO",
+        "alpha2Code": "LS",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "428",
+        "displayName": "Latvia",
+        "longDisplayName": "the Republic of Latvia",
+        "alpha3Code": "LVA",
+        "alpha2Code": "LV",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "430",
+        "displayName": "Liberia",
+        "longDisplayName": "the Republic of Liberia",
+        "alpha3Code": "LBR",
+        "alpha2Code": "LR",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "434",
+        "displayName": "Libyan Arab Jamahiriya (the)",
+        "longDisplayName": "the Socialist People’s Libyan Arab Jamahiriya",
+        "alpha3Code": "LBY",
+        "alpha2Code": "LY",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "438",
+        "displayName": "Liechtenstein",
+        "longDisplayName": "the Principality of Liechtenstein",
+        "alpha3Code": "LIE",
+        "alpha2Code": "LI",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "440",
+        "displayName": "Lithuania",
+        "longDisplayName": "the Republic of Lithuania",
+        "alpha3Code": "LTU",
+        "alpha2Code": "LT",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "442",
+        "displayName": "Luxembourg",
+        "longDisplayName": "the Grand Duchy of Luxembourg",
+        "alpha3Code": "LUX",
+        "alpha2Code": "LU",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "446",
+        "displayName": "Macao",
+        "longDisplayName": "Macao Special Administrative Region of China",
+        "alpha3Code": "MAC",
+        "alpha2Code": "MO",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "450",
+        "displayName": "Madagascar",
+        "longDisplayName": "the Republic of Madagascar",
+        "alpha3Code": "MDG",
+        "alpha2Code": "MG",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "454",
+        "displayName": "Malawi",
+        "longDisplayName": "the Republic of Malawi",
+        "alpha3Code": "MWI",
+        "alpha2Code": "MW",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "458",
+        "displayName": "Malaysia",
+        "longDisplayName": null,
+        "alpha3Code": "MYS",
+        "alpha2Code": "MY",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "462",
+        "displayName": "Maldives",
+        "longDisplayName": "the Republic of Maldives",
+        "alpha3Code": "MDV",
+        "alpha2Code": "MV",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "466",
+        "displayName": "Mali",
+        "longDisplayName": "the Republic of Mali",
+        "alpha3Code": "MLI",
+        "alpha2Code": "ML",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "470",
+        "displayName": "Malta",
+        "longDisplayName": "the Republic of Malta",
+        "alpha3Code": "MLT",
+        "alpha2Code": "MT",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "474",
+        "displayName": "Martinique",
+        "longDisplayName": null,
+        "alpha3Code": "MTQ",
+        "alpha2Code": "MQ",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "478",
+        "displayName": "Mauritania",
+        "longDisplayName": "the Islamic Republic of Mauritania",
+        "alpha3Code": "MRT",
+        "alpha2Code": "MR",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "480",
+        "displayName": "Mauritius",
+        "longDisplayName": "the Republic of Mauritius",
+        "alpha3Code": "MUS",
+        "alpha2Code": "MU",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "484",
+        "displayName": "Mexico",
+        "longDisplayName": "the United Mexican States",
+        "alpha3Code": "MEX",
+        "alpha2Code": "MX",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "492",
+        "displayName": "Monaco",
+        "longDisplayName": "the Principality of Monaco",
+        "alpha3Code": "MCO",
+        "alpha2Code": "MC",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "496",
+        "displayName": "Mongolia",
+        "longDisplayName": null,
+        "alpha3Code": "MNG",
+        "alpha2Code": "MN",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "498",
+        "displayName": "Moldova (the Republic of)",
+        "longDisplayName": "the Republic of Moldova",
+        "alpha3Code": "MDA",
+        "alpha2Code": "MD",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "500",
+        "displayName": "Montserrat",
+        "longDisplayName": null,
+        "alpha3Code": "MSR",
+        "alpha2Code": "MS",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "504",
+        "displayName": "Morocco",
+        "longDisplayName": "the Kingdom of Morocco",
+        "alpha3Code": "MAR",
+        "alpha2Code": "MA",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "508",
+        "displayName": "Mozambique",
+        "longDisplayName": "the Republic of Mozambique",
+        "alpha3Code": "MOZ",
+        "alpha2Code": "MZ",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "512",
+        "displayName": "Oman",
+        "longDisplayName": "the Sultanate of Oman",
+        "alpha3Code": "OMN",
+        "alpha2Code": "OM",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "516",
+        "displayName": "Namibia",
+        "longDisplayName": "the Republic of Namibia",
+        "alpha3Code": "NAM",
+        "alpha2Code": "NA",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "520",
+        "displayName": "Nauru",
+        "longDisplayName": "the Republic of Nauru",
+        "alpha3Code": "NRU",
+        "alpha2Code": "NR",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "524",
+        "displayName": "Nepal",
+        "longDisplayName": "the Kingdom of Nepal",
+        "alpha3Code": "NPL",
+        "alpha2Code": "NP",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "528",
+        "displayName": "Netherlands (the)",
+        "longDisplayName": "the Kingdom of the Netherlands",
+        "alpha3Code": "NLD",
+        "alpha2Code": "NL",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "530",
+        "displayName": "Netherlands Antilles (the)",
+        "longDisplayName": null,
+        "alpha3Code": "ANT",
+        "alpha2Code": "AN",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "533",
+        "displayName": "Aruba",
+        "longDisplayName": null,
+        "alpha3Code": "ABW",
+        "alpha2Code": "AW",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "540",
+        "displayName": "New Caledonia",
+        "longDisplayName": null,
+        "alpha3Code": "NCL",
+        "alpha2Code": "NC",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "548",
+        "displayName": "Vanuatu",
+        "longDisplayName": "the Republic of Vanuatu",
+        "alpha3Code": "VUT",
+        "alpha2Code": "VU",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "554",
+        "displayName": "New Zealand",
+        "longDisplayName": null,
+        "alpha3Code": "NZL",
+        "alpha2Code": "NZ",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "558",
+        "displayName": "Nicaragua",
+        "longDisplayName": "the Republic of Nicaragua",
+        "alpha3Code": "NIC",
+        "alpha2Code": "NI",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "562",
+        "displayName": "Niger (the)",
+        "longDisplayName": "the Republic of the Niger",
+        "alpha3Code": "NER",
+        "alpha2Code": "NE",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "566",
+        "displayName": "Nigeria",
+        "longDisplayName": "the Federal Republic of Nigeria",
+        "alpha3Code": "NGA",
+        "alpha2Code": "NG",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "570",
+        "displayName": "Niue",
+        "longDisplayName": "the Republic of Niue",
+        "alpha3Code": "NIU",
+        "alpha2Code": "NU",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "574",
+        "displayName": "Norfolk Island",
+        "longDisplayName": null,
+        "alpha3Code": "NFK",
+        "alpha2Code": "NF",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "578",
+        "displayName": "Norway",
+        "longDisplayName": "the Kingdom of Norway",
+        "alpha3Code": "NOR",
+        "alpha2Code": "NO",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "580",
+        "displayName": "Northern Mariana Islands (the)",
+        "longDisplayName": "the Commonwealth of the Northern Mariana Islands",
+        "alpha3Code": "MNP",
+        "alpha2Code": "MP",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "581",
+        "displayName": "United States Minor Outlying Islands",
+        "longDisplayName": null,
+        "alpha3Code": "UMI",
+        "alpha2Code": "UM",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "583",
+        "displayName": "Micronesia (the Federated States of)",
+        "longDisplayName": "the Federated States of Micronesia",
+        "alpha3Code": "FSM",
+        "alpha2Code": "FM",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "584",
+        "displayName": "Marshall Islands (the)",
+        "longDisplayName": "the Republic of the Marshall Islands",
+        "alpha3Code": "MHL",
+        "alpha2Code": "MH",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "585",
+        "displayName": "Palau",
+        "longDisplayName": "the Republic of Palau",
+        "alpha3Code": "PLW",
+        "alpha2Code": "PW",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "586",
+        "displayName": "Pakistan",
+        "longDisplayName": "the Islamic Republic of Pakistan",
+        "alpha3Code": "PAK",
+        "alpha2Code": "PK",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "591",
+        "displayName": "Panama",
+        "longDisplayName": "the Republic of Panama",
+        "alpha3Code": "PAN",
+        "alpha2Code": "PA",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "598",
+        "displayName": "Papua New Guinea",
+        "longDisplayName": null,
+        "alpha3Code": "PNG",
+        "alpha2Code": "PG",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "600",
+        "displayName": "Paraguay",
+        "longDisplayName": "the Republic of Paraguay",
+        "alpha3Code": "PRY",
+        "alpha2Code": "PY",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "604",
+        "displayName": "Peru",
+        "longDisplayName": "the Republic of Peru",
+        "alpha3Code": "PER",
+        "alpha2Code": "PE",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "608",
+        "displayName": "Philippines (the)",
+        "longDisplayName": "the Republic of the Philippines",
+        "alpha3Code": "PHL",
+        "alpha2Code": "PH",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "612",
+        "displayName": "Pitcairn",
+        "longDisplayName": null,
+        "alpha3Code": "PCN",
+        "alpha2Code": "PN",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "616",
+        "displayName": "Poland",
+        "longDisplayName": "the Republic of Poland",
+        "alpha3Code": "POL",
+        "alpha2Code": "PL",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "620",
+        "displayName": "Portugal",
+        "longDisplayName": "the Portuguese Republic",
+        "alpha3Code": "PRT",
+        "alpha2Code": "PT",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "624",
+        "displayName": "Guinea-Bissau",
+        "longDisplayName": "the Republic of Guinea-Bissau",
+        "alpha3Code": "GNB",
+        "alpha2Code": "GW",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "626",
+        "displayName": "Timor-Leste",
+        "longDisplayName": "the Democratic Republic of Timor-Leste",
+        "alpha3Code": "TLS",
+        "alpha2Code": "TL",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "630",
+        "displayName": "Puerto Rico",
+        "longDisplayName": null,
+        "alpha3Code": "PRI",
+        "alpha2Code": "PR",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "634",
+        "displayName": "Qatar",
+        "longDisplayName": "the State of Qatar",
+        "alpha3Code": "QAT",
+        "alpha2Code": "QA",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "638",
+        "displayName": "Réunion",
+        "longDisplayName": null,
+        "alpha3Code": "REU",
+        "alpha2Code": "RE",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "642",
+        "displayName": "Romania",
+        "longDisplayName": null,
+        "alpha3Code": "ROU",
+        "alpha2Code": "RO",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "643",
+        "displayName": "Russian Federation (the)",
+        "longDisplayName": "the Russian Federation",
+        "alpha3Code": "RUS",
+        "alpha2Code": "RU",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "646",
+        "displayName": "Rwanda",
+        "longDisplayName": "the Republic of Rwanda",
+        "alpha3Code": "RWA",
+        "alpha2Code": "RW",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "654",
+        "displayName": "Saint Helena",
+        "longDisplayName": null,
+        "alpha3Code": "SHN",
+        "alpha2Code": "SH",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "659",
+        "displayName": "Saint Kitts and Nevis",
+        "longDisplayName": "the Federation of Saint Christopher and Nevis",
+        "alpha3Code": "KNA",
+        "alpha2Code": "KN",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "660",
+        "displayName": "Anguilla",
+        "longDisplayName": null,
+        "alpha3Code": "AIA",
+        "alpha2Code": "AI",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "662",
+        "displayName": "Saint Lucia",
+        "longDisplayName": null,
+        "alpha3Code": "LCA",
+        "alpha2Code": "LC",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "666",
+        "displayName": "Saint Pierre and Miquelon",
+        "longDisplayName": null,
+        "alpha3Code": "SPM",
+        "alpha2Code": "PM",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "670",
+        "displayName": "Saint Vincent and the Grenadines",
+        "longDisplayName": null,
+        "alpha3Code": "VCT",
+        "alpha2Code": "VC",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "674",
+        "displayName": "San Marino",
+        "longDisplayName": "the Republic of San Marino",
+        "alpha3Code": "SMR",
+        "alpha2Code": "SM",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "678",
+        "displayName": "Sao Tome and Principe",
+        "longDisplayName": "the Democratic Republic of Sao Tome and Principe",
+        "alpha3Code": "STP",
+        "alpha2Code": "ST",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "682",
+        "displayName": "Saudi Arabia",
+        "longDisplayName": "the Kingdom of Saudi Arabia",
+        "alpha3Code": "SAU",
+        "alpha2Code": "SA",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "686",
+        "displayName": "Senegal",
+        "longDisplayName": "the Republic of Senegal",
+        "alpha3Code": "SEN",
+        "alpha2Code": "SN",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "690",
+        "displayName": "Seychelles",
+        "longDisplayName": "the Republic of Seychelles",
+        "alpha3Code": "SYC",
+        "alpha2Code": "SC",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "694",
+        "displayName": "Sierra Leone",
+        "longDisplayName": "the Republic of Sierra Leone",
+        "alpha3Code": "SLE",
+        "alpha2Code": "SL",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "702",
+        "displayName": "Singapore",
+        "longDisplayName": "the Republic of Singapore",
+        "alpha3Code": "SGP",
+        "alpha2Code": "SG",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "703",
+        "displayName": "Slovakia",
+        "longDisplayName": "the Slovak Republic",
+        "alpha3Code": "SVK",
+        "alpha2Code": "SK",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "704",
+        "displayName": "Viet Nam",
+        "longDisplayName": "the Socialist Republic of Viet Nam",
+        "alpha3Code": "VNM",
+        "alpha2Code": "VN",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "705",
+        "displayName": "Slovenia",
+        "longDisplayName": "the Republic of Slovenia",
+        "alpha3Code": "SVN",
+        "alpha2Code": "SI",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "706",
+        "displayName": "Somalia",
+        "longDisplayName": "the Somali Republic",
+        "alpha3Code": "SOM",
+        "alpha2Code": "SO",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "710",
+        "displayName": "South Africa",
+        "longDisplayName": "the Republic of South Africa",
+        "alpha3Code": "ZAF",
+        "alpha2Code": "ZA",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "716",
+        "displayName": "Zimbabwe",
+        "longDisplayName": "the Republic of Zimbabwe",
+        "alpha3Code": "ZWE",
+        "alpha2Code": "ZW",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "720",
+        "displayName": "Yemen (People's Democratic Republic of)",
+        "longDisplayName": "the People's Democratic Republic of Yemen",
+        "alpha3Code": "YMD",
+        "alpha2Code": "YD",
+        "isIndependent": false,
+        "isHistorical": true,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "724",
+        "displayName": "Spain",
+        "longDisplayName": "the Kingdom of Spain",
+        "alpha3Code": "ESP",
+        "alpha2Code": "ES",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "732",
+        "displayName": "Western Sahara",
+        "longDisplayName": null,
+        "alpha3Code": "ESH",
+        "alpha2Code": "EH",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "736",
+        "displayName": "Sudan (the)",
+        "longDisplayName": "the Republic of the Sudan",
+        "alpha3Code": "SDN",
+        "alpha2Code": "SD",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "740",
+        "displayName": "Suriname",
+        "longDisplayName": "the Republic of Suriname",
+        "alpha3Code": "SUR",
+        "alpha2Code": "SR",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "744",
+        "displayName": "Svalbard and Jan Mayen",
+        "longDisplayName": null,
+        "alpha3Code": "SJM",
+        "alpha2Code": "SJ",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "748",
+        "displayName": "Swaziland",
+        "longDisplayName": "the Kingdom of Swaziland",
+        "alpha3Code": "SWZ",
+        "alpha2Code": "SZ",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "752",
+        "displayName": "Sweden",
+        "longDisplayName": "the Kingdom of Sweden",
+        "alpha3Code": "SWE",
+        "alpha2Code": "SE",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "756",
+        "displayName": "Switzerland",
+        "longDisplayName": "the Swiss Confederation",
+        "alpha3Code": "CHE",
+        "alpha2Code": "CH",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "760",
+        "displayName": "Syrian Arab Republic (the)",
+        "longDisplayName": "the Syrian Arab Republic",
+        "alpha3Code": "SYR",
+        "alpha2Code": "SY",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "762",
+        "displayName": "Tajikistan",
+        "longDisplayName": "the Republic of Tajikistan",
+        "alpha3Code": "TJK",
+        "alpha2Code": "TJ",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "764",
+        "displayName": "Thailand",
+        "longDisplayName": "the Kingdom of Thailand",
+        "alpha3Code": "THA",
+        "alpha2Code": "TH",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "768",
+        "displayName": "Togo",
+        "longDisplayName": "the Togolese Republic",
+        "alpha3Code": "TGO",
+        "alpha2Code": "TG",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "772",
+        "displayName": "Tokelau",
+        "longDisplayName": null,
+        "alpha3Code": "TKL",
+        "alpha2Code": "TK",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "776",
+        "displayName": "Tonga",
+        "longDisplayName": "the Kingdom of Tonga",
+        "alpha3Code": "TON",
+        "alpha2Code": "TO",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "780",
+        "displayName": "Trinidad and Tobago",
+        "longDisplayName": "the Republic of Trinidad and Tobago",
+        "alpha3Code": "TTO",
+        "alpha2Code": "TT",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "784",
+        "displayName": "United Arab Emirates (the)",
+        "longDisplayName": "the United Arab Emirates",
+        "alpha3Code": "ARE",
+        "alpha2Code": "AE",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "788",
+        "displayName": "Tunisia",
+        "longDisplayName": "the Republic of Tunisia",
+        "alpha3Code": "TUN",
+        "alpha2Code": "TN",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "792",
+        "displayName": "Turkey",
+        "longDisplayName": "the Republic of Turkey",
+        "alpha3Code": "TUR",
+        "alpha2Code": "TR",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "795",
+        "displayName": "Turkmenistan",
+        "longDisplayName": null,
+        "alpha3Code": "TKM",
+        "alpha2Code": "TM",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "796",
+        "displayName": "Turks and Caicos Islands (the)",
+        "longDisplayName": null,
+        "alpha3Code": "TCA",
+        "alpha2Code": "TC",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "798",
+        "displayName": "Tuvalu",
+        "longDisplayName": null,
+        "alpha3Code": "TUV",
+        "alpha2Code": "TV",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "800",
+        "displayName": "Uganda",
+        "longDisplayName": "the Republic of Uganda",
+        "alpha3Code": "UGA",
+        "alpha2Code": "UG",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "804",
+        "displayName": "Ukraine",
+        "longDisplayName": null,
+        "alpha3Code": "UKR",
+        "alpha2Code": "UA",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "807",
+        "displayName": "Macedonia (The former Yugoslav Republic of)",
+        "longDisplayName": "The former Yugoslav Republic of Macedonia",
+        "alpha3Code": "MKD",
+        "alpha2Code": "MK",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "810",
+        "displayName": "USSR",
+        "longDisplayName": "the Union of Soviet Socialist Republics",
+        "alpha3Code": "SUN",
+        "alpha2Code": "SU",
+        "isIndependent": false,
+        "isHistorical": true,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "818",
+        "displayName": "Egypt",
+        "longDisplayName": "the Arab Republic of Egypt",
+        "alpha3Code": "EGY",
+        "alpha2Code": "EG",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "826",
+        "displayName": "United Kingdom (the)",
+        "longDisplayName": "the United Kingdom of Great Britain and Northern Ireland",
+        "alpha3Code": "GBR",
+        "alpha2Code": "GB",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "834",
+        "displayName": "Tanzania (the United Republic of) / Tanzania",
+        "longDisplayName": "the United Republic of Tanzania",
+        "alpha3Code": "TZA",
+        "alpha2Code": "TZ",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "840",
+        "displayName": "United States (the)",
+        "longDisplayName": "the United States of America",
+        "alpha3Code": "USA",
+        "alpha2Code": "US",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "850",
+        "displayName": "Virgin Islands (U.S.)",
+        "longDisplayName": "the Virgin Islands of the United States",
+        "alpha3Code": "VIR",
+        "alpha2Code": "VI",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "854",
+        "displayName": "Burkina Faso",
+        "longDisplayName": "Burkina Faso",
+        "alpha3Code": "BFA",
+        "alpha2Code": "BF",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "858",
+        "displayName": "Uruguay",
+        "longDisplayName": "the Eastern Republic of Uruguay",
+        "alpha3Code": "URY",
+        "alpha2Code": "UY",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "860",
+        "displayName": "Uzbekistan",
+        "longDisplayName": "the Republic of Uzbekistan",
+        "alpha3Code": "UZB",
+        "alpha2Code": "UZ",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "862",
+        "displayName": "Venezuela",
+        "longDisplayName": "the Bolivarian Republic of Venezuela",
+        "alpha3Code": "VEN",
+        "alpha2Code": "VE",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "876",
+        "displayName": "Wallis and Futuna",
+        "longDisplayName": "Wallis and Futuna Islands",
+        "alpha3Code": "WLF",
+        "alpha2Code": "WF",
+        "isIndependent": false,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "882",
+        "displayName": "Samoa",
+        "longDisplayName": "the Independent State of Samoa",
+        "alpha3Code": "WSM",
+        "alpha2Code": "WS",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "886",
+        "displayName": "Yemen (Arab Republic)",
+        "longDisplayName": "the Yemen Arab Republic",
+        "alpha3Code": "YEM",
+        "alpha2Code": "YE",
+        "isIndependent": false,
+        "isHistorical": true,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "887",
+        "displayName": "Yemen",
+        "longDisplayName": "the Republic of Yemen",
+        "alpha3Code": "YEM",
+        "alpha2Code": "YE",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "890",
+        "displayName": "Yugoslavia (Socialist Federal Republic of)",
+        "longDisplayName": "the Socialist Federal Republic of Yugoslavia",
+        "alpha3Code": "YUG",
+        "alpha2Code": "YU",
+        "isIndependent": false,
+        "isHistorical": true,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "891",
+        "displayName": "Serbia and Montenegro",
+        "longDisplayName": null,
+        "alpha3Code": "SCG",
+        "alpha2Code": "CS",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    },
+    {
+        "numericCode": "894",
+        "displayName": "Zambia",
+        "longDisplayName": "the Republic of Zambia",
+        "alpha3Code": "ZMB",
+        "alpha2Code": "ZM",
+        "isIndependent": true,
+        "isHistorical": false,
+        "isSubdivision": false
+    }
+]

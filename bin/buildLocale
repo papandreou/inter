@@ -10,6 +10,7 @@ var fs = require('fs'),
     cjson = require('cjson-papandreou'),
     libxmljs = require('libxmljs'),
     _ = require('underscore'),
+    leftPad = require('../lib/leftPad'),
     cldrPluralRuleToJavaScriptAst = require('../lib/cldrPluralRuleToJavaScriptAst'),
     commandLineOptions = require('optimist')
         .usage('$0 [--cldrpath <pathToCldr>] [-o <outputFileName>] --locale localeId,localeId...')
@@ -21,14 +22,35 @@ var fs = require('fs'),
             describe: 'Path to your CLDR files'
         })
         .options('locale', {
-            describe: 'Comma seperated list of locales to build',
+            describe: 'Comma-separated list of locales to build',
             type: 'string',
             demand: true
         })
         .argv,
     targetLocaleIds = _.flatten(_.flatten([commandLineOptions.locale]).map(function (localeId) {return localeId.split(",");})),
     localeDataByTargetLocaleId = {},
-    isTargetLocaleById = {};
+    isTargetLocaleById = {},
+    countries = JSON.parse(fs.readFileSync(Path.resolve(__dirname, '../countries.json'))),
+    numericRegionIdByNumericTerritoryId = {},
+    numericRegionIdByTerritoryId = {},
+    alpha2CodeByNumericTerritoryId = {};
+
+countries.forEach(function (country) {
+    alpha2CodeByNumericTerritoryId[country.numericCode] = country.alpha2Code;
+});
+
+(function traverseRegions(region, parentId) {
+    var id = leftPad(region.id, 3, '0');
+    if (parentId) {
+        numericRegionIdByNumericTerritoryId[id] = parentId;
+        numericRegionIdByTerritoryId[alpha2CodeByNumericTerritoryId[id]] = parentId;
+    }
+    if (region.children) {
+        region.children.forEach(function (child) {
+            traverseRegions(child, id);
+        });
+    }
+}(JSON.parse(fs.readFileSync(Path.resolve(__dirname, '../regions.json')))));
 
 targetLocaleIds.forEach(function (targetLocaleId) {
     isTargetLocaleById[targetLocaleId] = true;
@@ -389,12 +411,14 @@ seq(Object.keys(doExtractByLocaleId))
                 localeData.timeZoneInfo = Object.keys(localeData.timeZoneDisplayNames).filter(function (timeZoneId) {
                     return timeZoneId in utcStandardOffsetSecondsByTimeZoneId && timeZoneId in territoryIdByTimeZoneId;
                 }).map(function (timeZoneId) {
-                    var utcStandardOffsetSeconds = utcStandardOffsetSecondsByTimeZoneId[timeZoneId];
+                    var utcStandardOffsetSeconds = utcStandardOffsetSecondsByTimeZoneId[timeZoneId],
+                        territoryId = territoryIdByTimeZoneId[timeZoneId];
                     return {
                         id: timeZoneId,
+                        regionId: numericRegionIdByTerritoryId[territoryId] || null,
                         utcStandardOffsetSeconds: utcStandardOffsetSeconds,
                         displayName: localeData.timeZoneDisplayNames[timeZoneId],
-                        territoryId: territoryIdByTimeZoneId[timeZoneId]
+                        territoryId: territoryId
                     };
                 }).sort(function (a, b) {
                     return ((typeof b.utcStandardOffsetSeconds === 'number') - (typeof a.utcStandardOffsetSeconds === 'number')) ||
@@ -408,6 +432,7 @@ seq(Object.keys(doExtractByLocaleId))
                 localeData.territoryInfo = Object.keys(localeData.territoryDisplayNames).sort().map(function (territoryId) {
                     return {
                         id: territoryId,
+                        regionId: numericRegionIdByTerritoryId[territoryId] || null,
                         displayName: localeData.territoryDisplayNames[territoryId],
                         hasTimeZones: numTimeZonesByTerritoryId[territoryId] > 0
                     };
