@@ -31,12 +31,14 @@ var fs = require('fs'),
     localeDataByTargetLocaleId = {},
     isTargetLocaleById = {},
     countries = JSON.parse(fs.readFileSync(Path.resolve(__dirname, '../countries.json'))),
+    countryInfoByTerritoryId = {},
     numericRegionIdByNumericTerritoryId = {},
     numericRegionIdByTerritoryId = {},
     alpha2CodeByNumericTerritoryId = {};
 
-countries.forEach(function (country) {
-    alpha2CodeByNumericTerritoryId[country.numericCode] = country.alpha2Code;
+countries.forEach(function (countryInfo) {
+    alpha2CodeByNumericTerritoryId[countryInfo.numericCode] = countryInfo.alpha2Code;
+    countryInfoByTerritoryId[countryInfo.alpha2Code] = countryInfo;
 });
 
 (function traverseRegions(region, parentId) {
@@ -429,7 +431,10 @@ seq(Object.keys(doExtractByLocaleId))
             }
 
             if (localeData.territoryDisplayNames) {
-                localeData.territoryInfo = Object.keys(localeData.territoryDisplayNames).sort().map(function (territoryId) {
+                localeData.territoryInfo = Object.keys(localeData.territoryDisplayNames).sort().filter(function (territoryId) {
+                    var countryInfo = countryInfoByTerritoryId[territoryId];
+                    return countryInfo && !countryInfo.isHistorical && !countryInfo.isSubdivision;
+                }).map(function (territoryId) {
                     return {
                         id: territoryId,
                         regionId: numericRegionIdByTerritoryId[territoryId] || null,
