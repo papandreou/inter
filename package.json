@@ -1,6 +1,6 @@
 {
     "name": "buildlocale",
-    "version": "0.0.13",
+    "version": "0.0.14",
     "dependencies": {
         "cjson-papandreou": "=0.0.6-patch1",
         "libxmljs": "=0.5.4",
