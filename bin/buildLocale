@@ -56,6 +56,11 @@ var fs = require('fs'),
             type: 'boolean',
             default: false
         })
+        .options('regioninfo', {
+            describe: 'Whether to include region info and display names (one.locale.regionInfo)',
+            type: 'boolean',
+            default: false
+        })
         .options('localeinfo', {
             describe: 'Whether to include locale info and display names (one.locale.localeInfo). Only includes information about the locales included in the build',
             type: 'boolean',
@@ -495,6 +500,20 @@ seq(Object.keys(doExtractByLocaleId))
                         regionId: numericRegionIdByTerritoryId[territoryId] || null,
                         displayName: localeData.territoryDisplayNames[territoryId],
                         hasTimeZones: numTimeZonesByTerritoryId[territoryId] > 0
+                    };
+                });
+            }
+
+            if (commandLineOptions.regioninfo && localeData.territoryDisplayNames) {
+                localeData.regionInfo = Object.keys(localeData.territoryDisplayNames).filter(function (territoryId) {
+                    return /^\d{3}/.test(territoryId);
+                }).sort(function (a, b) {
+                    return localeData.territoryDisplayNames[a] < localeData.territoryDisplayNames[b] ? -1 :
+                        (localeData.territoryDisplayNames[a] > localeData.territoryDisplayNames[b] ? 1 : 0);
+                }).map(function (territoryId) {
+                    return {
+                        id: territoryId,
+                        displayName: localeData.territoryDisplayNames[territoryId]
                     };
                 });
             }
