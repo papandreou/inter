@@ -51,8 +51,8 @@ var fs = require('fs'),
             type: 'boolean',
             default: false
         })
-        .options('territoryinfo', {
-            describe: 'Whether to include territory info and display names (one.locale.territoryInfo)',
+        .options('countryinfo', {
+            describe: 'Whether to include country info and display names (one.locale.countryInfo)',
             type: 'boolean',
             default: false
         })
@@ -490,10 +490,13 @@ seq(Object.keys(doExtractByLocaleId))
             }
             delete localeData.timeZoneDisplayNames;
 
-            if (commandLineOptions.territoryinfo && localeData.territoryDisplayNames) {
-                localeData.territoryInfo = Object.keys(localeData.territoryDisplayNames).sort().filter(function (territoryId) {
+            if (commandLineOptions.countryinfo && localeData.territoryDisplayNames) {
+                localeData.countryInfo = Object.keys(localeData.territoryDisplayNames).sort().filter(function (territoryId) {
                     var countryInfo = countryInfoByTerritoryId[territoryId];
                     return countryInfo && !countryInfo.isHistorical && !countryInfo.isSubdivision;
+                }).sort(function (a, b) {
+                    return localeData.territoryDisplayNames[a] < localeData.territoryDisplayNames[b] ? -1 :
+                        (localeData.territoryDisplayNames[a] > localeData.territoryDisplayNames[b] ? 1 : 0);
                 }).map(function (territoryId) {
                     return {
                         id: territoryId,
