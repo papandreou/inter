@@ -451,8 +451,8 @@ seq(Object.keys(doExtractByLocaleId))
             if (commandLineOptions.localeinfo && localeData.localeDisplayNames) {
                 localeData.localeInfo = Object.keys(localeData.localeDisplayNames).map(function (localeId) {
                     return {
-                        displayName: localeData.localeDisplayNames[localeId],
-                        localeId: localeId
+                        id: localeId,
+                        displayName: localeData.localeDisplayNames[localeId]
                     };
                 });
             }
