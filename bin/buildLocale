@@ -21,6 +21,51 @@ var fs = require('fs'),
             default: '/usr/share/cldr',
             describe: 'Path to your CLDR files'
         })
+        .options('dateformats', {
+            describe: 'Whether to include date and time formats (one.locale.dateFormats and others)',
+            type: 'boolean',
+            default: false
+        })
+        .options('intervalformats', {
+            describe: 'Whether to include date and time interval formats (one.locale.intervalFormats)',
+            type: 'boolean',
+            default: false
+        })
+        .options('numberformats', {
+            describe: 'Whether to include number formats (one.locale.numberSymbols, one.locale.getNumberRenderer, one.locale.getFileSizeRenderer, one.locale.getPercentageRenderer)',
+            type: 'boolean',
+            default: false
+        })
+        .options('listpatterns', {
+            describe: 'Whether to include list formats (one.locale.listPatterns and one.locale.renderList)',
+            type: 'boolean',
+            default: false
+        })
+        .options('unitpatterns', {
+            describe: 'Whether to unit patterns (one.locale.unitPatterns and one.locale.getUnitRenderer)',
+            type: 'boolean',
+            default: false
+        })
+        .options('timezoneinfo', {
+            describe: 'Whether to include time zone info and display names (one.locale.timeZoneInfo)',
+            type: 'boolean',
+            default: false
+        })
+        .options('territoryinfo', {
+            describe: 'Whether to include territory info and display names (one.locale.territoryInfo)',
+            type: 'boolean',
+            default: false
+        })
+        .options('localeinfo', {
+            describe: 'Whether to include locale info and display names (one.locale.localeInfo). Only includes information about the locales included in the build',
+            type: 'boolean',
+            default: false
+        })
+        .options('pluralrules', {
+            describe: 'Whether to include plural rules (one.locale.getQuantity)',
+            type: 'boolean',
+            default: false
+        })
         .options('locale', {
             describe: 'Comma-separated list of locales to build',
             type: 'string',
@@ -257,10 +302,10 @@ function getLocaleData(localeId, cb) {
 
         ['day', 'hour', 'minute', 'month', 'week', 'year'].forEach(function (unit) {
             document.find("/ldml/units/unit[@type='" + unit + "']/unitPattern").forEach(function (unitPatternNode) {
-                localeData.units = localeData.units || {};
-                localeData.units[unit] = localeData.units[unit] || {};
+                localeData.unitPatterns = localeData.unitPatterns || {};
+                localeData.unitPatterns[unit] = localeData.unitPatterns[unit] || {};
                 var count = unitPatternNode.attr('count').value();
-                localeData.units[unit][count] = localeData.units[unit][count] || unitPatternNode.text();
+                localeData.unitPatterns[unit][count] = localeData.unitPatterns[unit][count] || unitPatternNode.text();
             });
         });
 
@@ -337,36 +382,40 @@ seq(Object.keys(doExtractByLocaleId))
     .seq(function () {
         var cb = this;
 
-        // Extract plural rules:
-        fs.readFile(Path.resolve(commandLineOptions.cldrpath, 'common', 'supplemental', 'plurals.xml'), 'utf-8', passError(cb, function (xmlString) {
-            var document = libxmljs.parseXmlString(xmlString);
-            Object.keys(doExtractByLocaleId).forEach(function (localeId) {
-                var matchLocalesXPathExpr =
-                    "@locales = '" + localeId + "' or " +
-                    "starts-with(@locales, '" + localeId + "') or " +
-                    "contains(@locales, ' " + localeId + " ') or " +
-                    "(contains(@locales, ' " + localeId + "') and substring-after(@locales, ' " + localeId + "') = '')";
+        if (commandLineOptions.pluralrules) {
+            fs.readFile(Path.resolve(commandLineOptions.cldrpath, 'common', 'supplemental', 'plurals.xml'), 'utf-8', passError(cb, function (xmlString) {
+                var document = libxmljs.parseXmlString(xmlString);
+                Object.keys(doExtractByLocaleId).forEach(function (localeId) {
+                    var matchLocalesXPathExpr =
+                        "@locales = '" + localeId + "' or " +
+                        "starts-with(@locales, '" + localeId + "') or " +
+                        "contains(@locales, ' " + localeId + " ') or " +
+                        "(contains(@locales, ' " + localeId + "') and substring-after(@locales, ' " + localeId + "') = '')";
 
-                var statementAsts = [],
-                    pluralRulesNodes = document.find("/supplementalData/plurals/pluralRules[" + matchLocalesXPathExpr + "]");
-                if (pluralRulesNodes.length > 0) {
-                    pluralRulesNodes[0].find("pluralRule").forEach(function (pluralRuleNode) {
-                        statementAsts.push(
-                            [
-                                'if',
-                                cldrPluralRuleToJavaScriptAst(pluralRuleNode.text()),
-                                ['return', ['string', pluralRuleNode.attr('count').value()]]
-                            ]
-                        );
-                    });
-                    statementAsts.push(['return', ['string', 'other']]);
-                    var functionAst = ['function', null, ['n'], statementAsts];
-                    localeDataByLocaleId[localeId].getQuantity = new Function("n", uglifyJs.uglify.gen_code(['toplevel', statementAsts]));
-                }
-            });
+                    var statementAsts = [],
+                        pluralRulesNodes = document.find("/supplementalData/plurals/pluralRules[" + matchLocalesXPathExpr + "]");
+                    if (pluralRulesNodes.length > 0) {
+                        pluralRulesNodes[0].find("pluralRule").forEach(function (pluralRuleNode) {
+                            statementAsts.push(
+                                [
+                                    'if',
+                                    cldrPluralRuleToJavaScriptAst(pluralRuleNode.text()),
+                                    ['return', ['string', pluralRuleNode.attr('count').value()]]
+                                ]
+                            );
+                        });
+                        statementAsts.push(['return', ['string', 'other']]);
+                        var functionAst = ['function', null, ['n'], statementAsts];
+                        localeDataByLocaleId[localeId].getQuantity = new Function("n", uglifyJs.uglify.gen_code(['toplevel', statementAsts]));
+                    }
+                });
+                cb();
+            }));
+        } else {
             cb();
-        }));
-
+        }
+    })
+    .seq(function () {
         timeZoneIds.forEach(function (timeZoneId) {
             localeDataByLocaleId.root.timeZoneDisplayNames = localeDataByLocaleId.root.timeZoneDisplayNames || {};
             if (!(timeZoneId in localeDataByLocaleId.root.timeZoneDisplayNames)) {
@@ -399,17 +448,17 @@ seq(Object.keys(doExtractByLocaleId))
                 }
             });
 
-            if (localeData.localeDisplayNames) {
+            if (commandLineOptions.localeinfo && localeData.localeDisplayNames) {
                 localeData.localeInfo = Object.keys(localeData.localeDisplayNames).map(function (localeId) {
                     return {
                         displayName: localeData.localeDisplayNames[localeId],
                         localeId: localeId
                     };
                 });
-                delete localeData.localeDisplayNames;
             }
+            delete localeData.localeDisplayNames;
 
-            if (localeData.timeZoneDisplayNames) {
+            if (commandLineOptions.timezoneinfo && localeData.timeZoneDisplayNames) {
                 localeData.timeZoneInfo = Object.keys(localeData.timeZoneDisplayNames).filter(function (timeZoneId) {
                     return timeZoneId in utcStandardOffsetSecondsByTimeZoneId && timeZoneId in territoryIdByTimeZoneId;
                 }).map(function (timeZoneId) {
@@ -427,10 +476,10 @@ seq(Object.keys(doExtractByLocaleId))
                         a.utcStandardOffsetSeconds - b.utcStandardOffsetSeconds ||
                         (a.displayName < b.displayName ? -1 : (b.displayName < a.displayName ? 1 : 0));
                 });
-                delete localeData.timeZoneDisplayNames;
             }
+            delete localeData.timeZoneDisplayNames;
 
-            if (localeData.territoryDisplayNames) {
+            if (commandLineOptions.territoryinfo && localeData.territoryDisplayNames) {
                 localeData.territoryInfo = Object.keys(localeData.territoryDisplayNames).sort().filter(function (territoryId) {
                     var countryInfo = countryInfoByTerritoryId[territoryId];
                     return countryInfo && !countryInfo.isHistorical && !countryInfo.isSubdivision;
@@ -442,21 +491,46 @@ seq(Object.keys(doExtractByLocaleId))
                         hasTimeZones: numTimeZonesByTerritoryId[territoryId] > 0
                     };
                 });
-                delete localeData.territoryDisplayNames;
             }
+            delete localeData.territoryDisplayNames;
 
-            if (localeData.dateTimePatterns && localeData.defaultDateTimePatternName) {
-                localeData.defaultDateTimePattern = localeData.dateTimePatterns[localeData.defaultDateTimePatternName];
-            }
+            if (commandLineOptions.dateformats) {
+                if (localeData.dateTimePatterns && localeData.defaultDateTimePatternName) {
+                    localeData.defaultDateTimePattern = localeData.dateTimePatterns[localeData.defaultDateTimePatternName];
+                }
 
-            if (localeData.dateFormats) {
-                ['short', 'medium', 'long', 'full'].forEach(function (length) {
-                   localeData.dateFormats.basic[length + 'DateTime'] = localeData.dateTimePatterns[length]
-                       .replace(/\{0\}/g, localeData.dateFormats.basic[length + 'Time'])
-                       .replace(/\{1\}/g, localeData.dateFormats.basic[length + 'Date']);
-                });
+                if (localeData.dateFormats) {
+                    ['short', 'medium', 'long', 'full'].forEach(function (length) {
+                       localeData.dateFormats.basic[length + 'DateTime'] = localeData.dateTimePatterns[length]
+                           .replace(/\{0\}/g, localeData.dateFormats.basic[length + 'Time'])
+                           .replace(/\{1\}/g, localeData.dateFormats.basic[length + 'Date']);
+                    });
+                }
+            } else if (!commandLineOptions.intervalformats) {
+                delete localeData.dateFormats;
+                delete localeData.defaultDateTimePatternName;
+                delete localeData.relativeDayDisplay;
+                delete localeData.fieldDisplayNames;
             }
             delete localeData.dateTimePatterns;
+
+            if (!commandLineOptions.listpatterns) {
+                delete localeData.listPatterns;
+            }
+
+            if (!commandLineOptions.intervalformats) {
+                delete localeData.intervalFormats;
+                delete localeData.intervalFallbackFormat;
+            }
+
+            if (!commandLineOptions.numberformats) {
+                delete localeData.numberSymbols;
+            }
+
+            if (!commandLineOptions.unitpatterns) {
+                delete localeData.unitPatterns;
+            }
+
             localeDataByTargetLocaleId[targetLocaleId] = localeData;
         });
 
