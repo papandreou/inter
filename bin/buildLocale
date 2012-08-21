@@ -480,7 +480,7 @@ seq(Object.keys(doExtractByLocaleId))
                         regionId: numericRegionIdByTerritoryId[territoryId] || null,
                         utcStandardOffsetSeconds: utcStandardOffsetSeconds,
                         displayName: localeData.timeZoneDisplayNames[timeZoneId],
-                        territoryId: territoryId
+                        countryId: territoryId
                     };
                 }).sort(function (a, b) {
                     return ((typeof b.utcStandardOffsetSeconds === 'number') - (typeof a.utcStandardOffsetSeconds === 'number')) ||
