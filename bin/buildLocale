@@ -178,9 +178,7 @@ function getLocaleData(localeId, cb) {
         localeData.localeDisplayNames = {};
         document.find('//languages/language').forEach(function (node) {
             var localeId = node.attr('type').value();
-            if (isTargetLocaleById[localeId]) {
-                localeData.localeDisplayNames[localeId] = localeData.localeDisplayNames[localeId] || node.text();
-            }
+            localeData.localeDisplayNames[localeId] = localeData.localeDisplayNames[localeId] || node.text();
         });
 
         localeData.relativeDayDisplay = {};
@@ -449,11 +447,19 @@ seq(Object.keys(doExtractByLocaleId))
             });
 
             if (commandLineOptions.localeinfo && localeData.localeDisplayNames) {
-                localeData.localeInfo = Object.keys(localeData.localeDisplayNames).map(function (localeId) {
-                    return {
-                        id: localeId,
-                        displayName: localeData.localeDisplayNames[localeId]
-                    };
+                localeData.localeInfo = Object.keys(localeData.localeDisplayNames).filter(function (localeId) {
+                    return isTargetLocaleById[localeId];
+                }).map(function (localeId) {
+                    var nativeDisplayName = localeDataByLocaleId[localeId].localeDisplayNames[localeId],
+                        displayName = localeData.localeDisplayNames[localeId],
+                        obj = {
+                            id: localeId,
+                            displayName: displayName
+                        };
+                    if (nativeDisplayName !== displayName) {
+                        obj.nativeDisplayName = nativeDisplayName;
+                    }
+                    return obj;
                 });
             }
             delete localeData.localeDisplayNames;
