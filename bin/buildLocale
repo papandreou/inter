@@ -71,6 +71,11 @@ var fs = require('fs'),
             type: 'boolean',
             default: false
         })
+        .options('exemplarcharacters', {
+            describe: 'Whether to exemplar characters (one.locale.exemplarCharacters)',
+            type: 'boolean',
+            default: false
+        })
         .options('locale', {
             describe: 'Comma-separated list of locales to build',
             type: 'string',
@@ -318,6 +323,14 @@ function getLocaleData(localeId, cb) {
             localeData.listPatterns[type] = localeData.listPatterns[type] || listPatternPartNode.text();
         });
 
+        localeData.exemplarCharacters = {};
+
+        document.find("/ldml/characters/exemplarCharacters").forEach(function (exemplarCharactersNode) {
+            var typeAttr = exemplarCharactersNode.attr('type'),
+                type = (typeAttr && typeAttr.value()) || 'default';
+            localeData.exemplarCharacters[type] = localeData.exemplarCharacters[type] || exemplarCharactersNode.text().replace(/^\[|\]$/g, '').split(" ");
+        });
+
         localeData.timeZoneDisplayNames = {};
 
         document.find("/ldml/dates/timeZoneNames/zone").forEach(function (zoneNode) {
@@ -544,6 +557,10 @@ seq(Object.keys(doExtractByLocaleId))
 
             if (!commandLineOptions.listpatterns) {
                 delete localeData.listPatterns;
+            }
+
+            if (!commandLineOptions.exemplarcharacters) {
+                delete localeData.exemplarCharacters;
             }
 
             if (!commandLineOptions.intervalformats) {
