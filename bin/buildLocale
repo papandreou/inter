@@ -36,6 +36,11 @@ var fs = require('fs'),
             type: 'boolean',
             default: false
         })
+        .options('delimiters', {
+            describe: 'Whether to include quotation delimiters (one.locale.delimiters)',
+            type: 'boolean',
+            default: false
+        })
         .options('listpatterns', {
             describe: 'Whether to include list formats (one.locale.listPatterns and one.locale.renderList)',
             type: 'boolean',
@@ -317,6 +322,12 @@ function getLocaleData(localeId, cb) {
             });
         });
 
+        localeData.delimiters = {};
+        document.find("/ldml/delimiters/*").forEach(function (delimiterNode) {
+            var type = delimiterNode.name();
+            localeData.delimiters[type] = localeData.delimiters[type] || delimiterNode.text();
+        });
+
         document.find("/ldml/listPatterns/listPattern/listPatternPart").forEach(function (listPatternPartNode) {
             localeData.listPatterns = localeData.listPatterns || {};
             var type = listPatternPartNode.attr('type').value();
@@ -554,6 +565,10 @@ seq(Object.keys(doExtractByLocaleId))
                 delete localeData.fieldDisplayNames;
             }
             delete localeData.dateTimePatterns;
+
+            if (!commandLineOptions.delimiters) {
+                delete localeData.delimiters;
+            }
 
             if (!commandLineOptions.listpatterns) {
                 delete localeData.listPatterns;
