@@ -86,6 +86,11 @@ var fs = require('fs'),
             type: 'string',
             demand: true
         })
+        .options('localeidvar', {
+            describe: 'The name of the JavaScript identifier used to determine which locale to select. If you don\'t use buildDevelopment (AssetGraph-builder) your own code must set this variable before the locale library is loaded.',
+            type: 'string',
+            default: 'LOCALEID'
+        })
         .argv,
     targetLocaleIds = _.flatten(_.flatten([commandLineOptions.locale]).map(function (localeId) {return localeId.split(",");})),
     localeDataByTargetLocaleId = {},
@@ -596,10 +601,11 @@ seq(Object.keys(doExtractByLocaleId))
             localeDataByTargetLocaleId[targetLocaleId] = localeData;
         });
 
-        var statementAsts = [];
+        var localeIdVarAst = uglifyJs.parser.parse(commandLineOptions.localeidvar)[1][0][1],
+            statementAsts = [];
         targetLocaleIds.forEach(function (targetLocaleId) {
             statementAsts.push(['if',
-                                ['binary', '===', ['name', 'LOCALEID'], ['string', targetLocaleId]],
+                                ['binary', '===', localeIdVarAst, ['string', targetLocaleId]],
                                 ['block',
                                     Object.keys(localeDataByTargetLocaleId[targetLocaleId]).map(function (propertyName) {
                                         return ['stat',
