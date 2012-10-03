@@ -645,7 +645,7 @@ seq(Object.keys(doExtractByLocaleId))
         //   tokenizePattern
 
         var localeLibAst = uglifyJs.parser.parse(fs.readFileSync(Path.resolve(__dirname, '../lib/locale.js'), 'utf-8')),
-            objectLiteralKeyValues = localeLibAst[1][0][1][3][1];
+            objectLiteralKeyValues = localeLibAst[1][1][1][3][1];
         for (var i = 0 ; i < objectLiteralKeyValues.length ; i += 1) {
             if (omitByMethodName[objectLiteralKeyValues[i][0]]) {
                 objectLiteralKeyValues.splice(i, 1);
