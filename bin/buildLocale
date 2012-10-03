@@ -47,7 +47,7 @@ var fs = require('fs'),
             default: false
         })
         .options('unitpatterns', {
-            describe: 'Whether to unit patterns (one.locale.unitPatterns and one.locale.getUnitRenderer)',
+            describe: 'Whether to include unit patterns (one.locale.unitPatterns and one.locale.getUnitRenderer)',
             type: 'boolean',
             default: false
         })
@@ -77,7 +77,7 @@ var fs = require('fs'),
             default: false
         })
         .options('exemplarcharacters', {
-            describe: 'Whether to exemplar characters (one.locale.exemplarCharacters)',
+            describe: 'Whether to include exemplar characters (one.locale.exemplarCharacters)',
             type: 'boolean',
             default: false
         })
