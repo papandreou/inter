@@ -52,31 +52,31 @@ var fs = require('fs'),
             type: 'boolean',
             default: false
         })
-        .options('timezoneinfo', {
-            describe: 'Whether to include time zone info and display names (inter.timeZoneInfo)',
+        .options('timezones', {
+            describe: 'Whether to include time zone info and display names (inter.timeZones)',
             type: 'boolean',
             default: false
         })
-        .options('countryinfo', {
-            describe: 'Whether to include country info and display names (inter.countryInfo)',
+        .options('countries', {
+            describe: 'Whether to include country info and display names (inter.countries)',
             type: 'boolean',
             default: false
         })
-        .options('regioninfo', {
-            describe: 'Whether to include region info and display names (inter.regionInfo)',
+        .options('regions', {
+            describe: 'Whether to include region info and display names (inter.regions)',
             type: 'boolean',
             default: false
         })
-        .options('localeinfo', {
-            describe: 'Whether to include locale info and display names (inter.localeInfo)',
+        .options('locales', {
+            describe: 'Whether to include locale info and display names (inter.locales)',
             type: 'boolean',
             default: false
         })
-        .options('localeinfoincludedonly', {
-            describe: 'Modifies --localeinfo to only include information about the locales included in the build. Useful for displaying a list of the supported locales in a web app while keeping down size of the library'
+        .options('localesincludedonly', {
+            describe: 'Modifies --locales to only include information about the locales included in the build. Useful for displaying a list of the supported locales in a web app while keeping down size of the library'
         })
-        .options('currencyinfo', {
-            describe: 'Whether to include currency info and display names (inter.currencyInfo)',
+        .options('currencies', {
+            describe: 'Whether to include currency info and display names (inter.currencies)',
             type: 'boolean',
             default: false
         })

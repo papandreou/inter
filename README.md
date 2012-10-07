@@ -52,11 +52,12 @@ Further `buildLocale` options:
 <dt><tt>--delimiters</tt></dt><dd>Include quotation delimiters (adds <tt>inter.delimiters</tt>)</dd>
 <dt><tt>--listpatterns</tt></dt><dd>Include list formats (<tt>inter.listPatterns</tt> and <tt>inter.renderList</tt>)</dd>
 <dt><tt>--unitpatterns</tt></dt><dd>Include unit patterns (<tt>inter.unitPatterns</tt> and <tt>inter.getUnitRenderer</tt>)</dd>
-<dt><tt>--timezoneinfo</tt></dt><dd>Include time zone info and display names (<tt>inter.timeZoneInfo</tt>)</dd>
-<dt><tt>--countryinfo</tt></dt><dd>Include country info and display names (<tt>inter.countryInfo</tt>)</dd>
-<dt><tt>--regioninfo</tt></dt><dd>Include region info and display names (<tt>inter.regionInfo</tt>)</dd>
-<dt><tt>--localeinfo</tt></dt><dd>Include locale info and display names (<tt>inter.localeInfo</tt>). Only includes information about the locales included in the build</dd>
-<dt><tt>--currencyinfo</tt></dt><dd>Include currency info and display names (<tt>inter.currencyInfo</tt>)</dd>
+<dt><tt>--timezones</tt></dt><dd>Include time zone info and display names (<tt>inter.timeZones</tt>)</dd>
+<dt><tt>--countries</tt></dt><dd>Include country info and display names (<tt>inter.countries</tt>)</dd>
+<dt><tt>--regions</tt></dt><dd>Include region info and display names (<tt>inter.regions</tt>)</dd>
+<dt><tt>--locales</tt></dt><dd>Include locale info and display names (<tt>inter.locales</tt>)</dd>
+<dt><tt>--localesincludedonly</tt></dt><dd>Modifies <tt>--locales</tt> to only include information about the locales included in the build. Useful for displaying a list of the supported locales in a web app while keeping down size of the library</dd>
+<dt><tt>--currencies</tt></dt><dd>Include currency info and display names (<tt>inter.currencies</tt>)</dd>
 <dt><tt>--pluralrules</tt></dt><dd>Include plural rules (<tt>inter.getQuantity</tt>)</dd>
 <dt><tt>--exemplarcharacters</tt></dt><dd>Include exemplar characters (<tt>inter.exemplarCharacters</tt>)</dd>
 </dl>
