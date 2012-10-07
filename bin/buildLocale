@@ -67,9 +67,12 @@ var fs = require('fs'),
             default: false
         })
         .options('localeinfo', {
-            describe: 'Whether to include locale info and display names (one.locale.localeInfo). Only includes information about the locales included in the build',
+            describe: 'Whether to include locale info and display names (one.locale.localeInfo)',
             type: 'boolean',
             default: false
+        })
+        .options('localeinfoincludedonly', {
+            describe: 'Modifies --localeinfo to only include information about the locales included in the build. Useful for displaying a list of the supported locales in a web app while keeping down size of the library'
         })
         .options('currencyinfo', {
             describe: 'Whether to include currency info and display names (one.locale.currencyInfo)',
@@ -97,7 +100,7 @@ var fs = require('fs'),
             default: 'LOCALEID'
         })
         .argv,
-    targetLocaleIds = _.flatten(_.flatten([commandLineOptions.locale]).map(function (localeId) {return localeId.split(",");})),
+    targetLocaleIds = _.flatten(_.flatten([commandLineOptions.locale]).map(function (localeId) {return localeId.split(",");})).map(normalizeLocaleId),
     localeDataByTargetLocaleId = {},
     isTargetLocaleById = {},
     countries = JSON.parse(fs.readFileSync(Path.resolve(__dirname, '../countries.json'))),
@@ -225,7 +228,7 @@ function getLocaleData(localeId, cb) {
 
         localeData.localeDisplayNames = {};
         document.find('//languages/language').forEach(function (node) {
-            var localeId = node.attr('type').value();
+            var localeId = normalizeLocaleId(node.attr('type').value());
             localeData.localeDisplayNames[localeId] = localeData.localeDisplayNames[localeId] || node.text();
         });
 
@@ -523,15 +526,15 @@ seq(Object.keys(doExtractByLocaleId))
 
             if (commandLineOptions.localeinfo && localeData.localeDisplayNames) {
                 localeData.localeInfo = Object.keys(localeData.localeDisplayNames).filter(function (localeId) {
-                    return isTargetLocaleById[localeId];
+                    return !commandLineOptions.localeinfoincludedonly || isTargetLocaleById[localeId];
                 }).map(function (localeId) {
-                    var nativeDisplayName = localeDataByLocaleId[localeId].localeDisplayNames[localeId],
+                    var nativeDisplayName = localeDataByLocaleId[localeId] && localeDataByLocaleId[localeId].localeDisplayNames[localeId],
                         displayName = localeData.localeDisplayNames[localeId],
                         obj = {
                             id: localeId,
                             displayName: displayName
                         };
-                    if (nativeDisplayName !== displayName) {
+                    if (nativeDisplayName && nativeDisplayName !== displayName) {
                         obj.nativeDisplayName = nativeDisplayName;
                     }
                     return obj;
