@@ -187,12 +187,35 @@ fs.readFileSync(Path.resolve('/usr/share/zoneinfo/', 'zone.tab'), 'ascii').split
     utcStandardOffsetSecondsByTimeZoneId[timeZoneId] = utcStandardOffsetSeconds;
 });
 
+
+/*
+ * Replace - with _ and convert to lower case: en-GB => en_gb
+ */
+function normalizeLocaleId(localeId) {
+    return localeId && localeId.replace(/-/g, '_').toLowerCase();
+}
+
+var cldrCommonMainXmlFileNameByNormalizedLocaleId = {};
+
+fs.readdirSync(Path.resolve(commandLineOptions.cldrpath, "common", "main")).forEach(function (fileName) {
+    var matchFileName = fileName.match(/^(.*)\.xml$/);
+    if (matchFileName) {
+        cldrCommonMainXmlFileNameByNormalizedLocaleId[normalizeLocaleId(matchFileName[1])] =
+            Path.resolve(commandLineOptions.cldrpath, "common", "main", fileName);
+    }
+});
+
 function getLocaleData(localeId, cb) {
     var localeData = {
         dateFormats: {}
     };
 
-    fs.readFile(Path.resolve(commandLineOptions.cldrpath, "common", "main", localeId + '.xml'), 'utf-8', passError(cb, function (xmlString) {
+    var cldrCommonMainXmlFileName = cldrCommonMainXmlFileNameByNormalizedLocaleId[normalizeLocaleId(localeId)];
+    if (!cldrCommonMainXmlFileName) {
+        throw new Error('Cannot find xml file for ' + localeId + ' in ' + commandLineOptions.cldrpath);
+    }
+
+    fs.readFile(cldrCommonMainXmlFileName, 'utf-8', passError(cb, function (xmlString) {
         var document = libxmljs.parseXmlString(xmlString);
 
         localeData.localeDisplayNames = {};
@@ -605,7 +628,7 @@ seq(Object.keys(doExtractByLocaleId))
             statementAsts = [];
         targetLocaleIds.forEach(function (targetLocaleId) {
             statementAsts.push(['if',
-                                ['binary', '===', localeIdVarAst, ['string', targetLocaleId]],
+                                ['binary', '===', localeIdVarAst, ['string', normalizeLocaleId(targetLocaleId)]],
                                 ['block',
                                     Object.keys(localeDataByTargetLocaleId[targetLocaleId]).map(function (propertyName) {
                                         return ['stat',
