@@ -71,6 +71,11 @@ var fs = require('fs'),
             type: 'boolean',
             default: false
         })
+        .options('currencyinfo', {
+            describe: 'Whether to include currency info and display names (one.locale.currencyInfo)',
+            type: 'boolean',
+            default: false
+        })
         .options('pluralrules', {
             describe: 'Whether to include plural rules (one.locale.getQuantity)',
             type: 'boolean',
@@ -401,6 +406,19 @@ function getLocaleData(localeId, cb) {
             localeData.territoryDisplayNames[territoryId] = localeData.territoryDisplayNames[territoryId] || territoryNode.text();
         });
 
+        localeData.currencyDisplayNames = {};
+        localeData.currencyDisplayNamesCount = {};
+        document.find("/ldml/numbers/currencies/currency/displayName").forEach(function (currencyDisplayNameNode) {
+            var currencyId = currencyDisplayNameNode.parent().attr('type').value(),
+                countAttribute = currencyDisplayNameNode.attr('count');
+            if (countAttribute) {
+                localeData.currencyDisplayNamesCount[currencyId] = localeData.currencyDisplayNamesCount[currencyId] || {};
+                localeData.currencyDisplayNamesCount[currencyId][countAttribute.value()] = currencyDisplayNameNode.text();
+            } else {
+                localeData.currencyDisplayNames[currencyId] = localeData.currencyDisplayNames[currencyId] || currencyDisplayNameNode.text();
+            }
+        });
+
         cb(null, localeData);
     }));
 }
@@ -573,6 +591,21 @@ seq(Object.keys(doExtractByLocaleId))
                 });
             }
             delete localeData.territoryDisplayNames;
+
+            if (commandLineOptions.currencyinfo) {
+                localeData.currencyInfo = Object.keys(localeData.currencyDisplayNames).sort(function (a, b) {
+                    return localeData.currencyDisplayNames[a] < localeData.currencyDisplayNames[b] ? -1 :
+                        (localeData.currencyDisplayNames[a] > localeData.currencyDisplayNames[b] ? 1 : 0);
+                }).map(function (currencyId) {
+                    return _.extend({
+                        id: currencyId,
+                        displayName: localeData.currencyDisplayNames[currencyId]
+                    }, localeData.currencyDisplayNamesCount[currencyId]);
+                });
+            }
+            delete localeData.currencyDisplayNames;
+            delete localeData.currencyDisplayNamesCount;
+
 
             if (commandLineOptions.dateformats) {
                 if (localeData.dateTimePatterns && localeData.defaultDateTimePatternName) {

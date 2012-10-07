@@ -56,6 +56,7 @@ Further `buildLocale` options:
 <dt><tt>--countryinfo</tt></dt><dd>Include country info and display names (<tt>one.locale.countryInfo</tt>)</dd>
 <dt><tt>--regioninfo</tt></dt><dd>Include region info and display names (<tt>one.locale.regionInfo</tt>)</dd>
 <dt><tt>--localeinfo</tt></dt><dd>Include locale info and display names (<tt>one.locale.localeInfo</tt>). Only includes information about the locales included in the build</dd>
+<dt><tt>--currencyinfo</tt></dt><dd>Include currency info and display names (<tt>one.locale.currencyInfo</tt>)</dd>
 <dt><tt>--pluralrules</tt></dt><dd>Include plural rules (<tt>one.locale.getQuantity</tt>)</dd>
 <dt><tt>--exemplarcharacters</tt></dt><dd>Include exemplar characters (<tt>one.locale.exemplarCharacters</tt>)</dd>
 </dl>
