@@ -32,6 +32,11 @@ var fs = require('fs'),
             type: 'boolean',
             default: false
         })
+        .options('fields', {
+            describe: 'Whether to include field display names (inter.fields)',
+            type: 'boolean',
+            default: false
+        })
         .options('numberformats', {
             describe: 'Whether to include number formats (inter.numberSymbols, inter.getNumberRenderer, inter.getFileSizeRenderer, inter.getPercentageRenderer)',
             type: 'boolean',
