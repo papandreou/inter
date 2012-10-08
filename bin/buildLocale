@@ -85,6 +85,11 @@ var fs = require('fs'),
             type: 'boolean',
             default: false
         })
+        .options('currencies', {
+            describe: 'Whether to include script display names (inter.scripts)',
+            type: 'boolean',
+            default: false
+        })
         .options('pluralrules', {
             describe: 'Whether to include plural rules (inter.getQuantity)',
             type: 'boolean',
