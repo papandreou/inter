@@ -11,7 +11,7 @@ var fs = require('fs'),
     _ = require('underscore'),
     leftPad = require('../lib/leftPad'),
     normalizeLocaleId = require('../lib/normalizeLocaleId'),
-    cldr = require('../lib/cldr'),
+    Cldr = require('../lib/Cldr'),
     resolveAndTrimLocaleData = require('../lib/resolveAndTrimLocaleData'),
     commandLineOptions = require('optimist')
         .usage('$0 [--cldrpath <pathToCldr>] [-o <outputFileName>] --locale localeId,localeId...')
@@ -29,6 +29,26 @@ var fs = require('fs'),
         })
         .options('dateintervalformats', {
             describe: 'Whether to include date and time interval formats (inter.dateIntervalFormats)',
+            type: 'boolean',
+            default: false
+        })
+        .options('daynames', {
+            describe: 'Whether to include day names (inter.calendars[calendarId].dayNames). Implied by --dateformats and --dateintervalformats',
+            type: 'boolean',
+            default: false
+        })
+        .options('monthnames', {
+            describe: 'Whether to include month names (inter.calendars[calendarId].monthNames). Implied by --dateformats and --dateintervalformats',
+            type: 'boolean',
+            default: false
+        })
+        .options('eranames', {
+            describe: 'Whether to include era names (inter.calendars[calendarId].eraNames). Implied by --dateformats and --dateintervalformats',
+            type: 'boolean',
+            default: false
+        })
+        .options('quarternames', {
+            describe: 'Whether to include quarter names (inter.calendars[calendarId].quarterNames). Implied by --dateformats and --dateintervalformats',
             type: 'boolean',
             default: false
         })
@@ -227,25 +247,13 @@ targetLocaleIds.forEach(function (targetLocaleId) {
     });
 });
 
-var cldrCommonMainXmlFileNameByNormalizedLocaleId = {};
-
-fs.readdirSync(Path.resolve(commandLineOptions.cldrpath, "common", "main")).forEach(function (fileName) {
-    var matchFileName = fileName.match(/^(.*)\.xml$/);
-    if (matchFileName) {
-        cldrCommonMainXmlFileNameByNormalizedLocaleId[normalizeLocaleId(matchFileName[1])] =
-            Path.resolve(commandLineOptions.cldrpath, "common", "main", fileName);
-    }
-});
+var cldr = new Cldr(commandLineOptions.cldrpath);
 
 seq(Object.keys(doExtractByLocaleId))
     .parEach(function (localeId) {
-        var cb = this,
-            cldrCommonMainXmlFileName = cldrCommonMainXmlFileNameByNormalizedLocaleId[normalizeLocaleId(localeId)];
-        if (!cldrCommonMainXmlFileName) {
-            throw new Error('Cannot find xml file for ' + localeId + ' in ' + commandLineOptions.cldrpath);
-        }
-        fs.readFile(cldrCommonMainXmlFileName, 'utf-8', passError(cb, function (xmlString) {
-            localeDataByLocaleId[localeId] = cldr.extractLocaleDataFromXmlString(xmlString);
+        var cb = this;
+        cldr.getLocaleData(localeId, passError(cb, function (localeData) {
+            localeDataByLocaleId[localeId] = localeData;
             cb();
         }));
     })
@@ -253,8 +261,7 @@ seq(Object.keys(doExtractByLocaleId))
         var cb = this;
 
         if (commandLineOptions.pluralrules) {
-            fs.readFile(Path.resolve(commandLineOptions.cldrpath, 'common', 'supplemental', 'plurals.xml'), 'utf-8', passError(cb, function (xmlString) {
-                var getQuantityMethodAstByLocaleId = cldr.generateGetQuantityMethodAstsFromXmlString(xmlString, Object.keys(doExtractByLocaleId));
+            cldr.generateGetQuantityMethodAstByLocaleId(Object.keys(doExtractByLocaleId), passError(cb, function (getQuantityMethodAstByLocaleId) {
                 Object.keys(doExtractByLocaleId).forEach(function (localeId) {
                     localeDataByLocaleId[localeId].getQuantity = getQuantityMethodAstByLocaleId[localeId];
                 });
@@ -302,17 +309,21 @@ seq(Object.keys(doExtractByLocaleId))
 
         var localeIdVarAst = uglifyJs.parser.parse(commandLineOptions.localeidvar)[1][0][1],
             statementAsts = [];
+
         targetLocaleIds.forEach(function (targetLocaleId) {
-            statementAsts.push(['if',
-                                ['binary', '===', localeIdVarAst, ['string', normalizeLocaleId(targetLocaleId)]],
-                                ['block',
-                                    Object.keys(localeDataByTargetLocaleId[targetLocaleId]).map(function (propertyName) {
-                                        return ['stat',
-                                            ['assign', true, ['dot', ['name', 'inter'], propertyName], uglifyAst.objToAst(localeDataByTargetLocaleId[targetLocaleId][propertyName])]
-                                        ];
-                                    })
-                                ]
-                               ]);
+            var propertyNames = Object.keys(localeDataByTargetLocaleId[targetLocaleId]);
+            if (propertyNames.length > 0) {
+                statementAsts.push(['if',
+                                    ['binary', '===', localeIdVarAst, ['string', normalizeLocaleId(targetLocaleId)]],
+                                    ['block',
+                                        propertyNames.map(function (propertyName) {
+                                            return ['stat',
+                                                ['assign', true, ['dot', ['name', 'inter'], propertyName], uglifyAst.objToAst(localeDataByTargetLocaleId[targetLocaleId][propertyName])]
+                                            ];
+                                        })
+                                    ]
+                                   ]);
+            }
         });
 
         var omitByMethodName = {};
