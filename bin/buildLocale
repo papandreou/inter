@@ -8,18 +8,33 @@ var fs = require('fs'),
     passError = require('passerror'),
     time = require('time'),
     _ = require('underscore'),
+    fsTools = require('../lib/fsTools'),
     leftPad = require('../lib/leftPad'),
     normalizeLocaleId = require('../lib/normalizeLocaleId'),
     Cldr = require('../lib/Cldr'),
     resolveAndTrimLocaleData = require('../lib/resolveAndTrimLocaleData'),
     commandLineOptions = require('optimist')
         .usage('$0 [--cldrpath <pathToCldr>] [-o <outputFileName>] --locale localeId,localeId...')
-        .options('o', {
-            describe: 'Output file name (defaults to STDOUT)'
-        })
         .options('cldrpath', {
             default: '/usr/share/cldr',
             describe: 'Path to your CLDR files'
+        })
+        .options('o', {
+            describe: 'Output directory (or output file if --onefile is specified)'
+        })
+        .options('bundle', {
+            default: false,
+            describe: 'Generate one bundle with all locale data in it (see also --localeidvar). The default is to generate one file per locale'
+        })
+        .check(function (argv) {
+            if (!argv.bundle && !argv.o) {
+                throw new Error('-o is mandatory unless --bundle is specified');
+            }
+        })
+        .options('localeidvar', {
+            describe: 'The name of the JavaScript identifier used to determine which locale to select (only applicable with --bundle). If you don\'t use buildDevelopment (AssetGraph-builder) your own code must set this variable before the locale library is loaded',
+            type: 'string',
+            default: 'LOCALEID'
         })
         .options('dateformats', {
             describe: 'Whether to include date and time formats (inter.dateFormats and others)',
@@ -122,11 +137,6 @@ var fs = require('fs'),
         .options('locale', {
             describe: 'Comma-separated list of locales to build',
             type: 'string'
-        })
-        .options('localeidvar', {
-            describe: 'The name of the JavaScript identifier used to determine which locale to select. If you don\'t use buildDevelopment (AssetGraph-builder) your own code must set this variable before the locale library is loaded.',
-            type: 'string',
-            default: 'LOCALEID'
         })
         .argv;
 
@@ -254,6 +264,71 @@ targetLocaleIds.forEach(function (targetLocaleId) {
     });
 });
 
+function localeDataToStatementAsts(localeData) {
+    var statementAsts = [],
+        propertyNames = Object.keys(localeData);
+
+    return propertyNames.map(function (propertyName) {
+        return [
+            'stat',
+            [
+                'assign',
+                true,
+                ['dot', ['name', 'inter'], propertyName],
+                uglifyAst.objToAst(localeData[propertyName])
+            ]
+        ];
+    });
+}
+
+function getTrimmedInterAst() {
+    var interAst = uglifyJs.parser.parse(fs.readFileSync(Path.resolve(__dirname, '../lib/inter.js'), 'utf-8')),
+        omitByMethodName = {};
+    if (!commandLineOptions.pluralrules) {
+        omitByMethodName.trQuantity = true;
+    }
+    if (!commandLineOptions.listpatterns) {
+        omitByMethodName.renderList = true;
+    }
+    if (!commandLineOptions.dateintervalformats) {
+        omitByMethodName.makeDateIntervalRendererFromFormatString = true;
+        omitByMethodName.makeDateIntervalRenderer = true;
+        omitByMethodName.makeDateIntervalRendererFromGreatestDifferences = true;
+    }
+    if (!commandLineOptions.dateformats && !commandLineOptions.dateintervalformats) {
+        omitByMethodName.tokenizeDateFormat = true;
+        omitByMethodName.getCodeFragmentForDateField = true;
+        omitByMethodName.getDateFormat = true;
+        omitByMethodName.makeDateRenderer = true;
+        omitByMethodName.makeDateRendererSource = true;
+        omitByMethodName.getBestICUFormatId = true;
+        omitByMethodName.adaptICUFormat = true;
+    }
+    if (!commandLineOptions.numberformats) {
+        omitByMethodName.makeNumberRendererSource = true;
+        omitByMethodName.makeNumberRenderer = true;
+        omitByMethodName.makeFileSizeRenderer = true;
+        omitByMethodName.makePercentageRenderer = true;
+    }
+    if (!commandLineOptions.unitpatterns) {
+        omitByMethodName.makeUnitRenderer = true;
+    }
+
+    // These methods are always included (for now):
+    //   makePatternRenderer
+    //   tokenizePattern
+
+    var factoryStatementAsts = interAst[1][0][1][2][1][3],
+        objectLiteralKeyValueAsts = factoryStatementAsts[0][1][0][1][1];
+    for (var i = 0 ; i < objectLiteralKeyValueAsts.length ; i += 1) {
+        if (omitByMethodName[objectLiteralKeyValueAsts[i][0]]) {
+            objectLiteralKeyValueAsts.splice(i, 1);
+            i -= 1;
+        }
+    }
+    return interAst;
+}
+
 seq(targetLocaleIds)
     .parEach(20, function (localeId) {
         var cb = this;
@@ -316,80 +391,50 @@ seq(targetLocaleIds)
             localeDataByTargetLocaleId[targetLocaleId] = resolveAndTrimLocaleData(localeDataByLocaleId[targetLocaleId], resolveAndTrimLocaleDataOptions);
         });
 
-        var localeIdVarAst = uglifyJs.parser.parse(commandLineOptions.localeidvar)[1][0][1],
-            statementAsts = [];
+        if (commandLineOptions.bundle) {
+            var localeIdVarAst = uglifyJs.parser.parse(commandLineOptions.localeidvar)[1][0][1],
+                statementAsts = [];
 
-        targetLocaleIds.forEach(function (targetLocaleId) {
-            var propertyNames = Object.keys(localeDataByTargetLocaleId[targetLocaleId]);
-            if (propertyNames.length > 0) {
-                statementAsts.push(['if',
-                                    ['binary', '===', localeIdVarAst, ['string', normalizeLocaleId(targetLocaleId)]],
-                                    ['block',
-                                        propertyNames.map(function (propertyName) {
-                                            return ['stat',
-                                                ['assign', true, ['dot', ['name', 'inter'], propertyName], uglifyAst.objToAst(localeDataByTargetLocaleId[targetLocaleId][propertyName])]
-                                            ];
-                                        })
-                                    ]
-                                   ]);
-            }
-        });
-
-        var omitByMethodName = {};
-        if (!commandLineOptions.pluralrules) {
-            omitByMethodName.trQuantity = true;
-        }
-        if (!commandLineOptions.listpatterns) {
-            omitByMethodName.renderList = true;
-        }
-        if (!commandLineOptions.dateintervalformats) {
-            omitByMethodName.makeDateIntervalRendererFromFormatString = true;
-            omitByMethodName.makeDateIntervalRenderer = true;
-            omitByMethodName.makeDateIntervalRendererFromGreatestDifferences = true;
-        }
-        if (!commandLineOptions.dateformats && !commandLineOptions.dateintervalformats) {
-            omitByMethodName.tokenizeDateFormat = true;
-            omitByMethodName.getCodeFragmentForDateField = true;
-            omitByMethodName.getDateFormat = true;
-            omitByMethodName.makeDateRenderer = true;
-            omitByMethodName.makeDateRendererSource = true;
-            omitByMethodName.getBestICUFormatId = true;
-            omitByMethodName.adaptICUFormat = true;
-        }
-        if (!commandLineOptions.numberformats) {
-            omitByMethodName.makeNumberRendererSource = true;
-            omitByMethodName.makeNumberRenderer = true;
-            omitByMethodName.makeFileSizeRenderer = true;
-            omitByMethodName.makePercentageRenderer = true;
-        }
-        if (!commandLineOptions.unitpatterns) {
-            omitByMethodName.makeUnitRenderer = true;
-        }
-
-        // These methods are always included (for now):
-        //   makePatternRenderer
-        //   tokenizePattern
-
-        var interAst = uglifyJs.parser.parse(fs.readFileSync(Path.resolve(__dirname, '../lib/inter.js'), 'utf-8')),
-            factoryStatementAsts = interAst[1][0][1][2][1][3],
-            objectLiteralKeyValueAsts = factoryStatementAsts[0][1][0][1][1];
-        for (var i = 0 ; i < objectLiteralKeyValueAsts.length ; i += 1) {
-            if (omitByMethodName[objectLiteralKeyValueAsts[i][0]]) {
-                objectLiteralKeyValueAsts.splice(i, 1);
-                i -= 1;
-            }
-        }
-
-        Array.prototype.splice.apply(factoryStatementAsts, [factoryStatementAsts.length - 2, 0].concat(statementAsts)); // Inject before "return inter;"
-
-        var javaScriptString = uglifyJs.uglify.gen_code(interAst, {beautify: true});
-        if ('o' in commandLineOptions) {
-            fs.writeFile(commandLineOptions.o, javaScriptString, 'utf-8', function (err) {
-                if (err) {
-                    throw err;
+            targetLocaleIds.forEach(function (targetLocaleId) {
+                if (Object.keys(localeDataByTargetLocaleId[targetLocaleId]).length > 0) {
+                    statementAsts.push([
+                        'if',
+                        ['binary', '===', localeIdVarAst, ['string', normalizeLocaleId(targetLocaleId)]],
+                            ['block',
+                                localeDataToStatementAsts(localeDataByTargetLocaleId[targetLocaleId])
+                            ]
+                        ]
+                    );
                 }
             });
+
+            var interAst = getTrimmedInterAst(),
+                factoryStatementAsts = interAst[1][0][1][2][1][3];
+
+            Array.prototype.splice.apply(factoryStatementAsts, [factoryStatementAsts.length - 1, 0].concat(statementAsts)); // Inject before "return inter;"
+
+            var javaScriptString = uglifyJs.uglify.gen_code(interAst, {beautify: true});
+            if ('o' in commandLineOptions) {
+                fs.writeFile(commandLineOptions.o, javaScriptString, 'utf-8', function (err) {
+                    if (err) {
+                        throw err;
+                    }
+                });
+            } else {
+                console.log(javaScriptString);
+            }
         } else {
-            console.log(javaScriptString);
+            // Build one file per locale, interpret commandLineOptions.o as a dir
+            seq(targetLocaleIds)
+                .parEach(40, function (targetLocaleId) {
+                    var interAst = getTrimmedInterAst(),
+                        factoryStatementAsts = interAst[1][0][1][2][1][3],
+                        statementAsts = localeDataToStatementAsts(localeDataByTargetLocaleId[targetLocaleId]);
+                    Array.prototype.splice.apply(factoryStatementAsts, [factoryStatementAsts.length - 1, 0].concat(statementAsts)); // Inject before "return inter;"
+                    // Interpret commandLineOptions.o as a directory name
+
+                    var javaScriptString = uglifyJs.uglify.gen_code(interAst, {beautify: true});
+                    fsTools.mkpathAndWriteFile(Path.resolve(commandLineOptions.o, targetLocaleId + '.js'), javaScriptString, 'utf-8', this);
+                });
         }
     });
