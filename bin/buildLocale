@@ -7,7 +7,6 @@ var fs = require('fs'),
     uglifyAst = require('uglifyast'),
     passError = require('passerror'),
     time = require('time'),
-    cjson = require('cjson-papandreou'),
     _ = require('underscore'),
     leftPad = require('../lib/leftPad'),
     normalizeLocaleId = require('../lib/normalizeLocaleId'),
@@ -122,17 +121,25 @@ var fs = require('fs'),
         })
         .options('locale', {
             describe: 'Comma-separated list of locales to build',
-            type: 'string',
-            demand: true
+            type: 'string'
         })
         .options('localeidvar', {
             describe: 'The name of the JavaScript identifier used to determine which locale to select. If you don\'t use buildDevelopment (AssetGraph-builder) your own code must set this variable before the locale library is loaded.',
             type: 'string',
             default: 'LOCALEID'
         })
-        .argv,
-    targetLocaleIds = _.flatten(_.flatten([commandLineOptions.locale]).map(function (localeId) {return localeId.split(",");})).map(normalizeLocaleId),
-    localeDataByTargetLocaleId = {},
+        .argv;
+
+var cldr = new Cldr(commandLineOptions.cldrpath),
+    targetLocaleIds;
+
+if (commandLineOptions.locale) {
+    targetLocaleIds = _.flatten(_.flatten([commandLineOptions.locale]).map(function (localeId) {return localeId.split(",");})).map(normalizeLocaleId);
+} else {
+    targetLocaleIds = cldr.allLocaleIds;
+}
+
+var localeDataByTargetLocaleId = {},
     isTargetLocaleById = {},
     countries = JSON.parse(fs.readFileSync(Path.resolve(__dirname, '../countries.json'))),
     countryInfoByTerritoryId = {},
@@ -247,14 +254,19 @@ targetLocaleIds.forEach(function (targetLocaleId) {
     });
 });
 
-var cldr = new Cldr(commandLineOptions.cldrpath);
-
-seq(Object.keys(doExtractByLocaleId))
-    .parEach(function (localeId) {
+seq(targetLocaleIds)
+    .parEach(20, function (localeId) {
         var cb = this;
         cldr.getLocaleData(localeId, passError(cb, function (localeData) {
             localeDataByLocaleId[localeId] = localeData;
-            cb();
+            if (commandLineOptions.pluralrules) {
+                cldr.generateGetQuantityFunction(localeId, passError(cb, function (getQuantityMethod) {
+                    localeDataByLocaleId[localeId].getQuantity = getQuantityMethod;
+                    cb();
+                }));
+            } else {
+                cb();
+            }
         }));
     })
     .seq(function () {
@@ -272,11 +284,13 @@ seq(Object.keys(doExtractByLocaleId))
         }
     })
     .seq(function () {
-        timeZoneIds.forEach(function (timeZoneId) {
-            localeDataByLocaleId.root.timeZoneDisplayNames = localeDataByLocaleId.root.timeZoneDisplayNames || {};
-            if (!(timeZoneId in localeDataByLocaleId.root.timeZoneDisplayNames)) {
-                localeDataByLocaleId.root.timeZoneDisplayNames[timeZoneId] = timeZoneIdToEnglishDisplayName(timeZoneId);
-            }
+        targetLocaleIds.forEach(function (targetLocaleId) {
+            var timeZoneDisplayNames = localeDataByLocaleId[targetLocaleId].timeZoneDisplayNames;
+            timeZoneIds.forEach(function (timeZoneId) {
+                if (!(timeZoneId in timeZoneDisplayNames)) {
+                    timeZoneDisplayNames[timeZoneId] = timeZoneIdToEnglishDisplayName(timeZoneId);
+                }
+            });
         });
 
         // Gotcha: Only includes the locale ids we're extracting data for
@@ -299,12 +313,7 @@ seq(Object.keys(doExtractByLocaleId))
         });
 
         targetLocaleIds.forEach(function (targetLocaleId) {
-            var localeDatasInPrioritizedOrder = expandLocaleIdToPrioritizedList(targetLocaleId).concat(['root']).map(function (localeId) {
-                return localeDataByLocaleId[localeId];
-            });
-
-            var localeData = cjson.extend.apply(cjson, [true, {}].concat(localeDatasInPrioritizedOrder.reverse()));
-            localeDataByTargetLocaleId[targetLocaleId] = resolveAndTrimLocaleData(localeData, resolveAndTrimLocaleDataOptions);
+            localeDataByTargetLocaleId[targetLocaleId] = resolveAndTrimLocaleData(localeDataByLocaleId[targetLocaleId], resolveAndTrimLocaleDataOptions);
         });
 
         var localeIdVarAst = uglifyJs.parser.parse(commandLineOptions.localeidvar)[1][0][1],
@@ -375,9 +384,12 @@ seq(Object.keys(doExtractByLocaleId))
 
         var javaScriptString = uglifyJs.uglify.gen_code(interAst, {beautify: true});
         if ('o' in commandLineOptions) {
-            fs.writeFile(commandLineOptions.o, javaScriptString, 'utf-8', this);
+            fs.writeFile(commandLineOptions.o, javaScriptString, 'utf-8', function (err) {
+                if (err) {
+                    throw err;
+                }
+            });
         } else {
             console.log(javaScriptString);
-            this();
         }
     });
