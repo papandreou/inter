@@ -6,17 +6,21 @@ var fs = require('fs'),
     uglifyJs = require('uglify-js'),
     uglifyAst = require('uglifyast'),
     passError = require('passerror'),
-    time = require('time'),
     _ = require('underscore'),
     fsTools = require('../lib/fsTools'),
     leftPad = require('../lib/leftPad'),
     normalizeLocaleId = require('../lib/normalizeLocaleId'),
     Cldr = require('../lib/Cldr'),
+    ZoneInfo = require('../lib/ZoneInfo'),
     commandLineOptions = require('optimist')
         .usage('$0 [--cldrpath <pathToCldr>] [-o <outputFileName>] --locale localeId,localeId...')
         .options('cldrpath', {
             default: '/usr/share/cldr',
             describe: 'Path to your CLDR files'
+        })
+        .options('zoneinfopath', {
+            default: '/usr/share/zoneinfo',
+            describe: 'Path to your zoneinfo database'
         })
         .options('o', {
             describe: 'Output directory (or output file if --onefile is specified)'
@@ -149,39 +153,17 @@ var fs = require('fs'),
         .argv;
 
 var cldr = new Cldr(commandLineOptions.cldrpath),
-    targetLocaleIds;
+    zoneInfo = new ZoneInfo(commandLineOptions.zoneinfopath),
+    worldInfo = require('../lib/worldInfo'),
+    targetLocaleIds,
+    localeDataByTargetLocaleId = {},
+    isTargetLocaleById = {};
 
 if (commandLineOptions.locales) {
     targetLocaleIds = _.flatten(_.flatten([commandLineOptions.locales]).map(function (localeId) {return localeId.split(",");})).map(normalizeLocaleId);
 } else {
-    targetLocaleIds = cldr.allLocaleIds;
+    targetLocaleIds = cldr.localeIds;
 }
-
-var localeDataByTargetLocaleId = {},
-    isTargetLocaleById = {},
-    countries = JSON.parse(fs.readFileSync(Path.resolve(__dirname, '../countries.json'))),
-    countryInfoByTerritoryId = {},
-    numericRegionIdByNumericTerritoryId = {},
-    numericRegionIdByTerritoryId = {},
-    alpha2CodeByNumericTerritoryId = {};
-
-countries.forEach(function (countryInfo) {
-    alpha2CodeByNumericTerritoryId[countryInfo.numericCode] = countryInfo.alpha2Code;
-    countryInfoByTerritoryId[countryInfo.alpha2Code] = countryInfo;
-});
-
-(function traverseRegions(region, parentId) {
-    var id = leftPad(region.id, 3, '0');
-    if (parentId) {
-        numericRegionIdByNumericTerritoryId[id] = parentId;
-        numericRegionIdByTerritoryId[alpha2CodeByNumericTerritoryId[id]] = parentId;
-    }
-    if (region.children) {
-        region.children.forEach(function (child) {
-            traverseRegions(child, id);
-        });
-    }
-}(JSON.parse(fs.readFileSync(Path.resolve(__dirname, '../regions.json')))));
 
 targetLocaleIds.forEach(function (targetLocaleId) {
     isTargetLocaleById[targetLocaleId] = true;
@@ -194,62 +176,6 @@ function zeroPad(str, length) {
     }
     return str;
 }
-
-var difficultTimeZoneIdToEnglishDisplayName = {
-    "Antarctica/DumontDUrville": "Dumont d'Urville",
-    "America/St_Thomas": "St. Thomas",
-    "America/St_Vincent": "St. Vincent",
-    "America/St_Lucia": "St. Lucia",
-    "America/St_Johns": "St. John's",
-    "America/St_Kitts": "St. Kitts"
-};
-
-function timeZoneIdToEnglishDisplayName(timeZoneId) {
-    if (timeZoneId in difficultTimeZoneIdToEnglishDisplayName) {
-        return difficultTimeZoneIdToEnglishDisplayName[timeZoneId];
-    }
-    return timeZoneId.split("/").pop().replace(/_/g, ' ');
-}
-
-var nextYear = new Date().getFullYear() + 1,
-    nextJanuary1st = new time.Date(nextYear, 0, 1),
-    nextJuly1st = new time.Date(nextYear, 6, 1),
-    territoryIdByTimeZoneId = {},
-    numTimeZonesByTerritoryId = {},
-    utcStandardOffsetSecondsByTimeZoneId = {},
-    timeZoneIds = [];
-
-fs.readFileSync(Path.resolve('/usr/share/zoneinfo/', 'zone.tab'), 'ascii').split(/\r\n?|\n\r?/).forEach(function (line) {
-    if (/^#|^\s*$/.test(line)) {
-        return;
-    }
-    var fields = line.split("\t");
-    if (fields.length < 3) {
-        console.warn('Skipping ' + line, fields);
-    }
-    var territoryId = fields[0],
-        timeZoneId = fields[2];
-
-    // Try instantiating a time.Date object with this time zone.
-    // If this throws an exception, node-time's set of time zones is somehow different
-    // from /usr/share/zoneinfo/zone.tab:
-    new time.Date(nextJanuary1st.getTime(), timeZoneId);
-
-    numTimeZonesByTerritoryId[territoryId] = (numTimeZonesByTerritoryId[territoryId] || 0) + 1;
-    territoryIdByTimeZoneId[timeZoneId] = territoryId;
-    timeZoneIds.push(timeZoneId);
-
-    time.tzset(timeZoneId);
-    var localtimeNextJanuary1st = time.localtime(nextJanuary1st.getTime() / 1000),
-        localtimeNextJuly1st = time.localtime(nextJuly1st.getTime() / 1000),
-        utcStandardOffsetSeconds;
-    if (localtimeNextJanuary1st.isDaylightSavings) {
-        utcStandardOffsetSeconds = localtimeNextJuly1st.gmtOffset;
-    } else {
-        utcStandardOffsetSeconds = localtimeNextJanuary1st.gmtOffset;
-    }
-    utcStandardOffsetSecondsByTimeZoneId[timeZoneId] = utcStandardOffsetSeconds;
-});
 
 var doExtractByLocaleId = {root: true};
 
@@ -336,12 +262,12 @@ function getTrimmedInterAst() {
     return interAst;
 }
 
-var getLocaleDataOptions = {};
+var getLocaleDataOptions = {zoneInfo: zoneInfo, worldInfo: worldInfo};
 ['languages', 'territories', 'countries', 'regions', 'timeZones', 'currencies', 'scripts', 'delimiters', 'unitPatterns', 'fields', 'dateFormats', 'dateIntervalFormats', 'exemplarCharacters', 'numberSymbols', 'listPatterns', 'eraNames', 'quarterNames', 'monthNames', 'dayNames'].forEach(function (optionName) {
     getLocaleDataOptions[optionName] = commandLineOptions[optionName.toLowerCase()];
 });
 
-if (commandLineOptions.calendar) {
+if (commandLineOptions.calendars) {
     getLocaleDataOptions.calendars = _.flatten(_.flatten([commandLineOptions.calendar]).map(function (localeId) {return localeId.split(",");}));
 }
 
@@ -373,7 +299,7 @@ seq(targetLocaleIds)
             var timeZoneDisplayNames = localeDataByTargetLocaleId[targetLocaleId].timeZoneDisplayNames;
             timeZoneIds.forEach(function (timeZoneId) {
                 if (!(timeZoneId in timeZoneDisplayNames)) {
-                    timeZoneDisplayNames[timeZoneId] = timeZoneIdToEnglishDisplayName(timeZoneId);
+                    timeZoneDisplayNames[timeZoneId] = zoneInfo.timeZoneIdToEnglishDisplayName(timeZoneId);
                 }
             });
         });
