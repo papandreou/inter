@@ -137,8 +137,8 @@ var fs = require('fs'),
             type: 'boolean',
             default: false
         })
-        .options('exemplarcharacters', {
-            describe: 'Whether to include exemplar characters (inter.exemplarCharacters)',
+        .options('characters', {
+            describe: 'Whether to include characters (inter.exemplarCharacters, inter.ellipsis)',
             type: 'boolean',
             default: false
         })
@@ -263,7 +263,7 @@ function getTrimmedInterAst() {
 }
 
 var getLocaleDataOptions = {zoneInfo: zoneInfo, worldInfo: worldInfo};
-['languages', 'territories', 'countries', 'regions', 'timeZones', 'currencies', 'scripts', 'delimiters', 'unitPatterns', 'fields', 'dateFormats', 'dateIntervalFormats', 'exemplarCharacters', 'numberSymbols', 'listPatterns', 'eraNames', 'quarterNames', 'monthNames', 'dayNames'].forEach(function (optionName) {
+['languages', 'territories', 'countries', 'regions', 'timeZones', 'currencies', 'scripts', 'delimiters', 'unitPatterns', 'fields', 'dateFormats', 'dateIntervalFormats', 'characters', 'numberSymbols', 'listPatterns', 'eraNames', 'quarterNames', 'monthNames', 'dayNames'].forEach(function (optionName) {
     getLocaleDataOptions[optionName] = commandLineOptions[optionName.toLowerCase()];
 });
 
