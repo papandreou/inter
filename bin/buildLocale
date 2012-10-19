@@ -278,7 +278,7 @@ var getLocaleDataOptions = {zoneInfo: zoneInfo, worldInfo: worldInfo};
 });
 
 if (commandLineOptions.calendars) {
-    getLocaleDataOptions.calendars = _.flatten(_.flatten([commandLineOptions.calendar]).map(function (localeId) {return localeId.split(",");}));
+    getLocaleDataOptions.calendars = _.flatten(_.flatten([commandLineOptions.calendars]).map(function (calendarId) {return calendarId.split(",");}));
 }
 
 seq(targetLocaleIds)
