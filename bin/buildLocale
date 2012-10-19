@@ -59,6 +59,11 @@ var fs = require('fs'),
             type: 'boolean',
             default: false
         })
+        .options('cyclicnames', {
+            describe: 'Whether to include cyclic names (inter.calendars[calendarId].cyclicNames). Implied by --dateformats and --dateintervalformats',
+            type: 'boolean',
+            default: false
+        })
         .options('monthnames', {
             describe: 'Whether to include month names (inter.calendars[calendarId].monthNames). Implied by --dateformats and --dateintervalformats',
             type: 'boolean',
@@ -273,7 +278,7 @@ function getTrimmedInterAst() {
 }
 
 var getLocaleDataOptions = {zoneInfo: zoneInfo, worldInfo: worldInfo};
-['languages', 'territories', 'countries', 'regions', 'timeZones', 'currencies', 'scripts', 'delimiters', 'unitPatterns', 'fields', 'dateFormats', 'dateIntervalFormats', 'characters', 'numberSymbols', 'listPatterns', 'eraNames', 'quarterNames', 'monthNames', 'monthPatterns', 'dayNames', 'dayPeriods'].forEach(function (optionName) {
+['languages', 'territories', 'countries', 'regions', 'timeZones', 'currencies', 'scripts', 'delimiters', 'unitPatterns', 'fields', 'dateFormats', 'dateIntervalFormats', 'characters', 'numberSymbols', 'listPatterns', 'eraNames', 'quarterNames', 'monthNames', 'monthPatterns', 'dayNames', 'dayPeriods', 'cyclicNames'].forEach(function (optionName) {
     getLocaleDataOptions[optionName] = commandLineOptions[optionName.toLowerCase()];
 });
 
