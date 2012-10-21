@@ -89,8 +89,8 @@ var fs = require('fs'),
             type: 'boolean',
             default: false
         })
-        .options('numberformats', {
-            describe: 'Whether to include number formats (inter.numberSymbols, inter.getNumberRenderer, inter.getFileSizeRenderer, inter.getPercentageRenderer)',
+        .options('numbers', {
+            describe: 'Whether to include number formats and symbols (inter.numbers, inter.getNumberRenderer, inter.getFileSizeRenderer, inter.getPercentageRenderer)',
             type: 'boolean',
             default: false
         })
@@ -252,7 +252,7 @@ function getTrimmedInterAst() {
         omitByMethodName.getBestICUFormatId = true;
         omitByMethodName.adaptICUFormat = true;
     }
-    if (!commandLineOptions.numberformats) {
+    if (!commandLineOptions.numbers) {
         omitByMethodName.makeNumberRendererSource = true;
         omitByMethodName.makeNumberRenderer = true;
         omitByMethodName.makeFileSizeRenderer = true;
@@ -278,7 +278,7 @@ function getTrimmedInterAst() {
 }
 
 var getLocaleDataOptions = {zoneInfo: zoneInfo, worldInfo: worldInfo};
-['languages', 'territories', 'countries', 'regions', 'timeZones', 'currencies', 'scripts', 'delimiters', 'unitPatterns', 'fields', 'dateFormats', 'dateIntervalFormats', 'characters', 'numberSymbols', 'listPatterns', 'eraNames', 'quarterNames', 'monthNames', 'monthPatterns', 'dayNames', 'dayPeriods', 'cyclicNames'].forEach(function (optionName) {
+['languages', 'territories', 'countries', 'regions', 'timeZones', 'currencies', 'scripts', 'delimiters', 'unitPatterns', 'fields', 'dateFormats', 'dateIntervalFormats', 'characters', 'numbers', 'listPatterns', 'eraNames', 'quarterNames', 'monthNames', 'monthPatterns', 'dayNames', 'dayPeriods', 'cyclicNames'].forEach(function (optionName) {
     getLocaleDataOptions[optionName] = commandLineOptions[optionName.toLowerCase()];
 });
 
