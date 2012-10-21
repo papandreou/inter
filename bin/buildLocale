@@ -25,6 +25,10 @@ var fs = require('fs'),
         .options('o', {
             describe: 'Output directory (or output file if --onefile is specified)'
         })
+        .options('locales', {
+            describe: 'Comma-separated list of locales to build',
+            type: 'string'
+        })
         .options('bundle', {
             default: false,
             describe: 'Generate one bundle with all locale data in it (see also --localeidvar). The default is to generate one file per locale'
@@ -157,9 +161,10 @@ var fs = require('fs'),
             type: 'boolean',
             default: false
         })
-        .options('locales', {
-            describe: 'Comma-separated list of locales to build',
-            type: 'string'
+        .options('rbnf', {
+            describe: 'Whether to include rbnf rules (inter.renderDigitsOrdinal, inter.renderSpelloutNumbering...)',
+            type: 'boolean',
+            default: false
         })
         .options('calendars', {
             describe: 'Comma-separated list of calendars to ínclude (defaults to all available)',
@@ -252,9 +257,11 @@ function getTrimmedInterAst() {
         omitByMethodName.getBestICUFormatId = true;
         omitByMethodName.adaptICUFormat = true;
     }
-    if (!commandLineOptions.numbers) {
+    if (!commandLineOptions.numbers && !commandLineOptions.rbnf) {
         omitByMethodName.makeNumberRendererSource = true;
         omitByMethodName.makeNumberRenderer = true;
+    }
+    if (!commandLineOptions.numbers) {
         omitByMethodName.makeFileSizeRenderer = true;
         omitByMethodName.makePercentageRenderer = true;
     }
@@ -278,7 +285,7 @@ function getTrimmedInterAst() {
 }
 
 var getLocaleDataOptions = {zoneInfo: zoneInfo, worldInfo: worldInfo};
-['languages', 'territories', 'countries', 'regions', 'timeZones', 'currencies', 'scripts', 'delimiters', 'unitPatterns', 'fields', 'dateFormats', 'dateIntervalFormats', 'characters', 'numbers', 'listPatterns', 'eraNames', 'quarterNames', 'monthNames', 'monthPatterns', 'dayNames', 'dayPeriods', 'cyclicNames'].forEach(function (optionName) {
+['languages', 'territories', 'countries', 'regions', 'timeZones', 'currencies', 'scripts', 'delimiters', 'unitPatterns', 'fields', 'dateFormats', 'dateIntervalFormats', 'characters', 'numbers', 'listPatterns', 'eraNames', 'quarterNames', 'monthNames', 'monthPatterns', 'dayNames', 'dayPeriods', 'cyclicNames', 'pluralRules', 'rbnf'].forEach(function (optionName) {
     getLocaleDataOptions[optionName] = commandLineOptions[optionName.toLowerCase()];
 });
 
@@ -297,15 +304,7 @@ seq(targetLocaleIds)
                     return targetLocaleIds.indexOf(languageInfo.id) !== -1;
                 });
             }
-
-            if (commandLineOptions.pluralrules) {
-                cldr.generateGetQuantityFunction(localeId, passError(cb, function (getQuantityMethod) {
-                    localeDataByTargetLocaleId[localeId].getQuantity = getQuantityMethod;
-                    cb();
-                }));
-            } else {
-                cb();
-            }
+            cb();
         }));
     })
     .seq(function () {
