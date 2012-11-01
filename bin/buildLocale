@@ -12,7 +12,7 @@ var fs = require('fs'),
     normalizeLocaleId = require('../lib/normalizeLocaleId'),
     Cldr = require('../lib/Cldr'),
     ZoneInfo = require('../lib/ZoneInfo'),
-    commandLineOptions = require('optimist')
+    optimist = require('optimist')
         .usage('$0 [--cldrpath <pathToCldr>] [-o <outputFileName>] --locale localeId,localeId...')
         .options('cldrpath', {
             default: '/usr/share/cldr',
@@ -43,134 +43,66 @@ var fs = require('fs'),
             type: 'string',
             default: 'LOCALEID'
         })
-        .options('dateformats', {
-            describe: 'Whether to include date and time formats (inter.dateFormats and others, implied by --dateintervalformats)',
-            type: 'boolean',
-            default: false
-        })
-        .options('dateintervalformats', {
-            describe: 'Whether to include date and time interval formats (inter.dateIntervalFormats)',
-            type: 'boolean',
-            default: false
-        })
-        .options('daynames', {
-            describe: 'Whether to include day names (inter.calendars[calendarId].dayNames). Implied by --dateformats and --dateintervalformats',
-            type: 'boolean',
-            default: false
-        })
-        .options('dayperiods', {
-            describe: 'Whether to include day periods (inter.calendars[calendarId].dayPeriods). Implied by --dateformats and --dateintervalformats',
-            type: 'boolean',
-            default: false
-        })
-        .options('cyclicnames', {
-            describe: 'Whether to include cyclic names (inter.calendars[calendarId].cyclicNames). Implied by --dateformats and --dateintervalformats',
-            type: 'boolean',
-            default: false
-        })
-        .options('monthnames', {
-            describe: 'Whether to include month names (inter.calendars[calendarId].monthNames). Implied by --dateformats and --dateintervalformats',
-            type: 'boolean',
-            default: false
-        })
-        .options('monthpatterns', {
-            describe: 'Whether to include month patterns (inter.calendars[calendarId].monthPatterns). Implied by --dateformats and --dateintervalformats',
-            type: 'boolean',
-            default: false
-        })
-        .options('eranames', {
-            describe: 'Whether to include era names (inter.calendars[calendarId].eraNames). Implied by --dateformats and --dateintervalformats',
-            type: 'boolean',
-            default: false
-        })
-        .options('quarternames', {
-            describe: 'Whether to include quarter names (inter.calendars[calendarId].quarterNames). Implied by --dateformats and --dateintervalformats',
-            type: 'boolean',
-            default: false
-        })
-        .options('fields', {
-            describe: 'Whether to include field display names (inter.calendars[calendarId].fields)',
-            type: 'boolean',
-            default: false
-        })
-        .options('numbers', {
-            describe: 'Whether to include number formats and symbols (inter.numbers, inter.getNumberRenderer, inter.getFileSizeRenderer, inter.getPercentageRenderer)',
-            type: 'boolean',
-            default: false
-        })
-        .options('delimiters', {
-            describe: 'Whether to include quotation delimiters (inter.delimiters)',
-            type: 'boolean',
-            default: false
-        })
-        .options('listpatterns', {
-            describe: 'Whether to include list formats (inter.listPatterns and inter.renderList)',
-            type: 'boolean',
-            default: false
-        })
-        .options('unitpatterns', {
-            describe: 'Whether to include unit patterns (inter.unitPatterns and inter.getUnitRenderer)',
-            type: 'boolean',
-            default: false
-        })
-        .options('timezones', {
-            describe: 'Whether to include time zone info and display names (inter.timeZones)',
-            type: 'boolean',
-            default: false
-        })
-        .options('territories', {
-            describe: 'Whether to include territory info and display names (inter.territories)',
-            type: 'boolean',
-            default: false
-        })
-        .options('countries', {
-            describe: 'Whether to include country info and display names (inter.countries, subset of inter.territories)',
-            type: 'boolean',
-            default: false
-        })
-        .options('regions', {
-            describe: 'Whether to include region info and display names (inter.regions, subset of inter.territories)',
-            type: 'boolean',
-            default: false
-        })
-        .options('languages', {
-            describe: 'Whether to include language info and display names (inter.languages)',
-            type: 'boolean',
-            default: false
+        .options('calendars', {
+            describe: 'Comma-separated list of calendars to include (defaults to all available)',
+            type: 'string'
         })
         .options('languagesincludedonly', {
             describe: 'Modifies --languages to only include information about the locales included in the build. Useful for displaying a list of the supported locales in a web app while keeping down size of the library'
-        })
-        .options('currencies', {
-            describe: 'Whether to include currency info and display names (inter.currencies)',
-            type: 'boolean',
-            default: false
-        })
-        .options('scripts', {
-            describe: 'Whether to include script display names (inter.scripts)',
-            type: 'boolean',
-            default: false
-        })
-        .options('pluralrules', {
-            describe: 'Whether to include plural rules (inter.getQuantity)',
-            type: 'boolean',
-            default: false
-        })
-        .options('characters', {
-            describe: 'Whether to include characters (inter.exemplarCharacters, inter.ellipsis)',
-            type: 'boolean',
-            default: false
-        })
-        .options('rbnf', {
-            describe: 'Whether to include rbnf rules (inter.renderDigitsOrdinal, inter.renderSpelloutNumbering...)',
-            type: 'boolean',
-            default: false
-        })
-        .options('calendars', {
-            describe: 'Comma-separated list of calendars to ínclude (defaults to all available)',
-            type: 'string'
-        })
-        .argv;
+        });
+
+var descriptionByOptionName = {
+    dateFormats: 'date and time formats (inter.dateFormats and others, implied by --dateintervalformats)',
+    dateIntervalFormats: 'date and time interval formats (inter.dateIntervalFormats)',
+    dayNames: 'day names (inter.calendars[calendarId].dayNames). Implied by --dateformats and --dateintervalformats',
+    dayPeriods: 'day periods (inter.calendars[calendarId].dayPeriods). Implied by --dateformats and --dateintervalformats',
+    cyclicNames: 'cyclic names (inter.calendars[calendarId].cyclicNames). Implied by --dateformats and --dateintervalformats',
+    monthNames: 'month names (inter.calendars[calendarId].monthNames). Implied by --dateformats and --dateintervalformats',
+    monthPatterns: 'month patterns (inter.calendars[calendarId].monthPatterns). Implied by --dateformats and --dateintervalformats',
+    eraNames: 'era names (inter.calendars[calendarId].eraNames). Implied by --dateformats and --dateintervalformats',
+    quarterNames: 'quarter names (inter.calendars[calendarId].quarterNames). Implied by --dateformats and --dateintervalformats',
+    fields: 'field display names (inter.calendars[calendarId].fields)',
+    numbers: 'number formats and symbols (inter.numbers, inter.getNumberRenderer, inter.getFileSizeRenderer, inter.getPercentageRenderer)',
+    delimiters: 'quotation delimiters (inter.delimiters)',
+    listPatterns: 'list patterns (inter.listPatterns and inter.renderList)',
+    unitPatterns: 'unit patterns (inter.unitPatterns and inter.getUnitRenderer)',
+    timeZones: 'time zone info and display names (inter.timeZones)',
+    territories: 'territory info and display names (inter.territories)',
+    countries: 'country info and display names (inter.countries, subset of inter.territories)',
+    regions: 'region info and display names (inter.regions, subset of inter.territories)',
+    languages: 'language info and display names (inter.languages)',
+    currencies: 'currency info and display names (inter.currencies)',
+    scripts: 'script display names (inter.scripts)',
+    pluralRules: 'plural rules (inter.getQuantity)',
+    characters: 'characters (inter.exemplarCharacters, inter.ellipsis)',
+    rbnf: 'rbnf rules (inter.renderDigitsOrdinal, inter.renderSpelloutNumbering...)'
+};
+
+var optionNames = Object.keys(descriptionByOptionName);
+optionNames.forEach(function (optionName) {
+    optimist = optimist.options(optionName.toLowerCase(), {
+        describe: 'Whether to include ' + descriptionByOptionName[optionName],
+        type: 'boolean',
+        default: false
+    });
+});
+
+optimist = optimist.options('all', {
+    describe: 'Extract all data (equivalent to ' + optionNames.map(function (optionName) {
+        return '--' + optionName.toLowerCase();
+    }).join(' ') + ')',
+    type: 'boolean',
+    default: false
+});
+
+var commandLineOptions = optimist.argv;
+
+if (commandLineOptions.all) {
+    optionNames.forEach(function (optionName) {
+        commandLineOptions[optionName.toLowerCase()] = true;
+    });
+}
+
 
 var cldr = new Cldr(commandLineOptions.cldrpath),
     zoneInfo = new ZoneInfo(commandLineOptions.zoneinfopath),
@@ -285,7 +217,7 @@ function getTrimmedInterAst() {
 }
 
 var getLocaleDataOptions = {zoneInfo: zoneInfo, worldInfo: worldInfo};
-['languages', 'territories', 'countries', 'regions', 'timeZones', 'currencies', 'scripts', 'delimiters', 'unitPatterns', 'fields', 'dateFormats', 'dateIntervalFormats', 'characters', 'numbers', 'listPatterns', 'eraNames', 'quarterNames', 'monthNames', 'monthPatterns', 'dayNames', 'dayPeriods', 'cyclicNames', 'pluralRules', 'rbnf'].forEach(function (optionName) {
+optionNames.forEach(function (optionName) {
     getLocaleDataOptions[optionName] = commandLineOptions[optionName.toLowerCase()];
 });
 
