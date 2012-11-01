@@ -33,6 +33,10 @@ var fs = require('fs'),
             default: false,
             describe: 'Generate one bundle with all locale data in it (see also --localeidvar). The default is to generate one file per locale'
         })
+        .options('golf', {
+            default: false,
+            describe: 'Optimize the size and memory footprint of the generated JavaScript by pulling common structures into vars (at the expense of readability)'
+        })
         .check(function (argv) {
             if (!argv.bundle && !argv.o) {
                 throw new Error('-o is mandatory unless --bundle is specified');
@@ -150,20 +154,22 @@ targetLocaleIds.forEach(function (targetLocaleId) {
 });
 
 function localeDataToStatementAsts(localeData) {
-    var statementAsts = [],
-        propertyNames = Object.keys(localeData);
-
-    return propertyNames.map(function (propertyName) {
-        return [
-            'stat',
-            [
-                'assign',
-                true,
-                ['dot', ['name', 'inter'], propertyName],
-                uglifyAst.objToAst(localeData[propertyName])
-            ]
-        ];
-    });
+    var propertyNames = Object.keys(localeData),
+        statementAsts = propertyNames.map(function (propertyName) {
+            return [
+                'stat',
+                [
+                    'assign',
+                    true,
+                    ['dot', ['name', 'inter'], propertyName],
+                    uglifyAst.objToAst(localeData[propertyName])
+                ]
+            ];
+        });
+    if (commandLineOptions.golf) {
+        uglifyAst.pullCommonStructuresIntoVars(['toplevel', statementAsts]);
+    }
+    return statementAsts;
 }
 
 function getTrimmedInterAst() {
