@@ -258,11 +258,10 @@ seq(targetLocaleIds)
             targetLocaleIds.forEach(function (targetLocaleId) {
                 localeDataByTargetLocaleId[targetLocaleId].languages.some(function (languageInfo) {
                     if (languageInfo.id === targetLocaleId) {
-                        nativeLanguageDisplayNameById[targetLocaleId] = displayName;
+                        nativeLanguageDisplayNameById[targetLocaleId] = languageInfo.displayName;
                         return true; // Break
                     }
                 });
-                nativeDisplayNameByLocaleId[targetLocaleId] = localeDataByTargetLocaleId[targetLocaleId].localeDisplayNames[targetLocaleId];
             });
             targetLocaleIds.forEach(function (targetLocaleId) {
                 localeDataByTargetLocaleId[targetLocaleId].languages.forEach(function (languageInfo) {
