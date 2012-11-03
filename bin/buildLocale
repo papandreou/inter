@@ -10,6 +10,7 @@ var fs = require('fs'),
     fsTools = require('../lib/fsTools'),
     leftPad = require('../lib/leftPad'),
     normalizeLocaleId = require('../lib/normalizeLocaleId'),
+    convertObjectsWithIntegerKeysToArrays = require('../lib/convertObjectsWithIntegerKeysToArrays'),
     Cldr = require('../lib/Cldr'),
     ZoneInfo = require('../lib/ZoneInfo'),
     optimist = require('optimist')
@@ -61,46 +62,59 @@ var fs = require('fs'),
             type: 'string'
         });
 
-var descriptionByOptionName = {
-    dateFormats: 'date and time formats (inter.dateFormats and others, implied by --dateintervalformats)',
-    dateIntervalFormats: 'date and time interval formats (inter.dateIntervalFormats)',
-    dayNames: 'day names (inter.calendars[calendarId].dayNames). Implied by --dateformats and --dateintervalformats',
-    dayPeriods: 'day periods (inter.calendars[calendarId].dayPeriods). Implied by --dateformats and --dateintervalformats',
-    cyclicNames: 'cyclic names (inter.calendars[calendarId].cyclicNames). Implied by --dateformats and --dateintervalformats',
-    monthNames: 'month names (inter.calendars[calendarId].monthNames). Implied by --dateformats and --dateintervalformats',
-    monthPatterns: 'month patterns (inter.calendars[calendarId].monthPatterns). Implied by --dateformats and --dateintervalformats',
-    eraNames: 'era names (inter.calendars[calendarId].eraNames). Implied by --dateformats and --dateintervalformats',
-    quarterNames: 'quarter names (inter.calendars[calendarId].quarterNames). Implied by --dateformats and --dateintervalformats',
-    fields: 'field display names (inter.calendars[calendarId].fields)',
-    delimiters: 'quotation delimiters (inter.delimiters)',
-    listPatterns: 'list patterns (inter.listPatterns and inter.renderList)',
-    unitPatterns: 'unit patterns (inter.unitPatterns and inter.getUnitRenderer)',
-    timeZones: 'time zone info and display names (inter.timeZones)',
-    timeZoneFormats: 'time zone formats (inter.timeZoneFormats)',
-    territories: 'territory info and display names (inter.territories)',
-    countries: 'country info and display names (inter.countries, subset of inter.territories)',
-    regions: 'region info and display names (inter.regions, subset of inter.territories)',
-    languages: 'language info and display names (inter.languages)',
-    languagesIncludedOnly: 'information about the locales included in the build only. Useful for displaying a list of the supported locales in a web app while keeping down size of the library',
-    languagesNative: 'the native display names of languages, if available (requires --languages)',
-    currencies: 'currency info and display names (inter.currencies)',
-    scripts: 'script display names (inter.scripts)',
-    pluralRules: 'plural rules (inter.getQuantity)',
-    characters: 'characters (inter.exemplarCharacters, inter.ellipsis)',
-    rbnf: 'rbnf rules (inter.renderDigitsOrdinal, inter.renderSpelloutNumbering...)'
+var descriptionByTypeAndOptionName = {
+    complex: {
+        timezones: 'Include time zone info and display names (inter.timeZones)',
+        territories: 'territory info and display names (inter.territories)',
+        countries: 'country info and display names (inter.countries, subset of inter.territories)',
+        regions: 'region info and display names (inter.regions, subset of inter.territories)',
+        languages: 'language info and display names (inter.languages)',
+        languagesIncludedOnly: 'information about the locales included in the build only. Useful for displaying a list of the supported locales in a web app while keeping down size of the library',
+        languagesNative: 'the native display names of languages, if available (requires --languages)',
+        rbnf: 'rbnf rules (inter.renderDigitsOrdinal, inter.renderSpelloutNumbering...)',
+        pluralRules: 'plural rules (inter.getQuantity)'
+    },
+    simple: {
+        delimiters: 'quotation delimiters (inter.delimiters)',
+        listPatterns: 'list patterns (inter.listPatterns and inter.renderList)',
+        unitPatterns: 'unit patterns (inter.unitPatterns and inter.getUnitRenderer)',
+        timeZoneFormats: 'time zone formats (inter.timeZoneFormats)',
+        currencies: 'currency info and display names (inter.currencies)',
+        scripts: 'script display names (inter.scripts)',
+        characters: 'characters (inter.exemplarCharacters, inter.ellipsis)'
+    },
+    calendar: {
+        dateFormats: 'date and time formats (inter.dateFormats and others, implied by --dateintervalformats)',
+        dateIntervalFormats: 'date and time interval formats (inter.dateIntervalFormats)',
+        dayNames: 'day names (inter.calendars[calendarId].dayNames). Implied by --dateformats and --dateintervalformats',
+        dayPeriods: 'day periods (inter.calendars[calendarId].dayPeriods). Implied by --dateformats and --dateintervalformats',
+        cyclicNames: 'cyclic names (inter.calendars[calendarId].cyclicNames). Implied by --dateformats and --dateintervalformats',
+        monthNames: 'month names (inter.calendars[calendarId].monthNames). Implied by --dateformats and --dateintervalformats',
+        monthPatterns: 'month patterns (inter.calendars[calendarId].monthPatterns). Implied by --dateformats and --dateintervalformats',
+        eraNames: 'era names (inter.calendars[calendarId].eraNames). Implied by --dateformats and --dateintervalformats',
+        quarterNames: 'quarter names (inter.calendars[calendarId].quarterNames). Implied by --dateformats and --dateintervalformats',
+        fields: 'field display names (inter.calendars[calendarId].fields)'
+    }
 };
 
-var optionNames = Object.keys(descriptionByOptionName);
-optionNames.forEach(function (optionName) {
-    optimist = optimist.options(optionName.toLowerCase(), {
-        describe: 'Include ' + descriptionByOptionName[optionName],
-        type: 'boolean',
-        default: false
+var optionNamesByType = {},
+    allOptionNames = [];
+
+Object.keys(descriptionByTypeAndOptionName).forEach(function (type) {
+    var optionNames = Object.keys(descriptionByTypeAndOptionName[type]);
+    optionNamesByType[type] = optionNames;
+    Array.prototype.push.apply(allOptionNames, optionNames);
+    optionNames.forEach(function (optionName) {
+        optimist = optimist.options(optionName.toLowerCase(), {
+            describe: 'Include ' + descriptionByTypeAndOptionName[type][optionName],
+            type: 'boolean',
+            default: false
+        });
     });
 });
 
 optimist = optimist.options('all', {
-    describe: 'Extract all data (equivalent to ' + optionNames.map(function (optionName) {
+    describe: 'Extract all data (equivalent to ' + allOptionNames.map(function (optionName) {
         return '--' + optionName.toLowerCase();
     }).join(' ') + ')',
     type: 'boolean',
@@ -110,7 +124,7 @@ optimist = optimist.options('all', {
 var commandLineOptions = optimist.argv;
 
 if (commandLineOptions.all) {
-    optionNames.forEach(function (optionName) {
+    allOptionNames.forEach(function (optionName) {
         commandLineOptions[optionName.toLowerCase()] = true;
     });
 }
@@ -118,29 +132,13 @@ if (commandLineOptions.all) {
 var cldr = new Cldr(commandLineOptions.cldrpath),
     zoneInfo = new ZoneInfo(commandLineOptions.zoneinfopath),
     worldInfo = require('../lib/worldInfo'),
-    targetLocaleIds,
-    localeDataByTargetLocaleId = {},
-    isTargetLocaleById = {};
+    targetLocaleIds;
 
 if (commandLineOptions.locales) {
     targetLocaleIds = _.flatten(_.flatten([commandLineOptions.locales]).map(function (localeId) {return localeId.split(",");})).map(normalizeLocaleId);
 } else {
     targetLocaleIds = cldr.localeIds;
 }
-
-targetLocaleIds.forEach(function (targetLocaleId) {
-    isTargetLocaleById[targetLocaleId] = true;
-});
-
-function zeroPad(str, length) {
-    str = String(str);
-    while (str.length < length) {
-        str = "0" + str;
-    }
-    return str;
-}
-
-var doExtractByLocaleId = {root: true};
 
 function expandLocaleIdToPrioritizedList(localeId) {
     if (!localeId) {
@@ -153,12 +151,6 @@ function expandLocaleIdToPrioritizedList(localeId) {
     }
     return localeIds;
 }
-
-targetLocaleIds.forEach(function (targetLocaleId) {
-    expandLocaleIdToPrioritizedList(targetLocaleId).forEach(function (localeId) {
-        doExtractByLocaleId[localeId] = true;
-    });
-});
 
 function localeDataToStatementAsts(localeData) {
     var propertyNames = Object.keys(localeData),
@@ -229,182 +221,182 @@ function getTrimmedInterAst() {
     return interAst;
 }
 
-var needsCalendarData = commandLineOptions.calendars || commandLineOptions.eraNames || commandLineOptions.quarterNames || commandLineOptions.monthNames || commandLineOptions.monthPatterns || commandLineOptions.dayNames || commandLineOptions.dayPeriods || commandLineOptions.cyclicNames || commandLineOptions.dateFormats || commandLineOptions.dateIntervalFormats || commandLineOptions.fields;
-
-var getLocaleDataOptions = {
-    territoryDisplayNames: commandLineOptions.territories || commandLineOptions.countries || commandLineOptions.regions,
-    timeZoneDisplayNames: commandLineOptions.timezones,
-    defaultNumberSystemId: commandLineOptions.numbers,
-    numbers: commandLineOptions.numbers ? (commandLineOptions.numbersystems ? _.flatten(_.flatten([commandLineOptions.numbersystems]).map(function (numberSystemId) {return numberSystemId.split(",");})) : true) : false,
-    defaultNumberSystemId: commandLineOptions.numbers,
-    calendars: commandLineOptions.needsCalendarData ? (commandLineOptions.calendars ? _.flatten(_.flatten([commandLineOptions.calendars]).map(function (calendarId) {return calendarId.split(",");})) : true) : false
-};
-
-optionNames.forEach(function (optionName) {
-    getLocaleDataOptions[optionName] = commandLineOptions[optionName.toLowerCase()];
-});
-
-if (commandLineOptions.calendars) {
-    getLocaleDataOptions.calendars = _.flatten(_.flatten([commandLineOptions.calendars]).map(function (calendarId) {return calendarId.split(",");}));
-}
-
-seq(targetLocaleIds)
-    .parEach(20, function (localeId) {
-        var cb = this;
-        cldr.extractDataForLocale(_.extend({localeId: localeId}, getLocaleDataOptions), passError(cb, function (localeData) {
-            localeDataByTargetLocaleId[localeId] = localeData;
-
-            if (getLocaleDataOptions.timeZoneDisplayNames) {
-                // Add the time zones from the zoneinfo database that aren't in the extracted locale data:
-                zoneInfo.timeZoneIds.forEach(function (timeZoneId) {
-                    if (!(timeZoneId in localeData.timeZoneDisplayNames)) {
-                        localeData.timeZoneDisplayNames[timeZoneId] = zoneInfo.timeZoneIdToEnglishDisplayName(timeZoneId);
-                    }
-                });
-                localeData.timeZones = Object.keys(localeData.timeZoneDisplayNames).filter(function (timeZoneId) {
-                    return timeZoneId in zoneInfo.utcStandardOffsetSecondsByTimeZoneId && timeZoneId in zoneInfo.territoryIdByTimeZoneId;
-                }).map(function (timeZoneId) {
-                    var utcStandardOffsetSeconds = zoneInfo.utcStandardOffsetSecondsByTimeZoneId[timeZoneId],
-                        territoryId = zoneInfo.territoryIdByTimeZoneId[timeZoneId];
-                    return {
-                        id: timeZoneId,
-                        regionId: worldInfo.numericRegionIdByTerritoryId[territoryId] || null,
-                        utcStandardOffsetSeconds: utcStandardOffsetSeconds,
-                        displayName: localeData.timeZoneDisplayNames[timeZoneId],
-                        countryId: territoryId
-                    };
-                }).sort(function (a, b) {
-                    return ((typeof b.utcStandardOffsetSeconds === 'number') - (typeof a.utcStandardOffsetSeconds === 'number')) ||
-                        a.utcStandardOffsetSeconds - b.utcStandardOffsetSeconds ||
-                        (a.displayName < b.displayName ? -1 : (b.displayName < a.displayName ? 1 : 0));
-                });
-                delete localeData.timeZoneDisplayNames;
+cldr.load(targetLocaleIds, function (err) {
+    if (err) {
+        throw error;
+    }
+    var needsCalendarData = optionNamesByType.calendar.some(function (calendarOptionName) {return commandLineOptions[calendarOptionName.toLowerCase()];}),
+        digitsByNumberSystemId = needsCalendarData && cldr.extractDigitsByNumberSystemId(),
+        localeDataByTargetLocaleId = {};
+    targetLocaleIds.forEach(function (targetLocaleId) {
+        var localeData = {};
+        optionNamesByType.simple.forEach(function (optionName) {
+            if (commandLineOptions[optionName.toLowerCase()]) {
+                localeData[optionName] = cldr['extract' + optionName.replace(/[a-z]/, function ($0) {return $0.toUpperCase();})](targetLocaleId);
             }
-
-            if (getLocaleDataOptions.territoryDisplayNames) {
-                localeData.territories = Object.keys(localeData.territoryDisplayNames).sort(function (a, b) {
-                    return localeData.territoryDisplayNames[a] < localeData.territoryDisplayNames[b] ? -1 :
-                        (localeData.territoryDisplayNames[a] > localeData.territoryDisplayNames[b] ? 1 : 0);
+        });
+        if (commandLineOptions.numbers || commandLineOptions.rbnf) {
+            var numberSystemIds = commandLineOptions.numbersystems ? _.flatten(_.flatten([commandLineOptions.numbersystems]).map(function (numberSystemId) {return numberSystemId.split(",");})) : Cldr.numberSystemIds;
+            localeData.numbers = {};
+            numberSystemIds.forEach(function (numberSystemId) {
+                localeData.numbers[numberSystemId] = cldr.extractNumberSystem(targetLocaleId, numberSystemId);
+                localeData.numbers[numberSystemId].digits = digitsByNumberSystemId[numberSystemId];
+            });
+            localeData.defaultNumberSystemId = cldr.extractDefaultNumberSystemId(targetLocaleId);
+        }
+        if (needsCalendarData) {
+            localeData.calendars = {};
+            var calendarIds = commandLineOptions.calendars ? _.flatten(_.flatten([commandLineOptions.calendars]).map(function (calendarId) {return calendarId.split(",");})) : Cldr.calendarIds,
+                extractCalendarOptions = {};
+            optionNamesByType.calendar.forEach(function (calendarOptionName) {
+                if (commandLineOptions[calendarOptionName.toLowerCase()]) {
+                    extractCalendarOptions[calendarOptionName] = true;
+                }
+            });
+            calendarIds.forEach(function (calendarId) {
+                localeData.calendars[calendarId] = cldr.extractCalendar(targetLocaleId, _.extend({id: calendarId}, extractCalendarOptions));
+            });
+        }
+        if (commandLineOptions.pluralrules) {
+            localeData.getQuantity = cldr.extractGetQuantityFunction(targetLocaleId);
+        }
+        if (commandLineOptions.rbnf) {
+            _.extend(localeData, cldr.extractRbnfFunctionByType(targetLocaleId, ['renderDigitsOrdinal', 'renderSpelloutNumbering']));
+        }
+        if (commandLineOptions.timezones) {
+            var timeZoneDisplayNames = cldr.extractTimeZoneDisplayNames(targetLocaleId);
+            // Add the time zones from the zoneinfo database that aren't in the extracted locale data:
+            zoneInfo.timeZoneIds.forEach(function (timeZoneId) {
+                if (!(timeZoneId in timeZoneDisplayNames)) {
+                    timeZoneDisplayNames[timeZoneId] = zoneInfo.timeZoneIdToEnglishDisplayName(timeZoneId);
+                }
+            });
+            localeData.timeZones = Object.keys(timeZoneDisplayNames).filter(function (timeZoneId) {
+                return timeZoneId in zoneInfo.utcStandardOffsetSecondsByTimeZoneId && timeZoneId in zoneInfo.territoryIdByTimeZoneId;
+            }).map(function (timeZoneId) {
+                var utcStandardOffsetSeconds = zoneInfo.utcStandardOffsetSecondsByTimeZoneId[timeZoneId],
+                    territoryId = zoneInfo.territoryIdByTimeZoneId[timeZoneId];
+                return {
+                    id: timeZoneId,
+                    regionId: worldInfo.numericRegionIdByTerritoryId[territoryId],
+                    utcStandardOffsetSeconds: utcStandardOffsetSeconds,
+                    displayName: timeZoneDisplayNames[timeZoneId],
+                    countryId: territoryId
+                };
+            }).sort(function (a, b) {
+                return ((typeof b.utcStandardOffsetSeconds === 'number') - (typeof a.utcStandardOffsetSeconds === 'number')) ||
+                    a.utcStandardOffsetSeconds - b.utcStandardOffsetSeconds ||
+                    (a.displayName < b.displayName ? -1 : (b.displayName < a.displayName ? 1 : 0));
+            });
+        }
+        if (commandLineOptions.territories || commandLineOptions.countries || commandLineOptions.regions)  {
+            var territoryDisplayNames = cldr.extractTerritoryDisplayNames(targetLocaleId),
+                territories = Object.keys(territoryDisplayNames).sort(function (a, b) {
+                    return territoryDisplayNames[a] < territoryDisplayNames[b] ? -1 :
+                        (territoryDisplayNames[a] > territoryDisplayNames[b] ? 1 : 0);
                 }).map(function (territoryId) {
                     return {
                         id: territoryId,
-                        displayName: localeData.territoryDisplayNames[territoryId],
-                        regionId: worldInfo.numericRegionIdByTerritoryId[territoryId] || null,
+                        displayName: territoryDisplayNames[territoryId],
+                        regionId: worldInfo.numericRegionIdByTerritoryId[territoryId],
                         hasTimeZones: zoneInfo.numTimeZonesByTerritoryId[territoryId] > 0
                     };
                 });
-                delete localeData.territoryDisplayNames;
 
-                if (commandLineOptions.regions) {
-                    localeData.regions = localeData.territories.filter(function (territoryInfo) {
-                        return /^\d{3}/.test(territoryInfo.id);
-                    });
-                }
-
-                if (commandLineOptions.countries) {
-                    localeData.countries = localeData.territories.filter(function (territoryInfo) {
-                        var countryInfo = worldInfo.countryInfoByTerritoryId[territoryInfo.id];
-                        return countryInfo && !countryInfo.isHistorical && !countryInfo.isSubdivision;
-                    });
-                }
-
-                if (!commandLineOptions.territories) {
-                    delete localeData.territories;
-                }
+            if (commandLineOptions.territories) {
+                localeData.territories = territories;
             }
-
-            if (getLocaleDataOptions.languagesIncludedOnly) {
-                localeData.languages = localeData.languages.filter(function (languageInfo) {
-                    return targetLocaleIds.indexOf(languageInfo.id) !== -1;
+            if (commandLineOptions.regions) {
+                localeData.regions = territories.filter(function (territoryInfo) {
+                    return /^\d{3}/.test(territoryInfo.id);
                 });
             }
-            cb();
-        }));
-    })
-    .seq(function () {
-        var cb = this;
-        if (getLocaleDataOptions.languages && getLocaleDataOptions.languagesNative) {
-            var isSeenByLocaleId = {};
-            targetLocaleIds.forEach(function (targetLocaleId) {
-                localeDataByTargetLocaleId[targetLocaleId].languages.forEach(function (languageInfo) {
-                    isSeenByLocaleId[languageInfo.id] = true;
+            if (commandLineOptions.countries) {
+                localeData.countries = territories.filter(function (territoryInfo) {
+                    var countryInfo = worldInfo.countryInfoByTerritoryId[territoryInfo.id];
+                    return countryInfo && !countryInfo.isHistorical && !countryInfo.isSubdivision;
                 });
-            });
-            var nativeDisplayNameByLocaleId = {};
-            seq(Object.keys(isSeenByLocaleId))
-                .parEach(20, function (localeId) {
-                    var cb2 = this;
-                    cldr.extractDataForLocale({localeId: localeId, languages: true}, passError(cb2, function (localeData) {
-                        localeData.languages.some(function (languageInfo) {
-                            if (languageInfo.id === localeId) {
-                                nativeDisplayNameByLocaleId[localeId] = languageInfo.displayName;
-                                return true; // Short circuit
-                            }
-                        });
-                        cb2();
-                    }));
-                })
-                .seq(function () {
-                    targetLocaleIds.forEach(function (targetLocaleId) {
-                        localeDataByTargetLocaleId[targetLocaleId].languages.forEach(function (languageInfo) {
-                            var nativeDisplayName = nativeDisplayNameByLocaleId[languageInfo.id];
-                            if (nativeDisplayName && nativeDisplayName !== languageInfo.displayName) {
-                                languageInfo.nativeDisplayName = nativeDisplayName;
-                            }
-                        });
-                    });
-                    cb();
-                });
-        } else {
-            cb();
+            }
         }
-    })
-    .seq(function () {
-        if (commandLineOptions.bundle) {
-            var localeIdVarAst = uglifyJs.parser.parse(commandLineOptions.localeidvar)[1][0][1],
-                statementAsts = [];
-
-            targetLocaleIds.forEach(function (targetLocaleId) {
-                if (Object.keys(localeDataByTargetLocaleId[targetLocaleId]).length > 0) {
-                    statementAsts.push([
-                        'if',
-                        ['binary', '===', localeIdVarAst, ['string', normalizeLocaleId(targetLocaleId)]],
-                            ['block',
-                                localeDataToStatementAsts(localeDataByTargetLocaleId[targetLocaleId])
-                            ]
-                        ]
-                    );
-                }
+        if (commandLineOptions.languages) {
+            var languageDisplayNames = cldr.extractLanguageDisplayNames(targetLocaleId);
+            localeData.languages = Object.keys(languageDisplayNames).filter(function (id) {
+                return !commandLineOptions.languageincludedonly || targetLocaleIds.indexOf(id) !== -1;
+            }).map(function (id) {
+                return {
+                    id: id,
+                    displayName: languageDisplayNames[id]
+                };
             });
-
-            var interAst = getTrimmedInterAst(),
-                factoryStatementAsts = interAst[1][0][1][2][1][3];
-
-            Array.prototype.splice.apply(factoryStatementAsts, [factoryStatementAsts.length - 1, 0].concat(statementAsts)); // Inject before "return inter;"
-
-            var javaScriptString = uglifyJs.uglify.gen_code(interAst, {beautify: true});
-            if ('o' in commandLineOptions) {
-                fs.writeFile(commandLineOptions.o, javaScriptString, 'utf-8', function (err) {
-                    if (err) {
-                        throw err;
-                    }
-                });
-            } else {
-                console.log(javaScriptString);
-            }
-        } else {
-            // Build one file per locale, interpret commandLineOptions.o as a dir
-            seq(targetLocaleIds)
-                .parEach(40, function (targetLocaleId) {
-                    var interAst = getTrimmedInterAst(),
-                        factoryStatementAsts = interAst[1][0][1][2][1][3],
-                        statementAsts = localeDataToStatementAsts(localeDataByTargetLocaleId[targetLocaleId]);
-
-                    Array.prototype.splice.apply(factoryStatementAsts, [factoryStatementAsts.length - 1, 0].concat(statementAsts)); // Inject before "return inter;"
-
-                    var javaScriptString = uglifyJs.uglify.gen_code(interAst, {beautify: true});
-
-                    fsTools.mkpathAndWriteFile(Path.resolve(commandLineOptions.o, targetLocaleId + '.js'), javaScriptString, 'utf-8', this);
-                });
         }
+        localeDataByTargetLocaleId[targetLocaleId] = convertObjectsWithIntegerKeysToArrays(localeData);
     });
+    if (commandLineOptions.languagesnative && commandLineOptions.languages) {
+        var isSeenByLocaleId = {};
+        targetLocaleIds.forEach(function (targetLocaleId) {
+            localeDataByTargetLocaleId[targetLocaleId].languages.forEach(function (languageInfo) {
+                isSeenByLocaleId[languageInfo.id] = true;
+            });
+        });
+        var nativeDisplayNameByLocaleId = {};
+        Object.keys(isSeenByLocaleId).forEach(function (localeId) {
+            // FIXME: The needed documents haven't necessarily been loaded beforehand, so they might be readFileSync'ed:
+            nativeDisplayNameByLocaleId[localeId] = cldr.extractLanguageDisplayNames(localeId)[localeId];
+        });
+        targetLocaleIds.forEach(function (targetLocaleId) {
+            localeDataByTargetLocaleId[targetLocaleId].languages.forEach(function (languageInfo) {
+                var nativeDisplayName = nativeDisplayNameByLocaleId[languageInfo.id];
+                if (nativeDisplayName && nativeDisplayName !== languageInfo.displayName) {
+                    languageInfo.nativeDisplayName = nativeDisplayName;
+                }
+            });
+        });
+    }
+    if (commandLineOptions.bundle) {
+        var localeIdVarAst = uglifyJs.parser.parse(commandLineOptions.localeidvar)[1][0][1],
+            statementAsts = [];
+
+        targetLocaleIds.forEach(function (targetLocaleId) {
+            if (Object.keys(localeDataByTargetLocaleId[targetLocaleId]).length > 0) {
+                statementAsts.push([
+                    'if',
+                    ['binary', '===', localeIdVarAst, ['string', normalizeLocaleId(targetLocaleId)]],
+                        ['block',
+                            localeDataToStatementAsts(localeDataByTargetLocaleId[targetLocaleId])
+                        ]
+                    ]
+                );
+            }
+        });
+
+        var interAst = getTrimmedInterAst(),
+            factoryStatementAsts = interAst[1][0][1][2][1][3];
+
+        Array.prototype.splice.apply(factoryStatementAsts, [factoryStatementAsts.length - 1, 0].concat(statementAsts)); // Inject before "return inter;"
+
+        var javaScriptString = uglifyJs.uglify.gen_code(interAst, {beautify: true});
+        if ('o' in commandLineOptions) {
+            fs.writeFile(commandLineOptions.o, javaScriptString, 'utf-8', function (err) {
+                if (err) {
+                    throw err;
+                }
+            });
+        } else {
+            console.log(javaScriptString);
+        }
+    } else {
+        // Build one file per locale, interpret commandLineOptions.o as a dir
+        seq(targetLocaleIds)
+            .parEach(40, function (targetLocaleId) {
+                var interAst = getTrimmedInterAst(),
+                    factoryStatementAsts = interAst[1][0][1][2][1][3],
+                    statementAsts = localeDataToStatementAsts(localeDataByTargetLocaleId[targetLocaleId]);
+
+                Array.prototype.splice.apply(factoryStatementAsts, [factoryStatementAsts.length - 1, 0].concat(statementAsts)); // Inject before "return inter;"
+
+                var javaScriptString = uglifyJs.uglify.gen_code(interAst, {beautify: true});
+
+                fsTools.mkpathAndWriteFile(Path.resolve(commandLineOptions.o, targetLocaleId + '.js'), javaScriptString, 'utf-8', this);
+            });
+    }
+});
