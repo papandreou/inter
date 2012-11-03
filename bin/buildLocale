@@ -50,9 +50,6 @@ var fs = require('fs'),
         .options('calendars', {
             describe: 'Comma-separated list of calendars to include. Supported values: ' + Cldr.calendarIds.join(", ") + '. Defaults to all available.',
             type: 'string'
-        })
-        .options('languagesincludedonly', {
-            describe: 'Modifies --languages to only include information about the locales included in the build. Useful for displaying a list of the supported locales in a web app while keeping down size of the library'
         });
 
 var descriptionByOptionName = {
@@ -75,6 +72,8 @@ var descriptionByOptionName = {
     countries: 'country info and display names (inter.countries, subset of inter.territories)',
     regions: 'region info and display names (inter.regions, subset of inter.territories)',
     languages: 'language info and display names (inter.languages)',
+    languagesIncludedOnly: 'information about the locales included in the build only. Useful for displaying a list of the supported locales in a web app while keeping down size of the library',
+    languagesNative: 'the native display names of languages, if available (requires --languages)',
     currencies: 'currency info and display names (inter.currencies)',
     scripts: 'script display names (inter.scripts)',
     pluralRules: 'plural rules (inter.getQuantity)',
@@ -237,13 +236,51 @@ seq(targetLocaleIds)
         cldr.extractDataForLocale(_.extend({localeId: localeId}, getLocaleDataOptions), passError(cb, function (localeData) {
             localeDataByTargetLocaleId[localeId] = localeData;
 
-            if (commandLineOptions.languagesincludedonly) {
+            if (getLocaleDataOptions.languagesIncludedOnly) {
                 localeData.languages = localeData.languages.filter(function (languageInfo) {
                     return targetLocaleIds.indexOf(languageInfo.id) !== -1;
                 });
             }
             cb();
         }));
+    })
+    .seq(function () {
+        var cb = this;
+        if (getLocaleDataOptions.languages && getLocaleDataOptions.languagesNative) {
+            var isSeenByLocaleId = {};
+            targetLocaleIds.forEach(function (targetLocaleId) {
+                localeDataByTargetLocaleId[targetLocaleId].languages.forEach(function (languageInfo) {
+                    isSeenByLocaleId[languageInfo.id] = true;
+                });
+            });
+            var nativeDisplayNameByLocaleId = {};
+            seq(Object.keys(isSeenByLocaleId))
+                .parEach(20, function (localeId) {
+                    var cb2 = this;
+                    cldr.extractDataForLocale({localeId: localeId, languages: true}, passError(cb2, function (localeData) {
+                        localeData.languages.some(function (languageInfo) {
+                            if (languageInfo.id === localeId) {
+                                nativeDisplayNameByLocaleId[localeId] = languageInfo.displayName;
+                                return true; // Short circuit
+                            }
+                        });
+                        cb2();
+                    }));
+                })
+                .seq(function () {
+                    targetLocaleIds.forEach(function (targetLocaleId) {
+                        localeDataByTargetLocaleId[targetLocaleId].languages.forEach(function (languageInfo) {
+                            var nativeDisplayName = nativeDisplayNameByLocaleId[languageInfo.id];
+                            if (nativeDisplayName && nativeDisplayName !== languageInfo.displayName) {
+                                languageInfo.nativeDisplayName = nativeDisplayName;
+                            }
+                        });
+                    });
+                    cb();
+                });
+        } else {
+            cb();
+        }
     })
     .seq(function () {
         /*
@@ -256,28 +293,6 @@ seq(targetLocaleIds)
             });
         });
         */
-
-        // Add nativeDisplayName property to all languages in all locales (when it differs from the displayName):
-        if (commandLineOptions.languages) {
-            // Gotcha: Only includes the locales we're extracting data for
-            var nativeLanguageDisplayNameById = {};
-            targetLocaleIds.forEach(function (targetLocaleId) {
-                localeDataByTargetLocaleId[targetLocaleId].languages.some(function (languageInfo) {
-                    if (languageInfo.id === targetLocaleId) {
-                        nativeLanguageDisplayNameById[targetLocaleId] = languageInfo.displayName;
-                        return true; // Break
-                    }
-                });
-            });
-            targetLocaleIds.forEach(function (targetLocaleId) {
-                localeDataByTargetLocaleId[targetLocaleId].languages.forEach(function (languageInfo) {
-                    var nativeDisplayName = nativeLanguageDisplayNameById[languageInfo.id];
-                    if (nativeDisplayName && languageInfo.displayName !== nativeDisplayName) {
-                        languageInfo.nativeDisplayName = nativeDisplayName;
-                    }
-                });
-            });
-        }
 
         if (commandLineOptions.bundle) {
             var localeIdVarAst = uglifyJs.parser.parse(commandLineOptions.localeidvar)[1][0][1],
