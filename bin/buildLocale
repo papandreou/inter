@@ -255,6 +255,12 @@ seq(targetLocaleIds)
             localeDataByTargetLocaleId[localeId] = localeData;
 
             if (getLocaleDataOptions.timeZoneDisplayNames) {
+                // Add the time zones from the zoneinfo database that aren't in the extracted locale data:
+                zoneInfo.timeZoneIds.forEach(function (timeZoneId) {
+                    if (!(timeZoneId in localeData.timeZoneDisplayNames)) {
+                        localeData.timeZoneDisplayNames[timeZoneId] = zoneInfo.timeZoneIdToEnglishDisplayName(timeZoneId);
+                    }
+                });
                 localeData.timeZones = Object.keys(localeData.timeZoneDisplayNames).filter(function (timeZoneId) {
                     return timeZoneId in zoneInfo.utcStandardOffsetSecondsByTimeZoneId && timeZoneId in zoneInfo.territoryIdByTimeZoneId;
                 }).map(function (timeZoneId) {
@@ -354,17 +360,6 @@ seq(targetLocaleIds)
         }
     })
     .seq(function () {
-        /*
-        targetLocaleIds.forEach(function (targetLocaleId) {
-            var timeZoneDisplayNames = localeDataByTargetLocaleId[targetLocaleId].timeZoneDisplayNames;
-            timeZoneIds.forEach(function (timeZoneId) {
-                if (!(timeZoneId in timeZoneDisplayNames)) {
-                    timeZoneDisplayNames[timeZoneId] = zoneInfo.timeZoneIdToEnglishDisplayName(timeZoneId);
-                }
-            });
-        });
-        */
-
         if (commandLineOptions.bundle) {
             var localeIdVarAst = uglifyJs.parser.parse(commandLineOptions.localeidvar)[1][0][1],
                 statementAsts = [];
