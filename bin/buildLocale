@@ -221,7 +221,7 @@ function getTrimmedInterAst() {
     return interAst;
 }
 
-var getLocaleDataOptions = {zoneInfo: zoneInfo, worldInfo: worldInfo};
+var getLocaleDataOptions = {territoryDisplayNames: commandLineOptions.territories || commandLineOptions.countries || commandLineOptions.regions, timeZoneDisplayNames: commandLineOptions.timezones};
 optionNames.forEach(function (optionName) {
     getLocaleDataOptions[optionName] = commandLineOptions[optionName.toLowerCase()];
 });
@@ -235,6 +235,59 @@ seq(targetLocaleIds)
         var cb = this;
         cldr.extractDataForLocale(_.extend({localeId: localeId}, getLocaleDataOptions), passError(cb, function (localeData) {
             localeDataByTargetLocaleId[localeId] = localeData;
+
+            if (getLocaleDataOptions.timeZoneDisplayNames) {
+                localeData.timeZones = Object.keys(localeData.timeZoneDisplayNames).filter(function (timeZoneId) {
+                    return timeZoneId in zoneInfo.utcStandardOffsetSecondsByTimeZoneId && timeZoneId in zoneInfo.territoryIdByTimeZoneId;
+                }).map(function (timeZoneId) {
+                    var utcStandardOffsetSeconds = zoneInfo.utcStandardOffsetSecondsByTimeZoneId[timeZoneId],
+                        territoryId = zoneInfo.territoryIdByTimeZoneId[timeZoneId];
+                    return {
+                        id: timeZoneId,
+                        regionId: worldInfo.numericRegionIdByTerritoryId[territoryId] || null,
+                        utcStandardOffsetSeconds: utcStandardOffsetSeconds,
+                        displayName: localeData.timeZoneDisplayNames[timeZoneId],
+                        countryId: territoryId
+                    };
+                }).sort(function (a, b) {
+                    return ((typeof b.utcStandardOffsetSeconds === 'number') - (typeof a.utcStandardOffsetSeconds === 'number')) ||
+                        a.utcStandardOffsetSeconds - b.utcStandardOffsetSeconds ||
+                        (a.displayName < b.displayName ? -1 : (b.displayName < a.displayName ? 1 : 0));
+                });
+                delete localeData.timeZoneDisplayNames;
+            }
+
+            if (getLocaleDataOptions.territoryDisplayNames) {
+                localeData.territories = Object.keys(localeData.territoryDisplayNames).sort(function (a, b) {
+                    return localeData.territoryDisplayNames[a] < localeData.territoryDisplayNames[b] ? -1 :
+                        (localeData.territoryDisplayNames[a] > localeData.territoryDisplayNames[b] ? 1 : 0);
+                }).map(function (territoryId) {
+                    return {
+                        id: territoryId,
+                        displayName: localeData.territoryDisplayNames[territoryId],
+                        regionId: worldInfo.numericRegionIdByTerritoryId[territoryId] || null,
+                        hasTimeZones: zoneInfo.numTimeZonesByTerritoryId[territoryId] > 0
+                    };
+                });
+                delete localeData.territoryDisplayNames;
+
+                if (commandLineOptions.regions) {
+                    localeData.regions = localeData.territories.filter(function (territoryInfo) {
+                        return /^\d{3}/.test(territoryInfo.id);
+                    });
+                }
+
+                if (commandLineOptions.countries) {
+                    localeData.countries = localeData.territories.filter(function (territoryInfo) {
+                        var countryInfo = worldInfo.countryInfoByTerritoryId[territoryInfo.id];
+                        return countryInfo && !countryInfo.isHistorical && !countryInfo.isSubdivision;
+                    });
+                }
+
+                if (!commandLineOptions.territories) {
+                    delete localeData.territories;
+                }
+            }
 
             if (getLocaleDataOptions.languagesIncludedOnly) {
                 localeData.languages = localeData.languages.filter(function (languageInfo) {
