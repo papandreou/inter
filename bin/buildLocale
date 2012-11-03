@@ -48,7 +48,16 @@ var fs = require('fs'),
             default: 'LOCALEID'
         })
         .options('calendars', {
-            describe: 'Comma-separated list of calendars to include. Supported values: ' + Cldr.calendarIds.join(", ") + '. Defaults to all available.',
+            describe: 'Comma-separated list of calendars to include. Defaults to all. Supported values: ' + Cldr.calendarIds.join(", "),
+            type: 'string'
+        })
+        .options('numbers', {
+            describe: 'Include number formats and symbols (inter.numbers, inter.getNumberRenderer, inter.getFileSizeRenderer, inter.getPercentageRenderer)',
+            type: 'boolean',
+            default: false
+        })
+        .options('numbersystems', {
+            describe: 'Comma-separated list of number systems to include. Defaults to all. Supported values: ' + Cldr.numberSystemIds.join(", "),
             type: 'string'
         });
 
@@ -63,7 +72,6 @@ var descriptionByOptionName = {
     eraNames: 'era names (inter.calendars[calendarId].eraNames). Implied by --dateformats and --dateintervalformats',
     quarterNames: 'quarter names (inter.calendars[calendarId].quarterNames). Implied by --dateformats and --dateintervalformats',
     fields: 'field display names (inter.calendars[calendarId].fields)',
-    numbers: 'number formats and symbols (inter.numbers, inter.getNumberRenderer, inter.getFileSizeRenderer, inter.getPercentageRenderer)',
     delimiters: 'quotation delimiters (inter.delimiters)',
     listPatterns: 'list patterns (inter.listPatterns and inter.renderList)',
     unitPatterns: 'unit patterns (inter.unitPatterns and inter.getUnitRenderer)',
@@ -85,7 +93,7 @@ var descriptionByOptionName = {
 var optionNames = Object.keys(descriptionByOptionName);
 optionNames.forEach(function (optionName) {
     optimist = optimist.options(optionName.toLowerCase(), {
-        describe: 'Whether to include ' + descriptionByOptionName[optionName],
+        describe: 'Include ' + descriptionByOptionName[optionName],
         type: 'boolean',
         default: false
     });
@@ -106,7 +114,6 @@ if (commandLineOptions.all) {
         commandLineOptions[optionName.toLowerCase()] = true;
     });
 }
-
 
 var cldr = new Cldr(commandLineOptions.cldrpath),
     zoneInfo = new ZoneInfo(commandLineOptions.zoneinfopath),
@@ -222,7 +229,17 @@ function getTrimmedInterAst() {
     return interAst;
 }
 
-var getLocaleDataOptions = {territoryDisplayNames: commandLineOptions.territories || commandLineOptions.countries || commandLineOptions.regions, timeZoneDisplayNames: commandLineOptions.timezones};
+var needsCalendarData = commandLineOptions.calendars || commandLineOptions.eraNames || commandLineOptions.quarterNames || commandLineOptions.monthNames || commandLineOptions.monthPatterns || commandLineOptions.dayNames || commandLineOptions.dayPeriods || commandLineOptions.cyclicNames || commandLineOptions.dateFormats || commandLineOptions.dateIntervalFormats || commandLineOptions.fields;
+
+var getLocaleDataOptions = {
+    territoryDisplayNames: commandLineOptions.territories || commandLineOptions.countries || commandLineOptions.regions,
+    timeZoneDisplayNames: commandLineOptions.timezones,
+    defaultNumberSystemId: commandLineOptions.numbers,
+    numbers: commandLineOptions.numbers ? (commandLineOptions.numbersystems ? _.flatten(_.flatten([commandLineOptions.numbersystems]).map(function (numberSystemId) {return numberSystemId.split(",");})) : true) : false,
+    defaultNumberSystemId: commandLineOptions.numbers,
+    calendars: commandLineOptions.needsCalendarData ? (commandLineOptions.calendars ? _.flatten(_.flatten([commandLineOptions.calendars]).map(function (calendarId) {return calendarId.split(",");})) : true) : false
+};
+
 optionNames.forEach(function (optionName) {
     getLocaleDataOptions[optionName] = commandLineOptions[optionName.toLowerCase()];
 });
