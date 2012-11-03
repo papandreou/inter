@@ -48,7 +48,7 @@ var fs = require('fs'),
             default: 'LOCALEID'
         })
         .options('calendars', {
-            describe: 'Comma-separated list of calendars to include (defaults to all available)',
+            describe: 'Comma-separated list of calendars to include. Supported values: ' + Cldr.calendarIds.join(", ") + '. Defaults to all available.',
             type: 'string'
         })
         .options('languagesincludedonly', {
