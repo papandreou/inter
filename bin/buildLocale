@@ -74,7 +74,7 @@ var descriptionByTypeAndOptionName = {
         languagesIncludedOnly: 'information about the locales included in the build only. Useful for displaying a list of the supported locales in a web app while keeping down size of the library',
         languagesNative: 'the native display names of languages, if available (requires --languages)',
         rbnf: 'rbnf rules (inter.renderDigitsOrdinal, inter.renderSpelloutNumbering...)',
-        pluralRules: 'plural rules (inter.getQuantity)'
+        pluralRules: 'plural rules (inter.pluralRule function)'
     },
     simple: {
         delimiters: 'quotation delimiters (inter.delimiters)',
@@ -301,7 +301,7 @@ cldr.load(targetLocaleIds, function (err) {
             });
         }
         if (commandLineOptions.pluralrules) {
-            localeData.getQuantity = cldr.extractGetQuantityFunction(targetLocaleId);
+            localeData.pluralRule = cldr.extractPluralRuleFunction(targetLocaleId);
         }
         if (commandLineOptions.rbnf) {
             _.extend(localeData, cldr.extractRbnfFunctionByType(targetLocaleId, ['renderDigitsOrdinal', 'renderSpelloutNumbering']));
