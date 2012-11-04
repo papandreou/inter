@@ -1,6 +1,7 @@
 {
-    "name": "buildlocale",
-    "version": "0.2.0",
+    "name": "inter",
+    "version": "0.0.0",
+    "author": "Andreas Lind Petersen <andreas@one.com>",
     "dependencies": {
         "cldr": "=0.0.1",
         "optimist": "=0.3.4",
