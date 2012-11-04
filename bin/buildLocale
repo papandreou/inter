@@ -70,6 +70,7 @@ var descriptionByTypeAndOptionName = {
         regions: 'region info and display names (inter.regions, subset of inter.territories)',
         languages: 'language info and display names (inter.languages)',
         scripts: 'script display names (inter.scripts)',
+        currencies: 'currency info and display names (inter.currencies)',
         languagesIncludedOnly: 'information about the locales included in the build only. Useful for displaying a list of the supported locales in a web app while keeping down size of the library',
         languagesNative: 'the native display names of languages, if available (requires --languages)',
         rbnf: 'rbnf rules (inter.renderDigitsOrdinal, inter.renderSpelloutNumbering...)',
@@ -80,7 +81,6 @@ var descriptionByTypeAndOptionName = {
         listPatterns: 'list patterns (inter.listPatterns and inter.renderList)',
         unitPatterns: 'unit patterns (inter.unitPatterns and inter.getUnitRenderer)',
         timeZoneFormats: 'time zone formats (inter.timeZoneFormats)',
-        currencies: 'currency info and display names (inter.currencies)',
         characters: 'characters (inter.exemplarCharacters, inter.ellipsis)'
     },
     calendar: {
@@ -379,6 +379,15 @@ cldr.load(targetLocaleIds, function (err) {
                     id: id,
                     displayName: scriptDisplayNames[id]
                 };
+            });
+        }
+        if (commandLineOptions.currencies) {
+            var currencyInfoById = cldr.extractCurrencyInfoById(targetLocaleId);
+            localeData.currencies = Object.keys(currencyInfoById).sort(function (a, b) {
+            return currencyInfoById[a].displayName < currencyInfoById[b].displayName ? -1 :
+                (currencyInfoById[a].displayName > currencyInfoById[b].displayName ? 1 : 0);
+            }).map(function (currencyId) {
+                return currencyInfoById[currencyId];
             });
         }
         localeDataByTargetLocaleId[targetLocaleId] = convertObjectsWithIntegerKeysToArrays(localeData);
