@@ -249,8 +249,11 @@ cldr.load(targetLocaleIds, function (err) {
             var numberSystemIds = commandLineOptions.numbersystems ? _.flatten(_.flatten([commandLineOptions.numbersystems]).map(function (numberSystemId) {return numberSystemId.split(",");})) : Cldr.numberSystemIds;
             localeData.numbers = {};
             numberSystemIds.forEach(function (numberSystemId) {
-                localeData.numbers[numberSystemId] = cldr.extractNumberSystem(targetLocaleId, numberSystemId);
-                localeData.numbers[numberSystemId].digits = digitsByNumberSystemId[numberSystemId];
+                localeData.numbers[numberSystemId] = {
+                    symbols: cldr.extractNumberSymbols(targetLocaleId, numberSystemId),
+                    formats: cldr.extractNumberFormats(targetLocaleId, numberSystemId),
+                    digits: digitsByNumberSystemId[numberSystemId]
+                };
             });
             localeData.defaultNumberSystemId = cldr.extractDefaultNumberSystemId(targetLocaleId);
         }
