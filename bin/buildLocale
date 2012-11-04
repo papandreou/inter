@@ -86,6 +86,7 @@ var descriptionByTypeAndOptionName = {
     calendar: {
         dateFormats: 'date and time formats (inter.dateFormats and others, implied by --dateintervalformats)',
         dateIntervalFormats: 'date and time interval formats (inter.dateIntervalFormats)',
+        dateIntervalFallbackFormat: 'date interval fallback format (inter.dateIntervalFallbackFormat). Implied by --dateintervalformats',
         dayNames: 'day names (inter.calendars[calendarId].dayNames). Implied by --dateformats and --dateintervalformats',
         dayPeriods: 'day periods (inter.calendars[calendarId].dayPeriods). Implied by --dateformats and --dateintervalformats',
         cyclicNames: 'cyclic names (inter.calendars[calendarId].cyclicNames). Implied by --dateformats and --dateintervalformats',
@@ -127,6 +128,15 @@ if (commandLineOptions.all) {
     allOptionNames.forEach(function (optionName) {
         commandLineOptions[optionName.toLowerCase()] = true;
     });
+}
+
+if (commandLineOptions.dateformats || commandLineOptions.dateintervalformats) {
+    ['eraNames', 'quarterNames', 'dayPeriods', 'cyclicNames', 'monthNames', 'monthPatterns'].forEach(function (calendarOptionName) {
+        commandLineOptions[calendarOptionName.toLowerCase()] = true;
+    });
+}
+if (commandLineOptions.dateintervalformats) {
+    commandLineOptions.dateintervalfallbackformat = true;
 }
 
 var cldr = new Cldr(commandLineOptions.cldrpath),
@@ -248,13 +258,43 @@ cldr.load(targetLocaleIds, function (err) {
             localeData.calendars = {};
             var calendarIds = commandLineOptions.calendars ? _.flatten(_.flatten([commandLineOptions.calendars]).map(function (calendarId) {return calendarId.split(",");})) : Cldr.calendarIds,
                 extractCalendarOptions = {};
-            optionNamesByType.calendar.forEach(function (calendarOptionName) {
-                if (commandLineOptions[calendarOptionName.toLowerCase()]) {
-                    extractCalendarOptions[calendarOptionName] = true;
-                }
-            });
             calendarIds.forEach(function (calendarId) {
-                localeData.calendars[calendarId] = cldr.extractCalendar(targetLocaleId, _.extend({id: calendarId}, extractCalendarOptions));
+                var calendar = localeData.calendars[calendarId] = {};
+
+                optionNamesByType.calendar.forEach(function (calendarOptionName) {
+                    if (commandLineOptions[calendarOptionName.toLowerCase()]) {
+                        var extractMethodName = 'extract' + calendarOptionName.replace(/[a-z]/, function ($0) {return $0.toUpperCase();});
+                        if (cldr[extractMethodName]) {
+                            calendar[calendarOptionName] = cldr[extractMethodName](targetLocaleId, calendarId);
+                        } else if (calendarOptionName === 'dateFormats') {
+                            calendar.dateFormats = {basic: {}, cldr: {}};
+
+                            ['date', 'time'].forEach(function (dateOrTime) {
+                                var formats = cldr.extractDateOrTimeFormats(targetLocaleId, calendarId, dateOrTime),
+                                    dateOrTimeCapitalized = dateOrTime.replace(/^(\w)/, function (ch) {return ch.toUpperCase();});
+                                Object.keys(formats).forEach(function (formatId) {
+                                    calendar.dateFormats.basic[formatId + dateOrTimeCapitalized] = formats[formatId];
+                                });
+                            });
+
+                            var dateFormatItems = cldr.extractDateFormatItems(targetLocaleId, calendarId);
+                            Object.keys(dateFormatItems).forEach(function (dateFormatItemId) {
+                                calendar.dateFormats.cldr[dateFormatItemId] = dateFormatItems[dateFormatItemId];
+                            });
+
+                            var dateTimePatterns = cldr.extractDateTimePatterns(targetLocaleId, calendarId);
+                            ['short', 'medium', 'long', 'full'].forEach(function (length) {
+                                calendar.dateFormats.basic[length + 'DateTime'] = dateTimePatterns[length]
+                                    .replace(/\{0\}/g, calendar.dateFormats.basic[length + 'Time'])
+                                    .replace(/\{1\}/g, calendar.dateFormats.basic[length + 'Date']);
+                            });
+                            calendar.defaultDateTimePattern = dateTimePatterns[cldr.extractDefaultDateTimePatternName(targetLocaleId, calendarId)];
+
+                            // Inspired by date_parts_order in DateTime::Locale::Base:
+                            calendar.datePartsOrder = calendar.dateFormats.basic.shortDate.replace(/[^dmy]/gi, '').toLowerCase().replace(/(\w)\1+/g, "$1");
+                        }
+                    }
+                });
             });
         }
         if (commandLineOptions.pluralrules) {
