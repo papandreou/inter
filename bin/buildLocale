@@ -236,8 +236,23 @@ cldr.load(targetLocaleIds, function (err) {
         throw error;
     }
     var needsCalendarData = optionNamesByType.calendar.some(function (calendarOptionName) {return commandLineOptions[calendarOptionName.toLowerCase()];}),
-        digitsByNumberSystemId = needsCalendarData && cldr.extractDigitsByNumberSystemId(),
+        calendarIds = commandLineOptions.calendars ? _.flatten(_.flatten([commandLineOptions.calendars]).map(function (calendarId) {
+            return calendarId.split(",");
+        })) : Cldr.calendarIds,
+        numberSystemIds = commandLineOptions.numbersystems ? _.flatten(_.flatten([commandLineOptions.numbersystems]).map(function (numberSystemId) {
+            return numberSystemId.split(",");
+        })) : Cldr.numberSystemIds,
+        digitsByNumberSystemId = commandLineOptions.numbers && cldr.extractDigitsByNumberSystemId(),
+        rbnfTypes = commandLineOptions.rbnf ? ['renderDigitsOrdinal', 'renderSpelloutNumbering'] : [], // FIXME: Review list of defaults
         localeDataByTargetLocaleId = {};
+
+    numberSystemIds.forEach(function (numberSystemId) {
+        var digits = digitsByNumberSystemId[numberSystemId];
+        if (typeof digits === 'string') {
+            rbnfTypes.push(digits);
+        }
+    });
+
     targetLocaleIds.forEach(function (targetLocaleId) {
         var localeData = {};
         optionNamesByType.simple.forEach(function (optionName) {
@@ -245,11 +260,10 @@ cldr.load(targetLocaleIds, function (err) {
                 localeData[optionName] = cldr['extract' + optionName.replace(/[a-z]/, function ($0) {return $0.toUpperCase();})](targetLocaleId);
             }
         });
-        if (commandLineOptions.numbers || commandLineOptions.rbnf) {
-            var numberSystemIds = commandLineOptions.numbersystems ? _.flatten(_.flatten([commandLineOptions.numbersystems]).map(function (numberSystemId) {return numberSystemId.split(",");})) : Cldr.numberSystemIds;
+        if (commandLineOptions.numbers) {
             localeData.numbers = {};
             numberSystemIds.forEach(function (numberSystemId) {
-                localeData.numbers[numberSystemId] = {
+                var numberSystem = localeData.numbers[numberSystemId] = {
                     symbols: cldr.extractNumberSymbols(targetLocaleId, numberSystemId),
                     formats: cldr.extractNumberFormats(targetLocaleId, numberSystemId),
                     digits: digitsByNumberSystemId[numberSystemId]
@@ -259,8 +273,7 @@ cldr.load(targetLocaleIds, function (err) {
         }
         if (needsCalendarData) {
             localeData.calendars = {};
-            var calendarIds = commandLineOptions.calendars ? _.flatten(_.flatten([commandLineOptions.calendars]).map(function (calendarId) {return calendarId.split(",");})) : Cldr.calendarIds,
-                extractCalendarOptions = {};
+            var extractCalendarOptions = {};
             calendarIds.forEach(function (calendarId) {
                 var calendar = localeData.calendars[calendarId] = {};
 
@@ -303,8 +316,8 @@ cldr.load(targetLocaleIds, function (err) {
         if (commandLineOptions.pluralrules) {
             localeData.pluralRule = cldr.extractPluralRuleFunction(targetLocaleId);
         }
-        if (commandLineOptions.rbnf) {
-            _.extend(localeData, cldr.extractRbnfFunctionByType(targetLocaleId, ['renderDigitsOrdinal', 'renderSpelloutNumbering']));
+        if (rbnfTypes) {
+            _.extend(localeData, cldr.extractRbnfFunctionByType(targetLocaleId, rbnfTypes));
         }
         if (commandLineOptions.timezones) {
             var timeZoneDisplayNames = cldr.extractTimeZoneDisplayNames(targetLocaleId);
