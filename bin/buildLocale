@@ -22,45 +22,51 @@ var fs = require('fs'),
         .options('zoneinfopath', {
             default: '/usr/share/zoneinfo',
             describe: 'Path to your zoneinfo database'
-        })
-        .options('o', {
-            describe: 'Output directory (or output file if --onefile is specified)'
-        })
-        .options('locales', {
-            describe: 'Comma-separated list of locales to build',
-            type: 'string'
-        })
-        .options('bundle', {
-            default: false,
-            describe: 'Generate one bundle with all locale data in it (see also --localeidvar). The default is to generate one file per locale'
-        })
-        .options('golf', {
-            default: false,
-            describe: 'Optimize the size and memory footprint of the generated JavaScript by pulling common structures into vars (at the expense of readability)'
-        })
-        .check(function (argv) {
-            if (!argv.bundle && !argv.o) {
-                throw new Error('-o is mandatory unless --bundle is specified');
-            }
-        })
-        .options('localeidvar', {
-            describe: 'The name of the JavaScript identifier used to determine which locale to select (only applicable with --bundle). If you don\'t use buildDevelopment (AssetGraph-builder) your own code must set this variable before the locale library is loaded',
-            type: 'string',
-            default: 'LOCALEID'
-        })
-        .options('calendars', {
-            describe: 'Comma-separated list of calendars to include. Defaults to all. Supported values: ' + Cldr.calendarIds.join(", "),
-            type: 'string'
-        })
-        .options('numbers', {
-            describe: 'Include number formats and symbols (inter.numbers, inter.getNumberRenderer, inter.getFileSizeRenderer, inter.getPercentageRenderer)',
-            type: 'boolean',
-            default: false
-        })
-        .options('numbersystems', {
-            describe: 'Comma-separated list of number systems to include. Defaults to all. Supported values: ' + Cldr.numberSystemIds.join(", "),
-            type: 'string'
-        });
+        }),
+    cldr = new Cldr(optimist.argv.cldrpath),
+    zoneInfo = new ZoneInfo(optimist.argv.zoneinfopath),
+    worldInfo = require('../lib/worldInfo'),
+    targetLocaleIds;
+
+optimist = optimist
+    .options('o', {
+        describe: 'Output directory (or output file if --onefile is specified)'
+    })
+    .options('locales', {
+        describe: 'Comma-separated list of locales to build',
+        type: 'string'
+    })
+    .options('bundle', {
+        default: false,
+        describe: 'Generate one bundle with all locale data in it (see also --localeidvar). The default is to generate one file per locale'
+    })
+    .options('golf', {
+        default: false,
+        describe: 'Optimize the size and memory footprint of the generated JavaScript by pulling common structures into vars (at the expense of readability)'
+    })
+    .check(function (argv) {
+        if (!argv.bundle && !argv.o) {
+            throw new Error('-o is mandatory unless --bundle is specified');
+        }
+    })
+    .options('localeidvar', {
+        describe: 'The name of the JavaScript identifier used to determine which locale to select (only applicable with --bundle). If you don\'t use buildDevelopment (AssetGraph-builder) your own code must set this variable before the locale library is loaded',
+        type: 'string',
+        default: 'LOCALEID'
+    })
+    .options('calendars', {
+        describe: 'Comma-separated list of calendars to include. Defaults to all. Supported values: ' + cldr.calendarIds.join(", "),
+        type: 'string'
+    })
+    .options('numbers', {
+        describe: 'Include number formats and symbols (inter.numbers, inter.getNumberRenderer, inter.getFileSizeRenderer, inter.getPercentageRenderer)',
+        type: 'boolean',
+        default: false
+    })
+    .options('numbersystems', {
+        describe: 'Comma-separated list of number systems to include. Defaults to all. Supported values: ' + cldr.numberSystemIds.join(", "),
+        type: 'string'
+    });
 
 var descriptionByTypeAndOptionName = {
     complex: {
@@ -138,11 +144,6 @@ if (commandLineOptions.dateformats || commandLineOptions.dateintervalformats) {
 if (commandLineOptions.dateintervalformats) {
     commandLineOptions.dateintervalfallbackformat = true;
 }
-
-var cldr = new Cldr(commandLineOptions.cldrpath),
-    zoneInfo = new ZoneInfo(commandLineOptions.zoneinfopath),
-    worldInfo = require('../lib/worldInfo'),
-    targetLocaleIds;
 
 if (commandLineOptions.locales) {
     targetLocaleIds = _.flatten(_.flatten([commandLineOptions.locales]).map(function (localeId) {return localeId.split(",");})).map(normalizeLocaleId);
@@ -238,10 +239,10 @@ cldr.load(targetLocaleIds, function (err) {
     var needsCalendarData = optionNamesByType.calendar.some(function (calendarOptionName) {return commandLineOptions[calendarOptionName.toLowerCase()];}),
         calendarIds = commandLineOptions.calendars ? _.flatten(_.flatten([commandLineOptions.calendars]).map(function (calendarId) {
             return calendarId.split(",");
-        })) : Cldr.calendarIds,
+        })) : cldr.calendarIds,
         numberSystemIds = commandLineOptions.numbersystems ? _.flatten(_.flatten([commandLineOptions.numbersystems]).map(function (numberSystemId) {
             return numberSystemId.split(",");
-        })) : Cldr.numberSystemIds,
+        })) : cldr.numberSystemIds,
         digitsByNumberSystemId = commandLineOptions.numbers && cldr.extractDigitsByNumberSystemId(),
         rbnfTypes = commandLineOptions.rbnf ? ['renderDigitsOrdinal', 'renderSpelloutNumbering'] : [], // FIXME: Review list of defaults
         localeDataByTargetLocaleId = {};
@@ -276,7 +277,6 @@ cldr.load(targetLocaleIds, function (err) {
             var extractCalendarOptions = {};
             calendarIds.forEach(function (calendarId) {
                 var calendar = localeData.calendars[calendarId] = {};
-
                 optionNamesByType.calendar.forEach(function (calendarOptionName) {
                     if (commandLineOptions[calendarOptionName.toLowerCase()]) {
                         var extractMethodName = 'extract' + calendarOptionName.replace(/[a-z]/, function ($0) {return $0.toUpperCase();});
@@ -288,26 +288,36 @@ cldr.load(targetLocaleIds, function (err) {
                             ['date', 'time'].forEach(function (dateOrTime) {
                                 var formats = cldr.extractDateOrTimeFormats(targetLocaleId, calendarId, dateOrTime),
                                     dateOrTimeCapitalized = dateOrTime.replace(/^(\w)/, function (ch) {return ch.toUpperCase();});
-                                Object.keys(formats).forEach(function (formatId) {
-                                    calendar.dateFormats.basic[formatId + dateOrTimeCapitalized] = formats[formatId];
-                                });
+                                if (formats) {
+                                    Object.keys(formats).forEach(function (formatId) {
+                                        calendar.dateFormats.basic[formatId + dateOrTimeCapitalized] = formats[formatId];
+                                    });
+                                }
                             });
 
                             var dateFormatItems = cldr.extractDateFormatItems(targetLocaleId, calendarId);
-                            Object.keys(dateFormatItems).forEach(function (dateFormatItemId) {
-                                calendar.dateFormats.cldr[dateFormatItemId] = dateFormatItems[dateFormatItemId];
-                            });
+                            if (dateFormatItems) {
+                                Object.keys(dateFormatItems).forEach(function (dateFormatItemId) {
+                                    calendar.dateFormats.cldr[dateFormatItemId] = dateFormatItems[dateFormatItemId];
+                                });
+                            }
 
                             var dateTimePatterns = cldr.extractDateTimePatterns(targetLocaleId, calendarId);
-                            ['short', 'medium', 'long', 'full'].forEach(function (length) {
-                                calendar.dateFormats.basic[length + 'DateTime'] = dateTimePatterns[length]
-                                    .replace(/\{0\}/g, calendar.dateFormats.basic[length + 'Time'])
-                                    .replace(/\{1\}/g, calendar.dateFormats.basic[length + 'Date']);
-                            });
-                            calendar.defaultDateTimePattern = dateTimePatterns[cldr.extractDefaultDateTimePatternName(targetLocaleId, calendarId)];
-
-                            // Inspired by date_parts_order in DateTime::Locale::Base:
-                            calendar.datePartsOrder = calendar.dateFormats.basic.shortDate.replace(/[^dmy]/gi, '').toLowerCase().replace(/(\w)\1+/g, "$1");
+                            if (dateTimePatterns) {
+                                ['short', 'medium', 'long', 'full'].forEach(function (length) {
+                                    var dateTimePattern = dateTimePatterns && dateTimePatterns[length];
+                                    if (dateTimePattern) {
+                                        calendar.dateFormats.basic[length + 'DateTime'] = dateTimePatterns[length]
+                                            .replace(/\{0\}/g, calendar.dateFormats.basic[length + 'Time'])
+                                            .replace(/\{1\}/g, calendar.dateFormats.basic[length + 'Date']);
+                                    }
+                                });
+                                calendar.defaultDateTimePattern = dateTimePatterns[cldr.extractDefaultDateTimePatternName(targetLocaleId, calendarId)];
+                            }
+                            if (calendar.dateFormats.basic.shortDate) {
+                                // Inspired by date_parts_order in DateTime::Locale::Base:
+                                calendar.datePartsOrder = calendar.dateFormats.basic.shortDate.replace(/[^dmy]/gi, '').toLowerCase().replace(/(\w)\1+/g, "$1");
+                            }
                         }
                     }
                 });
