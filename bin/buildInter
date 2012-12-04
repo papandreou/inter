@@ -69,7 +69,7 @@ optimist = optimist
 
 var descriptionByTypeAndOptionName = {
     complex: {
-        timezones: 'Include time zone info and display names (inter.timeZones)',
+        timezones: 'time zone info and display names (inter.timeZones)',
         territories: 'territory info and display names (inter.territories)',
         countries: 'country info and display names (inter.countries, subset of inter.territories)',
         regions: 'region info and display names (inter.regions, subset of inter.territories)',
