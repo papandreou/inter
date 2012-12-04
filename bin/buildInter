@@ -65,6 +65,11 @@ optimist = optimist
     .options('numbersystems', {
         describe: 'Comma-separated list of number systems to include. Defaults to all. Supported values: ' + cldr.numberSystemIds.join(", "),
         type: 'string'
+    })
+    .options('languagesincludedonly', {
+        describe: 'Include information about the locales included in the build only. Useful for displaying a list of the supported locales in a web app while keeping down size of the library',
+        type: 'boolean',
+        default: false
     });
 
 var descriptionByTypeAndOptionName = {
@@ -76,7 +81,6 @@ var descriptionByTypeAndOptionName = {
         languages: 'language info and display names (inter.languages)',
         scripts: 'script display names (inter.scripts)',
         currencies: 'currency info and display names (inter.currencies)',
-        languagesIncludedOnly: 'information about the locales included in the build only. Useful for displaying a list of the supported locales in a web app while keeping down size of the library',
         languagesNative: 'the native display names of languages, if available (requires --languages)',
         rbnf: 'rbnf rules (inter.renderDigitsOrdinal, inter.renderSpelloutNumbering...)',
         pluralRules: 'plural rules (inter.pluralRule function)'
