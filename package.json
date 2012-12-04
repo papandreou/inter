@@ -1,6 +1,6 @@
 {
     "name": "inter",
-    "version": "0.0.0",
+    "version": "0.3.0",
     "author": "Andreas Lind Petersen <andreas@one.com>",
     "dependencies": {
         "cldr": "=0.0.1",
