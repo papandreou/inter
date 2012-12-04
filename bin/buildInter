@@ -386,7 +386,7 @@ cldr.load(targetLocaleIds, function (err) {
         if (commandLineOptions.languages) {
             var languageDisplayNames = cldr.extractLanguageDisplayNames(targetLocaleId);
             localeData.languages = Object.keys(languageDisplayNames).filter(function (id) {
-                return !commandLineOptions.languageincludedonly || targetLocaleIds.indexOf(id) !== -1;
+                return !commandLineOptions.languagesincludedonly || targetLocaleIds.indexOf(id) !== -1;
             }).map(function (id) {
                 return {
                     id: id,
