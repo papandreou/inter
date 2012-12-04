@@ -140,7 +140,7 @@ if (commandLineOptions.all) {
 }
 
 if (commandLineOptions.dateformats || commandLineOptions.dateintervalformats) {
-    ['eraNames', 'quarterNames', 'dayPeriods', 'cyclicNames', 'monthNames', 'monthPatterns'].forEach(function (calendarOptionName) {
+    ['eraNames', 'quarterNames', 'dayPeriods', 'dayNames', 'cyclicNames', 'monthNames', 'monthPatterns'].forEach(function (calendarOptionName) {
         commandLineOptions[calendarOptionName.toLowerCase()] = true;
     });
 }
