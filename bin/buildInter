@@ -382,8 +382,10 @@ cldr.load(targetLocaleIds, function (err) {
             }
             if (commandLineOptions.countries) {
                 localeData.countries = territories.filter(function (territoryInfo) {
-                    var countryInfo = worldInfo.countryInfoByTerritoryId[territoryInfo.id];
-                    return countryInfo && !countryInfo.isHistorical && !countryInfo.isSubdivision;
+                    var countryInfos = worldInfo.countryInfosByTerritoryId[territoryInfo.id];
+                    return countryInfos && countryInfos.some(function (countryInfo) {
+                        return !countryInfo.isHistorical && !countryInfo.isSubdivision;
+                    });
                 });
             }
         }
