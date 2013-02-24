@@ -166,6 +166,30 @@ function expandLocaleIdToPrioritizedList(localeId) {
     return localeIds;
 }
 
+function getReferenceAstForOccurrence(occurrence, topLevelReferenceAst) {
+    var referenceAst = topLevelReferenceAst;
+    for (var stackPosition = 0 ; stackPosition < occurrence.stack.length - 1 ; stackPosition += 1) {
+        var parentNode = occurrence.stack[stackPosition];
+        if (parentNode[0] === 'object') {
+            for (var i = 0 ; i < parentNode[1].length ; i += 1) {
+                var keyValue = parentNode[1][i];
+                if (keyValue[1] === occurrence.stack[stackPosition + 1]) {
+                    referenceAst = ['dot', referenceAst, keyValue[0]];
+                    break;
+                }
+            }
+        } else if (parentNode[0] === 'array') {
+            referenceAst = ['sub', referenceAst, ['num', parentNode[1].indexOf(occurrence.stack[stackPosition + 1])]];
+        } else if (parentNode[0] === 'assign' && parentNode[2][0] === 'dot' && parentNode[2][1][0] === 'name' && parentNode[2][1][1] === 'inter') {
+            // inter.<something> = ...
+            referenceAst = ['dot', referenceAst, parentNode[2][2]];
+        } else {
+            // Ignore 'toplevel' etc.
+        }
+    }
+    return referenceAst;
+};
+
 function localeDataToStatementAsts(localeData) {
     var propertyNames = Object.keys(localeData),
         statementAsts = propertyNames.map(function (propertyName) {
@@ -179,9 +203,6 @@ function localeDataToStatementAsts(localeData) {
                 ]
             ];
         });
-    if (commandLineOptions.golf) {
-        uglifyAst.pullCommonStructuresIntoVars(['toplevel', statementAsts]);
-    }
     return statementAsts;
 }
 
@@ -233,6 +254,13 @@ function getTrimmedInterAst() {
         }
     }
     return interAst;
+}
+
+if (!commandLineOptions.bundle) {
+    targetLocaleIds.sort(function (a, b) {
+        return a.length - b.length;
+    });
+    targetLocaleIds.unshift('root');
 }
 
 cldr.load(targetLocaleIds, function (err) {
@@ -444,6 +472,7 @@ cldr.load(targetLocaleIds, function (err) {
             });
         });
     }
+
     if (commandLineOptions.bundle) {
         var localeIdVarAst = uglifyJs.parser.parse(commandLineOptions.localeidvar)[1][0][1],
             statementAsts = [];
@@ -478,12 +507,124 @@ cldr.load(targetLocaleIds, function (err) {
         }
     } else {
         // Build one file per locale, interpret commandLineOptions.o as a dir
+        var statementAstsByLocaleId = {},
+            occurrencesByTargetLocaleIdAndCode = {};
+        targetLocaleIds.forEach(function (targetLocaleId) {
+            var statementAsts = statementAstsByLocaleId[targetLocaleId] = localeDataToStatementAsts(localeDataByTargetLocaleId[targetLocaleId]),
+                occurrencesByCode = uglifyAst.findOccurrencesByCode(['toplevel', statementAsts]),
+                prioritizedLocaleIds = expandLocaleIdToPrioritizedList(targetLocaleId),
+                parentLocaleId = targetLocaleId !== 'root' && (prioritizedLocaleIds.length > 1 ? prioritizedLocaleIds[1] : 'root');
+
+            if (targetLocaleId === 'root' || targetLocaleIds.some(function (localeId) {return localeId.indexOf(targetLocaleId + '_') === 0;})) {
+                occurrencesByTargetLocaleIdAndCode[targetLocaleId] = occurrencesByCode;
+            }
+
+            if (parentLocaleId) {
+                var occurrencesInParentLocaleByCode = occurrencesByTargetLocaleIdAndCode[parentLocaleId];
+                uglifyAst.iterateOverOccurrences(occurrencesByCode, function (code, occurrences) {
+                    if (occurrencesInParentLocaleByCode[code]) {
+                        // Get the shortest reference (P.a.b.c) to an occurrence in the parent locale code:
+                        var referencesToParentOccurrences = occurrencesInParentLocaleByCode[code].map(function (occurrenceInParentLocaleCode) {
+                            var ast = getReferenceAstForOccurrence(occurrenceInParentLocaleCode, ['name', 'P']);
+                            return {
+                                ast: ast,
+                                length: uglifyJs.uglify.gen_code(ast).length
+                            };
+                        }).sort(function (a, b) {
+                            return b.length - a.length;
+                        });
+
+                        var shortestReference = referencesToParentOccurrences[0];
+                        if (shortestReference.length >= code.length) {
+                            return;
+                        }
+                        var referenceToParentOccurrenceAst;
+                        occurrences.forEach(function (occurrence) {
+                            var parentNode = occurrence.stack[occurrence.stack.length - 2];
+                            if (parentNode[0] === 'object') {
+                                for (var i = 0 ; i < parentNode[1].length ; i += 1) {
+                                    var keyValue = parentNode[1][i];
+                                    if (keyValue[1] === occurrence.node) {
+                                        keyValue[1] = shortestReference.ast;
+                                        break;
+                                    }
+                                }
+                            } else if (parentNode[0] === 'array') {
+                                parentNode[1][parentNode[1].indexOf(occurrence.node)] = shortestReference.ast;
+                            } else if (parentNode[0] === 'assign' && parentNode[3] === occurrence.node) {
+                                parentNode[3] = shortestReference.ast;
+                            } else {
+                                throw new Error("Unsupported ast node: " + require('util').inspect(parentNode));
+                            }
+                        });
+                    } else {
+                        return false;
+                    }
+                });
+
+                for (var i = 0 ; i < statementAsts.length ; i += 1) {
+                    var statementAst = statementAsts[i];
+                    if (statementAst[0] === 'stat' && statementAst[1][0] === 'assign' && statementAst[1][2][0] === 'dot' && statementAst[1][2][1][0] === 'name' && statementAst[1][2][1][1] === 'inter') {
+                        if (_.isEqual(localeDataByTargetLocaleId[targetLocaleId][statementAst[1][2][2]], localeDataByTargetLocaleId[parentLocaleId][statementAst[1][2][2]])) {
+                            // inter.<something> === P.<something>
+                            statementAsts.splice(i, 1);
+                            i -= 1;
+                        } else if (statementAst[1][3][0] === 'array') {
+                            var arrayElementAsts = statementAst[1][3][1],
+                                numElementsSaved = 0,
+                                replacementElements = [],
+                                replacementAst = ['call', ['dot', ['array', []], 'concat'], replacementElements];
+                            for (var j = 0 ; j < arrayElementAsts.length ; j += 1) {
+                                if (arrayElementAsts[j][0] === 'sub' && arrayElementAsts[j][2][0] === 'num') {
+                                    var startIndex = arrayElementAsts[j][2][1],
+                                        k = j;
+                                    while (k + 1 < arrayElementAsts.length && _.isEqual(arrayElementAsts[j][1], arrayElementAsts[k + 1][1]) && arrayElementAsts[k + 1][2][0] === 'num' && arrayElementAsts[k + 1][2][1] === startIndex + (k + 1 - j)) {
+                                        k += 1;
+                                    }
+                                    if (k > j) {
+                                        replacementElements.push(['call', ['dot', arrayElementAsts[j][1], 'slice'], [['num', startIndex], ['num', startIndex + k + 1 - j]]]);
+                                        j = k;
+                                        numElementsSaved += k - j + 1;
+                                    } else {
+                                        replacementElements.push(arrayElementAsts[j]);
+                                    }
+                                } else {
+                                    replacementElements.push(arrayElementAsts[j]);
+                                }
+                            }
+                            if (numElementsSaved) {
+                                statementAst[1][3] = replacementAst;
+                            }
+                        }
+                    }
+                }
+            }
+            if (commandLineOptions.golf) {
+                uglifyAst.pullCommonStructuresIntoVars(['toplevel', statementAsts]);
+            }
+        });
+
         seq(targetLocaleIds)
             .parEach(40, function (targetLocaleId) {
-                var interAst = getTrimmedInterAst(),
+                var prioritizedLocaleIds = expandLocaleIdToPrioritizedList(targetLocaleId),
+                    parentLocaleId = targetLocaleId !== 'root' && (prioritizedLocaleIds.length > 1 ? prioritizedLocaleIds[1] : 'root'),
+                    interAst = getTrimmedInterAst(),
                     factoryStatementAsts = interAst[1][0][1][2][1][3],
-                    statementAsts = localeDataToStatementAsts(localeDataByTargetLocaleId[targetLocaleId]);
+                    statementAsts = statementAstsByLocaleId[targetLocaleId];
 
+                if (parentLocaleId) {
+                    factoryStatementAsts.splice(
+                        0,
+                        factoryStatementAsts.length - 1,
+                        [
+                            'var', [
+                                ['_', ['call', ['name', 'require'], [['string', 'underscore']]]],
+                                ['P', ['call', ['name', 'require'], [['string', './' + parentLocaleId]]]],
+                                ['inter', ['call', ['dot', ['name', '_'], 'extend'], [[ 'object', [['renderers', ['object', []]]]], ['name', 'P']]]]
+                            ]
+                        ]
+                    );
+                }
                 Array.prototype.splice.apply(factoryStatementAsts, [factoryStatementAsts.length - 1, 0].concat(statementAsts)); // Inject before "return inter;"
 
                 var javaScriptString = uglifyJs.uglify.gen_code(interAst, {beautify: true});
