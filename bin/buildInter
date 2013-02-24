@@ -29,7 +29,7 @@ var fs = require('fs'),
 
 optimist = optimist
     .options('o', {
-        describe: 'Output directory (or output file if --onefile is specified)'
+        describe: 'Output directory (or output file if --bundle is specified)'
     })
     .options('locales', {
         describe: 'Comma-separated list of locales to build',
