@@ -446,7 +446,7 @@ cldr.preload(targetLocaleIds, function (err) {
             return currencyInfoById[a].displayName < currencyInfoById[b].displayName ? -1 :
                 (currencyInfoById[a].displayName > currencyInfoById[b].displayName ? 1 : 0);
             }).map(function (currencyId) {
-                return currencyInfoById[currencyId];
+                return _.extend({id: currencyId}, currencyInfoById[currencyId]);
             });
         }
         localeDataByTargetLocaleId[targetLocaleId] = convertObjectsWithIntegerKeysToArrays(localeData);
