@@ -108,7 +108,7 @@ var descriptionByTypeAndOptionName = {
 };
 
 var optionNamesByType = {},
-    allOptionNames = [];
+    allOptionNames = ['numbers'];
 
 Object.keys(descriptionByTypeAndOptionName).forEach(function (type) {
     var optionNames = Object.keys(descriptionByTypeAndOptionName[type]);
