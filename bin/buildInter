@@ -14,6 +14,7 @@ var fs = require('fs'),
     ZoneInfo = require('../lib/ZoneInfo'),
     optimist = require('optimist')
         .usage('$0 [--cldrpath <pathToCldr>] [-o <outputFileName>] --locale localeId,localeId...')
+        .wrap(72)
         .options('cldrpath', {
             describe: 'Path to your CLDR files (defaults to the release bundled with node-cldr)'
         })
