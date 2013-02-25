@@ -613,9 +613,9 @@ cldr.preload(targetLocaleIds, function (err) {
                     statementAsts = statementAstsByLocaleId[targetLocaleId];
 
                 if (parentLocaleId) {
-                    factoryStatementAsts.splice(
-                        0,
-                        factoryStatementAsts.length - 1,
+                    factoryStatementAsts.splice(0, factoryStatementAsts.length - 1);
+
+                    statementAsts.unshift(
                         [
                             'var', [
                                 ['_', ['call', ['name', 'require'], [['string', 'underscore']]]],
@@ -624,6 +624,15 @@ cldr.preload(targetLocaleIds, function (err) {
                             ]
                         ]
                     );
+                } else {
+                    var normalizeLocaleIdAst = uglifyAst.objToAst(normalizeLocaleId);
+                    normalizeLocaleIdAst[0] = 'defun';
+                    statementAsts.push(normalizeLocaleIdAst);
+                    Array.prototype.push.apply(statementAsts, uglifyAst.objToAst(function () {
+                        inter.load = function (localeId) {
+                            return require('./' + normalizeLocaleId(localeId));
+                        };
+                    })[3]);
                 }
                 Array.prototype.splice.apply(factoryStatementAsts, [factoryStatementAsts.length - 1, 0].concat(statementAsts)); // Inject before "return inter;"
 
