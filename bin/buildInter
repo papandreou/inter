@@ -15,14 +15,13 @@ var fs = require('fs'),
     optimist = require('optimist')
         .usage('$0 [--cldrpath <pathToCldr>] [-o <outputFileName>] --locale localeId,localeId...')
         .options('cldrpath', {
-            default: '/usr/share/cldr',
-            describe: 'Path to your CLDR files'
+            describe: 'Path to your CLDR files (defaults to the release bundled with node-cldr)'
         })
         .options('zoneinfopath', {
             default: '/usr/share/zoneinfo',
             describe: 'Path to your zoneinfo database'
         }),
-    cldr = require('cldr')(optimist.argv.cldrpath),
+    cldr = optimist.argv.cldrpath ? require('cldr').load(optimist.argv.cldrpath) : require('cldr'),
     zoneInfo = new ZoneInfo(optimist.argv.zoneinfopath),
     worldInfo = require('../lib/worldInfo'),
     targetLocaleIds;
@@ -263,7 +262,7 @@ if (!commandLineOptions.bundle) {
     targetLocaleIds.unshift('root');
 }
 
-cldr.load(targetLocaleIds, function (err) {
+cldr.preload(targetLocaleIds, function (err) {
     if (err) {
         throw error;
     }
