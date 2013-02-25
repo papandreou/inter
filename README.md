@@ -1,73 +1,314 @@
-buildlocale
-===========
+inter
+=====
 
-A module that extracts a bunch of information from the CLDR database
-and builds a JavaScript library (called `inter`) that can be used to
-render dates, date and date-time intervals, numbers, lists, and more.
+A JavaScript locale library that can be used to render dates, date and
+date-time intervals, numbers, lists, and more. Also contains localized
+display names for countries, regions, languages, time zones, and
+currencies. Most of the informations comes from the <a
+href="http://cldr.unicode.org/">Unicode CLDR</a> (Common Localization
+Data Repository) and is extracted using the <a
+href="https://github.com/papandreou/node-cldr">cldr module</a>.
 
-Intended for use with `buildProduction --locale` (see <a
-href="https://github.com/One-com/assetgraph-builder">AssetGraph-builder</a>),
-but can also be used on its own.
-
-Installation and building
-=========================
+Installation
+============
 
 Make sure you have <a href="http://nodejs.org/">node.js</a> and <a
 href="http://npmjs.org/">npm</a> installed, then run:
 
-    $ npm install -g buildlocale
-
-You now have the `buildLocale` binary in your $PATH.
-
-Next up you need to download a <a
-href="http://cldr.unicode.org/index/downloads">CLDR release</a> or
-checkout the <a href="http://unicode.org/repos/cldr/">Subversion
-repo</a>.
-
-Next up, build your custom library by running `buildLocale` and tell
-it where to find your CLDR files and which locales and features you
-want:
-
 ```
-buildLocale --cldrpath /path/to/cldr/root/dir -o myLocaleLib.js --locale en,da,fr --localeidvar LOCALEID --dateformats --numberformats ...
+$ npm install -g inter
 ```
-
-This produces a single (large) JavaScript file containing all the
-features for all the locales. The value of the JavaScript variable
-`theLocaleId` will determine which locale will become active. Set it
-before `myLocaleLib.js` is loaded.
-
-To cut down the size of the locale library for production use I
-recommend using assetgraph-builder (`buildProduction --locale ...`) or
-`uglifyjs myLocaleLib.js --define LOCALEID=\"fr\"` etc. to produce an
-optimized version for each locale (I've been told that Closure
-compiler has a similar feature).
-
-Further `buildLocale` options:
-
-<dl>
-<dt><tt>--dateformats</tt></dt><dd>Include date and time formats (adds <tt>inter.dateFormats</tt> and a bunch of methods, see below)</dd>
-<dt><tt>--dateintervalformats</tt></dt><dd>Include date and time interval formats (adds <tt>inter.dateIntervalFormats</tt> and a bunch of methods).</dd>
-<dt><tt>--numberformats</tt></dt><dd>Include number formats (adds <tt>inter.numberSymbols</tt>, <tt>inter.getNumberRenderer</tt>, <tt>inter.getFileSizeRenderer</tt>, and <tt>inter.getPercentageRenderer</tt>)</dd>
-<dt><tt>--delimiters</tt></dt><dd>Include quotation delimiters (adds <tt>inter.delimiters</tt>)</dd>
-<dt><tt>--listpatterns</tt></dt><dd>Include list formats (<tt>inter.listPatterns</tt> and <tt>inter.renderList</tt>)</dd>
-<dt><tt>--unitpatterns</tt></dt><dd>Include unit patterns (<tt>inter.unitPatterns</tt> and <tt>inter.getUnitRenderer</tt>)</dd>
-<dt><tt>--timezones</tt></dt><dd>Include time zone info and display names (<tt>inter.timeZones</tt>)</dd>
-<dt><tt>--countries</tt></dt><dd>Include country info and display names (<tt>inter.countries</tt>)</dd>
-<dt><tt>--regions</tt></dt><dd>Include region info and display names (<tt>inter.regions</tt>)</dd>
-<dt><tt>--locales</tt></dt><dd>Include locale info and display names (<tt>inter.locales</tt>)</dd>
-<dt><tt>--localesincludedonly</tt></dt><dd>Modifies <tt>--locales</tt> to only include information about the locales included in the build. Useful for displaying a list of the supported locales in a web app while keeping down size of the library</dd>
-<dt><tt>--currencies</tt></dt><dd>Include currency info and display names (<tt>inter.currencies</tt>)</dd>
-<dt><tt>--pluralrules</tt></dt><dd>Include plural rules (<tt>inter.getQuantity</tt>)</dd>
-<dt><tt>--exemplarcharacters</tt></dt><dd>Include exemplar characters (<tt>inter.exemplarCharacters</tt>)</dd>
-</dl>
 
 Usage
 =====
 
+To use inter in node.js, just require the library and use the `load`
+method to get an `inter` object with information about a specific
+locale:
+
+```javascript
+var localeId = 'en_US',
+    inter = require('inter').load(localeId);
+```
+
+In the browser you'll most likely want to build a version with only
+the specific features and locales you need. There's a `buildInter`
+script in the package that's useful for that. Look for the `--bundle`
+switch if you're using <a
+href="https://github.com/One-com/assetgraph-builder">assetgraph-builder</a>
+with the `--locales` switch.
+
+Reference
+=========
+
+inter.countries
+---------------
+
+An array of objects representing country display names. The array is
+ordered by display name and contains some additional properties:
+
+```javascript
+require('inter').load('da').countries[0];
+{ id: 'AF',
+  displayName: 'Afghanistan',
+  regionId: '034',
+  hasTimeZones: true }
+```
+
+inter.getCountry(countryId)
+---------------------------
+
+Get info about a specific country (queried by ID):
+
+```javascript
+require('inter').load('sv').getCountry('SE');
+{ id: 'SE',
+  displayName: 'Sverige',
+  regionId: '154',
+  hasTimeZones: true }
+```
+
+inter.regions
+-------------
+
+An array of objects representing region display names. The array is
+ordered by display name. Superset of `inter.countries` and
+`inter.regions`.
+
+```javascript
+require('inter').load('en_US').regions;
+[ { id: '002',
+    displayName: 'Africa',
+    hasTimeZones: false },
+  { id: '019',
+    displayName: 'Americas',
+    hasTimeZones: false },
+  [...]
+  { id: '001',
+    displayName: 'World',
+    hasTimeZones: false } ]
+```
+
+inter.getRegion(regionId)
+-------------------------
+
+Get info about a specific region, queried by ID:
+
+```javascript
+require('inter').load('en_US').getRegion('018');
+{ id: '018',
+  displayName: 'Southern Africa',
+  hasTimeZones: false }
+```
+
+inter.territories
+-----------------
+
+An array of objects representing country display names. The array is
+ordered by display name and contains some additional
+properties. Superset of `inter.countries` and `inter.regions`.
+
+```javascript
+require('inter').load('en_US').territories;
+[ { id: 'AF',
+    displayName: 'Afghanistan',
+    regionId: '034',
+    hasTimeZones: true },
+  { id: '002',
+    displayName: 'Africa',
+    hasTimeZones: false },
+  [...]
+  { id: 'AX',
+    displayName: 'Åland Islands',
+    regionId: '154',
+    hasTimeZones: true } ]
+```
+
+inter.getTerritory(territoryId)
+-------------------------------
+
+Get info about a specific territory, queried by ID (can be either a
+region or a country):
+
+```javascript
+require('inter').load('en_US').getTerritory('US');
+{ id: 'US',
+  displayName: 'United States',
+  regionId: '021',
+  hasTimeZones: true }
+```
+
+inter.timeZones
+---------------
+
+An array of objects representing all available time zone display names
+plus some additional info (Olson/tzdata ID, UTC offset, and the ID of
+the country it belongs to). The array is ordered by UTC offset and
+secondarily by display name:
+
+```javascript
+require('inter').load('da').timeZones;
+[ { id: 'Pacific/Midway',
+    utcStandardOffsetSeconds: -39600,
+    displayName: 'Midway',
+    countryId: 'UM' },
+  [...]
+  { id: 'Pacific/Kiritimati',
+    regionId: '057',
+    utcStandardOffsetSeconds: 50400,
+    displayName: 'Kiritimati',
+    countryId: 'KI' } ]
+```
+
+inter.getTimeZone(timeZoneId)
+-----------------------------
+
+Get info about a specific time zone (queried by its Olson/tzdata ID):
+
+```javascript
+require('inter').load('da').getTimeZone('Europe/Copenhagen');
+{ id: 'Europe/Copenhagen',
+  regionId: '154',
+  utcStandardOffsetSeconds: 3600,
+  displayName: 'København',
+  countryId: 'DK' }
+```
+
+inter.languages
+---------------
+
+An array of objects representing all available language display names
+plus some additional info. The array is ordered by display name:
+
+```javascript
+require('inter').load('en_US').languages;
+[ { id: 'aa',
+    displayName: 'Afar',
+    nativeDisplayName: 'Qafar' },
+  { id: 'ab', displayName: 'Abkhazian' },
+  { id: 'ace', displayName: 'Achinese' },
+  [...]
+  { id: 'zxx',
+    displayName: 'No linguistic content' },
+  { id: 'zza', displayName: 'Zaza' } ]
+```
+
+inter.getLanguage(languageId)
+-----------------------------
+
+Get info about a specific language, queried by its ID:
+
+```javascript
+require('inter').load('en_US').getLanguage('zh_hans');
+{ id: 'zh_hans',
+  displayName: 'Simplified Chinese',
+  nativeDisplayName: '简体中文' }
+```
+
+inter.currencies
+----------------
+
+An array of objects with all available currency display names,
+including ids and symbols and instructions for displaying different
+quantities:
+
+```javascript
+require('inter').load('sv').currencies;
+[ { id: 'AWG',
+    displayName: 'Aruba-gulden',
+    one: 'Aruba-florin',
+    other: 'Aruba-floriner' },
+  { id: 'BSD',
+    displayName: 'Bahamas-dollar',
+    symbol: 'BS$',
+    one: 'Bahamas-dollar',
+    other: 'Bahamas-dollar' },
+  [...]
+  { id: 'DDM',
+    displayName: 'östtysk mark',
+    one: 'östtysk mark',
+    other: 'östtyska mark' } ]
+```
+
+inter.getCurrency(currencyId)
+-----------------------------
+
+Get info about a specific time zone, queried by its ID:
+
+```javascript
+require('inter').load('ar').getCurrency('ZRN');
+{ id: 'ZRN',
+  displayName: 'زائير زائيري جديد',
+  symbol: undefined,
+  zero: 'زائير زائيري جديد',
+  one: 'زائير زائيري جديد',
+  two: 'زائير زائيري جديد',
+  few: 'زائير زائيري جديد',
+  many: 'زائير زائيري جديد',
+  other: 'زائير زائيري جديد' }
+```
+
+inter.scripts
+-------------
+
+An array of objects with all available script display names, including
+IDs:
+
+```javascript
+require('inter').load('en_US').scripts;
+[ { id: 'Afak', displayName: 'Afaka' },
+  { id: 'Hluw',
+    displayName: 'Anatolian Hieroglyphs' },
+  [...]
+  { id: 'Wole', displayName: 'Woleai' },
+  { id: 'Yiii', displayName: 'Yi' } ]
+```
+
+inter.getScript(scriptId)
+-------------------------
+
+Get info about a specific script, queried by its ID:
+
+```javascript
+require('inter').load('en_US').getScript('Sgnw');
+{ id: 'Sgnw', displayName: 'SignWriting' }
+```
+
+inter.renderSpelloutCardinal(number)
+------------------------------------
+
+```javascript
+require('inter').load('en_US').renderSpelloutCardinal(53723);
+'fifty-three thousand seven hundred twenty-three'
+```
+
+The library must be built with the `--rbnf` switch.
+
+inter.renderDigitsOrdinal(number)
+---------------------------------
+
+```javascript
+require('inter').load('en_US').renderDigitsOrdinal(42);
+'42nd'
+```
+
+The library must be built with the `--rbnf` switch.
+
+
+inter.pluralRule(number)
+------------------------
+
+Determine the locale's plural form for a given number, eg. `"one"`,
+`"two"`, `"few"`, `"zero"`, `"many"`, or `"other"`.
+
+See the <a
+href="http://unicode.org/repos/cldr/trunk/specs/ldml/tr35.html#Language_Plural_Rules">LDML
+spec</a> for more information.
+
+The library must be built with the `--pluralrules` switch.
 
 inter.renderList(itemArray)
---------------------------------
+---------------------------
 
 Render a list of items using the list patterns. The locale library must be built with the `--listpatterns` switch.
 
@@ -93,6 +334,18 @@ inter.getUnitRenderer('week')(1); // '1 week' (en_US)
 inter.getUnitRenderer('month')(5); // '5 months' (en_US)
 inter.renderUnit(1, 'week'); // '1 week' (en_US)
 ```
+
+inter.renderNumber(number[, numberFormat[, numberSystemId]])
+------------------------------------------------------------
+
+inter.getNumberRenderer([numberFormat[, numberSystemId]])
+------------------------------------------------------------
+
+Render (or get a renderer function for) a number according to the
+specified <a
+href="http://www.unicode.org/reports/tr35/tr35-29.html#Number_Format_Patterns">ICU
+DecimalFormat</a> (defaults to the locale standard number format for
+the locale).
 
 inter.renderPercentage(number[, numDecimals])
 ---------------------------------------------
@@ -239,5 +492,5 @@ inter.getDateFormat('mediumTime'); // 'h:mm:ss a' (en_US)
 License
 -------
 
-buildlocale is licensed under a standard 3-clause BSD license -- see the
+inter is licensed under a standard 3-clause BSD license -- see the
 `LICENSE`-file for details.
