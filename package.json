@@ -3,6 +3,7 @@
     "version": "1.0.0rc1",
     "author": "Andreas Lind Petersen <andreas@one.com>",
     "dependencies": {
+        "async": "=0.2.5",
         "cldr": "=1.0.0",
         "optimist": "=0.3.4",
         "passerror": "=0.0.1",
@@ -17,7 +18,7 @@
     },
     "main": "./build/root.js",
     "scripts": {
-        "prepublish": "rm -fr build && ./bin/buildInter -o build --all --golf"
+        "prepublish": "rm -fr build && ./bin/buildInter -o build --all --golf --jobsize 100"
     },
     "devDependencies": {},
     "optionalDependencies": {}
