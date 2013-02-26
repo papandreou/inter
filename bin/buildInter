@@ -166,6 +166,28 @@ function expandLocaleIdToPrioritizedList(localeId) {
     return localeIds;
 }
 
+// Make sure all intermediate locales (and root) are included:
+var doPreloadByLocaleId = {},
+    parentLocaleIdByLocaleId = {},
+    hasSubLocalesByLocaleId = {root: true};
+targetLocaleIds.forEach(function (targetLocaleId) {
+    expandLocaleIdToPrioritizedList(targetLocaleId).forEach(function (subLocaleId, i) {
+        doPreloadByLocaleId[subLocaleId] = true;
+        hasSubLocalesByLocaleId[subLocaleId] = hasSubLocalesByLocaleId[subLocaleId] || i > 0;
+        if (i === 1) {
+            parentLocaleIdByLocaleId[targetLocaleId] = subLocaleId;
+        }
+    });
+});
+
+var preloadLocaleIds = ['root'].concat(Object.keys(doPreloadByLocaleId).sort(function (a, b) {
+    return a.length - b.length;
+}));
+
+if (!commandLineOptions.bundle) {
+    targetLocaleIds = preloadLocaleIds;
+}
+
 function getReferenceAstForOccurrence(occurrence, topLevelReferenceAst) {
     var referenceAst = topLevelReferenceAst;
     for (var stackPosition = 0 ; stackPosition < occurrence.stack.length - 1 ; stackPosition += 1) {
@@ -256,200 +278,198 @@ function getTrimmedInterAst() {
     return interAst;
 }
 
-if (!commandLineOptions.bundle) {
-    targetLocaleIds.sort(function (a, b) {
-        return a.length - b.length;
+var needsCalendarData = optionNamesByType.calendar.some(function (calendarOptionName) {return commandLineOptions[calendarOptionName.toLowerCase()];}),
+    calendarIds = commandLineOptions.calendars ? _.flatten(_.flatten([commandLineOptions.calendars]).map(function (calendarId) {
+        return calendarId.split(",");
+    })) : cldr.calendarIds,
+    numberSystemIds = commandLineOptions.numbersystems ? _.flatten(_.flatten([commandLineOptions.numbersystems]).map(function (numberSystemId) {
+        return numberSystemId.split(",");
+    })) : cldr.numberSystemIds,
+    digitsByNumberSystemId = commandLineOptions.numbers && cldr.extractDigitsByNumberSystemId(),
+    rbnfTypes = commandLineOptions.rbnf ? ['renderDigitsOrdinal', 'renderSpelloutNumbering'] : [], // FIXME: Review list of defaults
+    localeDataByTargetLocaleId = {};
+
+numberSystemIds.forEach(function (numberSystemId) {
+    var digits = digitsByNumberSystemId[numberSystemId];
+    if (typeof digits === 'string') {
+        rbnfTypes.push(digits);
+    }
+});
+
+function extractAndMassageLocaleData(targetLocaleId) {
+    var localeData = {};
+    optionNamesByType.simple.forEach(function (optionName) {
+        if (commandLineOptions[optionName.toLowerCase()]) {
+            localeData[optionName] = cldr['extract' + optionName.replace(/[a-z]/, function ($0) {return $0.toUpperCase();})](targetLocaleId);
+        }
     });
-    targetLocaleIds.unshift('root');
+    if (commandLineOptions.numbers) {
+        localeData.numbers = {};
+        numberSystemIds.forEach(function (numberSystemId) {
+            var numberSystem = localeData.numbers[numberSystemId] = {
+                symbols: cldr.extractNumberSymbols(targetLocaleId, numberSystemId),
+                formats: cldr.extractNumberFormats(targetLocaleId, numberSystemId),
+                digits: digitsByNumberSystemId[numberSystemId]
+            };
+        });
+        localeData.defaultNumberSystemId = cldr.extractDefaultNumberSystemId(targetLocaleId);
+    }
+    if (needsCalendarData) {
+        localeData.calendars = {};
+        var extractCalendarOptions = {};
+        calendarIds.forEach(function (calendarId) {
+            var calendar = localeData.calendars[calendarId] = {};
+            optionNamesByType.calendar.forEach(function (calendarOptionName) {
+                if (commandLineOptions[calendarOptionName.toLowerCase()]) {
+                    var extractMethodName = 'extract' + calendarOptionName.replace(/[a-z]/, function ($0) {return $0.toUpperCase();});
+                    if (calendarOptionName === 'dateFormats') {
+                        calendar.dateFormats = {basic: {}, cldr: {}};
+
+                        ['date', 'time'].forEach(function (dateOrTime) {
+                            var formats = cldr.extractDateOrTimeFormats(targetLocaleId, calendarId, dateOrTime),
+                                dateOrTimeCapitalized = dateOrTime.replace(/^(\w)/, function (ch) {return ch.toUpperCase();});
+                            if (formats) {
+                                Object.keys(formats).forEach(function (formatId) {
+                                    calendar.dateFormats.basic[formatId + dateOrTimeCapitalized] = formats[formatId];
+                                });
+                            }
+                        });
+
+                        var dateFormatItems = cldr.extractDateFormatItems(targetLocaleId, calendarId);
+                        if (dateFormatItems) {
+                            Object.keys(dateFormatItems).forEach(function (dateFormatItemId) {
+                                calendar.dateFormats.cldr[dateFormatItemId] = dateFormatItems[dateFormatItemId];
+                            });
+                        }
+
+                        var dateTimePatterns = cldr.extractDateTimePatterns(targetLocaleId, calendarId);
+                        if (dateTimePatterns) {
+                            ['short', 'medium', 'long', 'full'].forEach(function (length) {
+                                var dateTimePattern = dateTimePatterns && dateTimePatterns[length];
+                                if (dateTimePattern) {
+                                    calendar.dateFormats.basic[length + 'DateTime'] = dateTimePatterns[length]
+                                        .replace(/\{0\}/g, calendar.dateFormats.basic[length + 'Time'])
+                                        .replace(/\{1\}/g, calendar.dateFormats.basic[length + 'Date']);
+                                }
+                            });
+                            calendar.defaultDateTimePattern = dateTimePatterns[cldr.extractDefaultDateTimePatternName(targetLocaleId, calendarId)];
+                        }
+                        if (calendar.dateFormats.basic.shortDate) {
+                            // Inspired by date_parts_order in DateTime::Locale::Base:
+                            calendar.datePartsOrder = calendar.dateFormats.basic.shortDate.replace(/[^dmy]/gi, '').toLowerCase().replace(/(\w)\1+/g, "$1");
+                        }
+                    } else if (cldr[extractMethodName]) {
+                        calendar[calendarOptionName] = cldr[extractMethodName](targetLocaleId, calendarId);
+                    }
+                }
+            });
+        });
+    }
+    if (commandLineOptions.pluralrules) {
+        localeData.pluralRule = cldr.extractPluralRuleFunction(targetLocaleId);
+    }
+    if (rbnfTypes) {
+        _.extend(localeData, cldr.extractRbnfFunctionByType(targetLocaleId, rbnfTypes));
+    }
+    if (commandLineOptions.timezones) {
+        var timeZoneDisplayNames = cldr.extractTimeZoneDisplayNames(targetLocaleId);
+        // Add the time zones from the zoneinfo database that aren't in the extracted locale data:
+        zoneInfo.timeZoneIds.forEach(function (timeZoneId) {
+            if (!(timeZoneId in timeZoneDisplayNames)) {
+                timeZoneDisplayNames[timeZoneId] = zoneInfo.timeZoneIdToEnglishDisplayName(timeZoneId);
+            }
+        });
+        localeData.timeZones = Object.keys(timeZoneDisplayNames).filter(function (timeZoneId) {
+            return timeZoneId in zoneInfo.utcStandardOffsetSecondsByTimeZoneId && timeZoneId in zoneInfo.territoryIdByTimeZoneId;
+        }).map(function (timeZoneId) {
+            var utcStandardOffsetSeconds = zoneInfo.utcStandardOffsetSecondsByTimeZoneId[timeZoneId],
+                territoryId = zoneInfo.territoryIdByTimeZoneId[timeZoneId];
+            return {
+                id: timeZoneId,
+                regionId: worldInfo.numericRegionIdByTerritoryId[territoryId],
+                utcStandardOffsetSeconds: utcStandardOffsetSeconds,
+                displayName: timeZoneDisplayNames[timeZoneId],
+                countryId: territoryId
+            };
+        }).sort(function (a, b) {
+            return ((typeof b.utcStandardOffsetSeconds === 'number') - (typeof a.utcStandardOffsetSeconds === 'number')) ||
+                a.utcStandardOffsetSeconds - b.utcStandardOffsetSeconds ||
+                (a.displayName < b.displayName ? -1 : (b.displayName < a.displayName ? 1 : 0));
+        });
+    }
+    if (commandLineOptions.territories || commandLineOptions.countries || commandLineOptions.regions)  {
+        var territoryDisplayNames = cldr.extractTerritoryDisplayNames(targetLocaleId),
+            territories = Object.keys(territoryDisplayNames).sort(function (a, b) {
+                return territoryDisplayNames[a] < territoryDisplayNames[b] ? -1 :
+                    (territoryDisplayNames[a] > territoryDisplayNames[b] ? 1 : 0);
+            }).map(function (territoryId) {
+                return {
+                    id: territoryId,
+                    displayName: territoryDisplayNames[territoryId],
+                    regionId: worldInfo.numericRegionIdByTerritoryId[territoryId],
+                    hasTimeZones: zoneInfo.numTimeZonesByTerritoryId[territoryId] > 0
+                };
+            });
+
+        if (commandLineOptions.territories) {
+            localeData.territories = territories;
+        }
+        if (commandLineOptions.regions) {
+            localeData.regions = territories.filter(function (territoryInfo) {
+                return /^\d{3}/.test(territoryInfo.id);
+            });
+        }
+        if (commandLineOptions.countries) {
+            localeData.countries = territories.filter(function (territoryInfo) {
+                var countryInfos = worldInfo.countryInfosByTerritoryId[territoryInfo.id];
+                return countryInfos && countryInfos.some(function (countryInfo) {
+                    return !countryInfo.isHistorical && !countryInfo.isSubdivision;
+                });
+            });
+        }
+    }
+    if (commandLineOptions.languages) {
+        var languageDisplayNames = cldr.extractLanguageDisplayNames(targetLocaleId);
+        localeData.languages = Object.keys(languageDisplayNames).filter(function (id) {
+            return !commandLineOptions.languagesincludedonly || targetLocaleIds.indexOf(id) !== -1;
+        }).map(function (id) {
+            return {
+                id: id,
+                displayName: languageDisplayNames[id]
+            };
+        });
+    }
+    if (commandLineOptions.scripts) {
+        var scriptDisplayNames = cldr.extractScriptDisplayNames(targetLocaleId);
+        localeData.scripts = Object.keys(scriptDisplayNames).sort(function (a, b) {
+            return scriptDisplayNames[a] < scriptDisplayNames[b] ? -1 :
+                (scriptDisplayNames[a] > scriptDisplayNames[b] ? 1 : 0);
+        }).map(function (id) {
+            return {
+                id: id,
+                displayName: scriptDisplayNames[id]
+            };
+        });
+    }
+    if (commandLineOptions.currencies) {
+        var currencyInfoById = cldr.extractCurrencyInfoById(targetLocaleId);
+        localeData.currencies = Object.keys(currencyInfoById).sort(function (a, b) {
+        return currencyInfoById[a].displayName < currencyInfoById[b].displayName ? -1 :
+            (currencyInfoById[a].displayName > currencyInfoById[b].displayName ? 1 : 0);
+        }).map(function (currencyId) {
+            return _.extend({id: currencyId}, currencyInfoById[currencyId]);
+        });
+    }
+    return convertObjectsWithIntegerKeysToArrays(localeData);
 }
 
-cldr.preload(targetLocaleIds, function (err) {
+cldr.preload(preloadLocaleIds, function (err) {
     if (err) {
         throw error;
     }
-    var needsCalendarData = optionNamesByType.calendar.some(function (calendarOptionName) {return commandLineOptions[calendarOptionName.toLowerCase()];}),
-        calendarIds = commandLineOptions.calendars ? _.flatten(_.flatten([commandLineOptions.calendars]).map(function (calendarId) {
-            return calendarId.split(",");
-        })) : cldr.calendarIds,
-        numberSystemIds = commandLineOptions.numbersystems ? _.flatten(_.flatten([commandLineOptions.numbersystems]).map(function (numberSystemId) {
-            return numberSystemId.split(",");
-        })) : cldr.numberSystemIds,
-        digitsByNumberSystemId = commandLineOptions.numbers && cldr.extractDigitsByNumberSystemId(),
-        rbnfTypes = commandLineOptions.rbnf ? ['renderDigitsOrdinal', 'renderSpelloutNumbering'] : [], // FIXME: Review list of defaults
-        localeDataByTargetLocaleId = {};
-
-    numberSystemIds.forEach(function (numberSystemId) {
-        var digits = digitsByNumberSystemId[numberSystemId];
-        if (typeof digits === 'string') {
-            rbnfTypes.push(digits);
-        }
-    });
 
     targetLocaleIds.forEach(function (targetLocaleId) {
-        var localeData = {};
-        optionNamesByType.simple.forEach(function (optionName) {
-            if (commandLineOptions[optionName.toLowerCase()]) {
-                localeData[optionName] = cldr['extract' + optionName.replace(/[a-z]/, function ($0) {return $0.toUpperCase();})](targetLocaleId);
-            }
-        });
-        if (commandLineOptions.numbers) {
-            localeData.numbers = {};
-            numberSystemIds.forEach(function (numberSystemId) {
-                var numberSystem = localeData.numbers[numberSystemId] = {
-                    symbols: cldr.extractNumberSymbols(targetLocaleId, numberSystemId),
-                    formats: cldr.extractNumberFormats(targetLocaleId, numberSystemId),
-                    digits: digitsByNumberSystemId[numberSystemId]
-                };
-            });
-            localeData.defaultNumberSystemId = cldr.extractDefaultNumberSystemId(targetLocaleId);
-        }
-        if (needsCalendarData) {
-            localeData.calendars = {};
-            var extractCalendarOptions = {};
-            calendarIds.forEach(function (calendarId) {
-                var calendar = localeData.calendars[calendarId] = {};
-                optionNamesByType.calendar.forEach(function (calendarOptionName) {
-                    if (commandLineOptions[calendarOptionName.toLowerCase()]) {
-                        var extractMethodName = 'extract' + calendarOptionName.replace(/[a-z]/, function ($0) {return $0.toUpperCase();});
-                        if (calendarOptionName === 'dateFormats') {
-                            calendar.dateFormats = {basic: {}, cldr: {}};
-
-                            ['date', 'time'].forEach(function (dateOrTime) {
-                                var formats = cldr.extractDateOrTimeFormats(targetLocaleId, calendarId, dateOrTime),
-                                    dateOrTimeCapitalized = dateOrTime.replace(/^(\w)/, function (ch) {return ch.toUpperCase();});
-                                if (formats) {
-                                    Object.keys(formats).forEach(function (formatId) {
-                                        calendar.dateFormats.basic[formatId + dateOrTimeCapitalized] = formats[formatId];
-                                    });
-                                }
-                            });
-
-                            var dateFormatItems = cldr.extractDateFormatItems(targetLocaleId, calendarId);
-                            if (dateFormatItems) {
-                                Object.keys(dateFormatItems).forEach(function (dateFormatItemId) {
-                                    calendar.dateFormats.cldr[dateFormatItemId] = dateFormatItems[dateFormatItemId];
-                                });
-                            }
-
-                            var dateTimePatterns = cldr.extractDateTimePatterns(targetLocaleId, calendarId);
-                            if (dateTimePatterns) {
-                                ['short', 'medium', 'long', 'full'].forEach(function (length) {
-                                    var dateTimePattern = dateTimePatterns && dateTimePatterns[length];
-                                    if (dateTimePattern) {
-                                        calendar.dateFormats.basic[length + 'DateTime'] = dateTimePatterns[length]
-                                            .replace(/\{0\}/g, calendar.dateFormats.basic[length + 'Time'])
-                                            .replace(/\{1\}/g, calendar.dateFormats.basic[length + 'Date']);
-                                    }
-                                });
-                                calendar.defaultDateTimePattern = dateTimePatterns[cldr.extractDefaultDateTimePatternName(targetLocaleId, calendarId)];
-                            }
-                            if (calendar.dateFormats.basic.shortDate) {
-                                // Inspired by date_parts_order in DateTime::Locale::Base:
-                                calendar.datePartsOrder = calendar.dateFormats.basic.shortDate.replace(/[^dmy]/gi, '').toLowerCase().replace(/(\w)\1+/g, "$1");
-                            }
-                        } else if (cldr[extractMethodName]) {
-                            calendar[calendarOptionName] = cldr[extractMethodName](targetLocaleId, calendarId);
-                        }
-                    }
-                });
-            });
-        }
-        if (commandLineOptions.pluralrules) {
-            localeData.pluralRule = cldr.extractPluralRuleFunction(targetLocaleId);
-        }
-        if (rbnfTypes) {
-            _.extend(localeData, cldr.extractRbnfFunctionByType(targetLocaleId, rbnfTypes));
-        }
-        if (commandLineOptions.timezones) {
-            var timeZoneDisplayNames = cldr.extractTimeZoneDisplayNames(targetLocaleId);
-            // Add the time zones from the zoneinfo database that aren't in the extracted locale data:
-            zoneInfo.timeZoneIds.forEach(function (timeZoneId) {
-                if (!(timeZoneId in timeZoneDisplayNames)) {
-                    timeZoneDisplayNames[timeZoneId] = zoneInfo.timeZoneIdToEnglishDisplayName(timeZoneId);
-                }
-            });
-            localeData.timeZones = Object.keys(timeZoneDisplayNames).filter(function (timeZoneId) {
-                return timeZoneId in zoneInfo.utcStandardOffsetSecondsByTimeZoneId && timeZoneId in zoneInfo.territoryIdByTimeZoneId;
-            }).map(function (timeZoneId) {
-                var utcStandardOffsetSeconds = zoneInfo.utcStandardOffsetSecondsByTimeZoneId[timeZoneId],
-                    territoryId = zoneInfo.territoryIdByTimeZoneId[timeZoneId];
-                return {
-                    id: timeZoneId,
-                    regionId: worldInfo.numericRegionIdByTerritoryId[territoryId],
-                    utcStandardOffsetSeconds: utcStandardOffsetSeconds,
-                    displayName: timeZoneDisplayNames[timeZoneId],
-                    countryId: territoryId
-                };
-            }).sort(function (a, b) {
-                return ((typeof b.utcStandardOffsetSeconds === 'number') - (typeof a.utcStandardOffsetSeconds === 'number')) ||
-                    a.utcStandardOffsetSeconds - b.utcStandardOffsetSeconds ||
-                    (a.displayName < b.displayName ? -1 : (b.displayName < a.displayName ? 1 : 0));
-            });
-        }
-        if (commandLineOptions.territories || commandLineOptions.countries || commandLineOptions.regions)  {
-            var territoryDisplayNames = cldr.extractTerritoryDisplayNames(targetLocaleId),
-                territories = Object.keys(territoryDisplayNames).sort(function (a, b) {
-                    return territoryDisplayNames[a] < territoryDisplayNames[b] ? -1 :
-                        (territoryDisplayNames[a] > territoryDisplayNames[b] ? 1 : 0);
-                }).map(function (territoryId) {
-                    return {
-                        id: territoryId,
-                        displayName: territoryDisplayNames[territoryId],
-                        regionId: worldInfo.numericRegionIdByTerritoryId[territoryId],
-                        hasTimeZones: zoneInfo.numTimeZonesByTerritoryId[territoryId] > 0
-                    };
-                });
-
-            if (commandLineOptions.territories) {
-                localeData.territories = territories;
-            }
-            if (commandLineOptions.regions) {
-                localeData.regions = territories.filter(function (territoryInfo) {
-                    return /^\d{3}/.test(territoryInfo.id);
-                });
-            }
-            if (commandLineOptions.countries) {
-                localeData.countries = territories.filter(function (territoryInfo) {
-                    var countryInfos = worldInfo.countryInfosByTerritoryId[territoryInfo.id];
-                    return countryInfos && countryInfos.some(function (countryInfo) {
-                        return !countryInfo.isHistorical && !countryInfo.isSubdivision;
-                    });
-                });
-            }
-        }
-        if (commandLineOptions.languages) {
-            var languageDisplayNames = cldr.extractLanguageDisplayNames(targetLocaleId);
-            localeData.languages = Object.keys(languageDisplayNames).filter(function (id) {
-                return !commandLineOptions.languagesincludedonly || targetLocaleIds.indexOf(id) !== -1;
-            }).map(function (id) {
-                return {
-                    id: id,
-                    displayName: languageDisplayNames[id]
-                };
-            });
-        }
-        if (commandLineOptions.scripts) {
-            var scriptDisplayNames = cldr.extractScriptDisplayNames(targetLocaleId);
-            localeData.scripts = Object.keys(scriptDisplayNames).sort(function (a, b) {
-                return scriptDisplayNames[a] < scriptDisplayNames[b] ? -1 :
-                    (scriptDisplayNames[a] > scriptDisplayNames[b] ? 1 : 0);
-            }).map(function (id) {
-                return {
-                    id: id,
-                    displayName: scriptDisplayNames[id]
-                };
-            });
-        }
-        if (commandLineOptions.currencies) {
-            var currencyInfoById = cldr.extractCurrencyInfoById(targetLocaleId);
-            localeData.currencies = Object.keys(currencyInfoById).sort(function (a, b) {
-            return currencyInfoById[a].displayName < currencyInfoById[b].displayName ? -1 :
-                (currencyInfoById[a].displayName > currencyInfoById[b].displayName ? 1 : 0);
-            }).map(function (currencyId) {
-                return _.extend({id: currencyId}, currencyInfoById[currencyId]);
-            });
-        }
-        localeDataByTargetLocaleId[targetLocaleId] = convertObjectsWithIntegerKeysToArrays(localeData);
+        localeDataByTargetLocaleId[targetLocaleId] = extractAndMassageLocaleData(targetLocaleId);
     });
     if (commandLineOptions.languagesnative && commandLineOptions.languages) {
         var isSeenByLocaleId = {};
