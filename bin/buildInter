@@ -180,7 +180,7 @@ targetLocaleIds.forEach(function (targetLocaleId) {
     });
 });
 
-if (commandLineOptions.jobsize) {
+if (commandLineOptions.jobsize && targetLocaleIds.length > commandLineOptions.jobsize) {
     targetLocaleIds.sort();
     var localeIdBatches = [];
     for (var i = 0 ; i < targetLocaleIds.length ; i += commandLineOptions.jobsize) {
