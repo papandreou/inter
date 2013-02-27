@@ -33,10 +33,20 @@ var localeId = 'en_US',
 
 In the browser you'll most likely want to build a version with only
 the specific features and locales you need. There's a `buildInter`
-script in the package that's useful for that. Look for the `--bundle`
-switch if you're using <a
+script in the package that's useful for that. You can build one
+completely self-contained file per locale by specifying `--type
+browser`.
+
+You can also build a single file with the data for all locales using
+`--type bundle`. The active locale will be determined by the value of
+the `LOCALEID` variable when the bundle is loaded into the
+browser. This is tailored especially for <a
 href="https://github.com/One-com/assetgraph-builder">assetgraph-builder</a>
-with the `--locales` switch.
+with the `--locales` switch. Working with a single file is convenient
+during development. When doing a production build UglifyJS' dead code
+elimination will be used to strip the library down after
+`buildProduction` has created separate versions of your JavaScript
+for each locale.
 
 Reference
 =========

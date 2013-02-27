@@ -3,6 +3,7 @@
 var fs = require('fs'),
     Path = require('path'),
     seq = require('seq'),
+    async = require('async'),
     uglifyJs = require('uglify-js'),
     uglifyAst = require('uglifyast'),
     passError = require('passerror'),
@@ -29,27 +30,30 @@ var fs = require('fs'),
 
 optimist = optimist
     .options('o', {
-        describe: 'Output directory (or output file if --bundle is specified)'
+        describe: 'Output directory (or output file if --type bundle is specified)'
     })
     .options('locales', {
         describe: 'Comma-separated list of locales to build',
         type: 'string'
     })
-    .options('bundle', {
-        default: false,
-        describe: 'Generate one bundle with all locale data in it (see also --localeidvar). The default is to generate one file per locale'
+    .options('type', {
+        type: 'string',
+        describe: 'The type of library to build. Can either be "node", "browser", or "bundle" (see also --localeidvar)'
     })
     .options('golf', {
         default: false,
         describe: 'Optimize the size and memory footprint of the generated JavaScript by pulling common structures into vars (at the expense of readability)'
     })
     .check(function (argv) {
-        if (!argv.bundle && !argv.o) {
-            throw new Error('-o is mandatory unless --bundle is specified');
+        if (!/^(?:node|browser|bundle)$/.test(argv.type)) {
+            throw new Error('--type <node|browser|bundle> is a mandatory parameter');
+        }
+        if (argv.type !== 'bundle' && !argv.o) {
+            throw new Error('-o is mandatory unless --type bundle is specified');
         }
     })
     .options('localeidvar', {
-        describe: 'The name of the JavaScript identifier used to determine which locale to select (only applicable with --bundle). If you don\'t use buildDevelopment (AssetGraph-builder) your own code must set this variable before the locale library is loaded',
+        describe: 'The name of the JavaScript identifier used to determine which locale to select (only applicable with --type bundle). If you don\'t use buildDevelopment (AssetGraph-builder) your own code must set this variable before the locale library is loaded',
         type: 'string',
         default: 'LOCALEID'
     })
@@ -186,7 +190,7 @@ if (commandLineOptions.jobsize && targetLocaleIds.length > commandLineOptions.jo
     for (var i = 0 ; i < targetLocaleIds.length ; i += commandLineOptions.jobsize) {
         localeIdBatches.push(targetLocaleIds.slice(i, i + commandLineOptions.jobsize));
     }
-    require('async').eachLimit(localeIdBatches, commandLineOptions.numjobs || require('os').cpus().length, function (localeIdBatch, cb) {
+    async.eachLimit(localeIdBatches, commandLineOptions.numjobs || require('os').cpus().length, function (localeIdBatch, cb) {
         var switches = process.argv.slice(2),
             seenLocalesSwitch = false;
         for (var i = 0 ; i < switches.length ; i += 1) {
@@ -216,7 +220,7 @@ if (commandLineOptions.jobsize && targetLocaleIds.length > commandLineOptions.jo
         return a.length - b.length;
     }));
 
-    if (!commandLineOptions.bundle) {
+    if (commandLineOptions.type === 'node') {
         targetLocaleIds = preloadLocaleIds;
     }
 
@@ -525,17 +529,21 @@ if (commandLineOptions.jobsize && targetLocaleIds.length > commandLineOptions.jo
             });
         }
 
-        if (commandLineOptions.bundle) {
+        if (commandLineOptions.type === 'bundle') {
             var localeIdVarAst = uglifyJs.parser.parse(commandLineOptions.localeidvar)[1][0][1],
                 statementAsts = [];
 
             targetLocaleIds.forEach(function (targetLocaleId) {
                 if (Object.keys(localeDataByTargetLocaleId[targetLocaleId]).length > 0) {
+                    var localeSpecificBlockStatementAsts = localeDataToStatementAsts(localeDataByTargetLocaleId[targetLocaleId]);
+                    if (commandLineOptions.golf) {
+                        uglifyAst.pullCommonStructuresIntoVars(['toplevel', localeSpecificBlockStatementAsts]);
+                    }
                     statementAsts.push([
                         'if',
                         ['binary', '===', localeIdVarAst, ['string', normalizeLocaleId(targetLocaleId)]],
                             ['block',
-                                localeDataToStatementAsts(localeDataByTargetLocaleId[targetLocaleId])
+                                localeSpecificBlockStatementAsts
                             ]
                         ]
                     );
@@ -557,7 +565,24 @@ if (commandLineOptions.jobsize && targetLocaleIds.length > commandLineOptions.jo
             } else {
                 console.log(javaScriptString);
             }
+        } else if (commandLineOptions.type === 'browser') {
+            async.eachLimit(targetLocaleIds, 20, function (targetLocaleId, cb) {
+                var interAst = getTrimmedInterAst(),
+                    statementAsts = localeDataToStatementAsts(localeDataByTargetLocaleId[targetLocaleId]),
+                    factoryStatementAsts = interAst[1][0][1][2][1][3];
+
+                if (commandLineOptions.golf) {
+                    uglifyAst.pullCommonStructuresIntoVars(['toplevel', statementAsts]);
+                }
+
+                Array.prototype.splice.apply(factoryStatementAsts, [factoryStatementAsts.length - 1, 0].concat(statementAsts)); // Inject before "return inter;"
+
+                var javaScriptString = uglifyJs.uglify.gen_code(interAst, {beautify: true});
+
+                fsTools.mkpathAndWriteFile(Path.resolve(commandLineOptions.o, targetLocaleId + '.js'), javaScriptString, 'utf-8', cb);
+            });
         } else {
+            // commandLineOptions.type === 'node'
             // Build one file per locale, interpret commandLineOptions.o as a dir
             var statementAstsByLocaleId = {},
                 occurrencesByTargetLocaleIdAndCode = {};
