@@ -329,7 +329,7 @@ if (commandLineOptions.jobsize && targetLocaleIds.length > commandLineOptions.jo
     });
 
     function extractAndMassageLocaleData(targetLocaleId) {
-        var localeData = {};
+        var localeData = {id: targetLocaleId};
         optionNamesByType.simple.forEach(function (optionName) {
             if (commandLineOptions[optionName.toLowerCase()]) {
                 localeData[optionName] = cldr['extract' + optionName.replace(/[a-z]/, function ($0) {return $0.toUpperCase();})](targetLocaleId);
