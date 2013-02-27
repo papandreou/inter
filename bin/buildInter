@@ -573,7 +573,7 @@ if (commandLineOptions.jobsize) {
 
                 if (parentLocaleId) {
                     var occurrencesInParentLocaleByCode = occurrencesByTargetLocaleIdAndCode[parentLocaleId];
-                    uglifyAst.iterateOverOccurrences(occurrencesByCode, function (code, occurrences) {
+                    uglifyAst.iterateOverOccurrences(occurrencesByCode, true, function (code, occurrences) {
                         if (occurrencesInParentLocaleByCode[code]) {
                             // Get the shortest reference (P.a.b.c) to an occurrence in the parent locale code:
                             var referencesToParentOccurrences = occurrencesInParentLocaleByCode[code].map(function (occurrenceInParentLocaleCode) {
