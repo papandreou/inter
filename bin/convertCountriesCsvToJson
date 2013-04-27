@@ -7,7 +7,7 @@ var fs = require('fs'),
     countries = [];
 
 csv()
-    .from(fs.readFileSync(Path.resolve(__dirname, '../countries.csv'), 'utf-8'))
+    .from(fs.readFileSync(Path.resolve(__dirname, '../worldInfo/countries.csv'), 'utf-8'))
     .on('data', function (row) {
         countries.push({
             numericCode: leftPad(row[0], 3, '0'),
@@ -24,5 +24,5 @@ csv()
         countries.sort(function (a, b) {
             return a.numericCode < b.numericCode ? -1 : (a.numericCode > b.numericCode ? 1 : 0);
         });
-        fs.writeFileSync(Path.resolve(__dirname, '../countries.json'), JSON.stringify(countries, undefined, "    "), 'utf-8');
+        fs.writeFileSync(Path.resolve(__dirname, '../worldInfo/countries.json'), JSON.stringify(countries, undefined, "    "), 'utf-8');
     });
