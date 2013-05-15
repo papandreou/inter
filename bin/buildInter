@@ -468,6 +468,9 @@ if (commandLineOptions.jobsize && targetLocaleIds.length > commandLineOptions.jo
             var languageDisplayNames = cldr.extractLanguageDisplayNames(targetLocaleId);
             localeData.languages = Object.keys(languageDisplayNames).filter(function (id) {
                 return !commandLineOptions.languagesincludedonly || targetLocaleIds.indexOf(id) !== -1;
+            }).sort(function (a, b) {
+                return languageDisplayNames[a] < languageDisplayNames[b] ? -1 :
+                    (languageDisplayNames[a] > languageDisplayNames[b] ? 1 : 0);
             }).map(function (id) {
                 return {
                     id: id,
