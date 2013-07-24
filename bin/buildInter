@@ -525,7 +525,7 @@ if (commandLineOptions.jobsize && targetLocaleIds.length > commandLineOptions.jo
             targetLocaleIds.forEach(function (targetLocaleId) {
                 localeDataByTargetLocaleId[targetLocaleId].languages.forEach(function (languageInfo) {
                     var nativeDisplayName = nativeDisplayNameByLocaleId[languageInfo.id];
-                    if (nativeDisplayName && nativeDisplayName !== languageInfo.displayName) {
+                    if (nativeDisplayName) {
                         languageInfo.nativeDisplayName = nativeDisplayName;
                     }
                 });
