@@ -523,11 +523,21 @@ if (commandLineOptions.jobsize && targetLocaleIds.length > commandLineOptions.jo
                 nativeDisplayNameByLocaleId[localeId] = cldr.extractLanguageDisplayNames(localeId)[localeId];
             });
             targetLocaleIds.forEach(function (targetLocaleId) {
-                localeDataByTargetLocaleId[targetLocaleId].languages.forEach(function (languageInfo) {
+                var languages = localeDataByTargetLocaleId[targetLocaleId].languages;
+                languages.forEach(function (languageInfo) {
                     var nativeDisplayName = nativeDisplayNameByLocaleId[languageInfo.id];
                     if (nativeDisplayName) {
                         languageInfo.nativeDisplayName = nativeDisplayName;
                     }
+                });
+
+                // If you specify the --languagesnative switch, you'll most likely want the languages array to
+                // be sorted by the native display name:
+                languages.sort(function (a, b) {
+                    var aNativeDisplayNameOrDisplayName = (a.nativeDisplayName || a.displayName).toLowerCase(),
+                        bNativeDisplayNameOrDisplayName = (b.nativeDisplayName || b.displayName).toLowerCase();
+                    return aNativeDisplayNameOrDisplayName < bNativeDisplayNameOrDisplayName ? -1 :
+                        (aNativeDisplayNameOrDisplayName > bNativeDisplayNameOrDisplayName ? 1 : 0);
                 });
             });
         }
