@@ -230,9 +230,15 @@ if (commandLineOptions.jobsize && targetLocaleIds.length > commandLineOptions.jo
             var parentNode = occurrence.stack[stackPosition];
             if (parentNode[0] === 'object') {
                 for (var i = 0 ; i < parentNode[1].length ; i += 1) {
-                    var keyValue = parentNode[1][i];
-                    if (keyValue[1] === occurrence.stack[stackPosition + 1]) {
-                        referenceAst = ['dot', referenceAst, keyValue[0]];
+                    var keyValue = parentNode[1][i],
+                        key = keyValue[0],
+                        value = keyValue[1];
+                    if (value === occurrence.stack[stackPosition + 1]) {
+                        if (/-/.test(key)) { // FIXME: This should also check for reserved words etc.
+                            referenceAst = ['sub', referenceAst, ['string', key]];
+                        } else {
+                            referenceAst = ['dot', referenceAst, key];
+                        }
                         break;
                     }
                 }
