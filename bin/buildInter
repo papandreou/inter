@@ -394,7 +394,6 @@ if (commandLineOptions.jobsize && targetLocaleIds.length > commandLineOptions.jo
                                             .replace(/\{1\}/g, calendar.dateFormats.basic[length + 'Date']);
                                     }
                                 });
-                                calendar.defaultDateTimePattern = dateTimePatterns[cldr.extractDefaultDateTimePatternName(targetLocaleId, calendarId)];
                             }
                             if (calendar.dateFormats.basic.shortDate) {
                                 // Inspired by date_parts_order in DateTime::Locale::Base:
