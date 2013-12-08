@@ -317,7 +317,7 @@ spec</a> for more information.
 
 The library must be built with the `--pluralrules` switch.
 
-inter.renderList(itemArray)
+inter.renderList(itemArray[, 'unit'|'unitShort'|'unitNarrow'|'default'])
 ---------------------------
 
 Render a list of items using the list patterns. The locale library must be built with the `--listpatterns` switch.

@@ -15,4 +15,14 @@ describe('inter', function () {
             expect(inter.renderDate(d), 'to equal', 'Friday, December 6, 2013 at 10:54:10 am ' + timeZoneOffsetStr);
         });
     });
+
+    describe('#renderList()', function () {
+        it('should should render a list according to the unitNarrow pattern', function () {
+            expect(inter.renderList(['foo', 'bar', 'quux'], 'unitNarrow'), 'to equal', 'foo bar quux')
+        });
+
+        it('should use the default format when the type parameter is omitted', function () {
+            expect(inter.renderList(['foo', 'bar', 'quux']), 'to equal', 'foo, bar, and quux')
+        });
+    });
 });
