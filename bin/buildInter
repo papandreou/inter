@@ -443,7 +443,8 @@ if (commandLineOptions.jobsize && targetLocaleIds.length > commandLineOptions.jo
                         id: territoryId,
                         displayName: territoryDisplayNames[territoryId],
                         regionId: worldInfo.numericRegionIdByTerritoryId[territoryId],
-                        hasTimeZones: zoneInfo.numTimeZonesByTerritoryId[territoryId] > 0
+                        hasTimeZones: zoneInfo.numTimeZonesByTerritoryId[territoryId] > 0,
+                        parentRegionId: worldInfo.parentRegionIdByTerritoryId[territoryId]
                     };
                 });
 
