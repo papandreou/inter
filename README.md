@@ -284,11 +284,11 @@ require('inter').load('en_US').getScript('Sgnw');
 { id: 'Sgnw', displayName: 'SignWriting' }
 ```
 
-inter.renderSpelloutCardinal(number)
-------------------------------------
+inter.renderSpelloutNumbering(number)
+-------------------------------------
 
 ```javascript
-require('inter').load('en_US').renderSpelloutCardinal(53723);
+require('inter').load('en_US').renderSpelloutNumbering(53723);
 'fifty-three thousand seven hundred twenty-three'
 ```
 
