@@ -240,6 +240,8 @@ if (commandLineOptions.jobsize && targetLocaleIds.length > commandLineOptions.jo
                             referenceAst = ['dot', referenceAst, key];
                         }
                         break;
+                    } else {
+                        return;
                     }
                 }
             } else if (parentNode[0] === 'array') {
@@ -620,17 +622,26 @@ if (commandLineOptions.jobsize && targetLocaleIds.length > commandLineOptions.jo
                     uglifyAst.iterateOverOccurrences(occurrencesByCode, true, function (code, occurrences) {
                         if (occurrencesInParentLocaleByCode[code]) {
                             // Get the shortest reference (P.a.b.c) to an occurrence in the parent locale code:
-                            var referencesToParentOccurrences = occurrencesInParentLocaleByCode[code].map(function (occurrenceInParentLocaleCode) {
+                            var referencesToParentOccurrences = [];
+
+                            occurrencesInParentLocaleByCode[code].forEach(function (occurrenceInParentLocaleCode) {
                                 var ast = getReferenceAstForOccurrence(occurrenceInParentLocaleCode, ['name', 'P']);
-                                return {
-                                    ast: ast,
-                                    length: uglifyJs.uglify.gen_code(ast).length
-                                };
-                            }).sort(function (a, b) {
+                                if (ast) {
+                                    referencesToParentOccurrences.push({
+                                        ast: ast,
+                                        length: uglifyJs.uglify.gen_code(ast).length
+                                    });
+                                }
+                            })
+
+                            referencesToParentOccurrences.sort(function (a, b) {
                                 return b.length - a.length;
                             });
 
                             var shortestReference = referencesToParentOccurrences[0];
+                            if (!shortestReference) {
+                                return;
+                            }
                             if (shortestReference.length >= code.length) {
                                 return;
                             }
