@@ -234,7 +234,7 @@ if (commandLineOptions.jobsize && targetLocaleIds.length > commandLineOptions.jo
                         key = keyValue[0],
                         value = keyValue[1];
                     if (value === occurrence.stack[stackPosition + 1]) {
-                        if (/-/.test(key)) { // FIXME: This should also check for reserved words etc.
+                        if (/^\d|-/.test(key)) { // FIXME: This should also check for reserved words etc.
                             referenceAst = ['sub', referenceAst, ['string', key]];
                         } else {
                             referenceAst = ['dot', referenceAst, key];
