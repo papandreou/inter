@@ -25,4 +25,16 @@ describe('inter', function () {
             expect(inter.renderList(['foo', 'bar', 'quux']), 'to equal', 'foo, bar, and quux')
         });
     });
+
+    describe('#renderNumber', function () {
+        it('should render a number in the Indian English locale (#11)', function () {
+            expect(require('../build/en_in').renderNumber(10000000.23), 'to equal', '10,000,000.23');
+        });
+    });
+
+    describe('#renderNumber', function () {
+        it('should render a number in the Danish locale (#11)', function () {
+            expect(require('../build/da').renderNumber(10000000.23), 'to equal', '10,000,000.23');
+        });
+    });
 });
