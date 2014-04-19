@@ -412,7 +412,9 @@ if (commandLineOptions.jobsize && targetLocaleIds.length > commandLineOptions.jo
             localeData.pluralRule = cldr.extractPluralRuleFunction(targetLocaleId);
         }
         if (rbnfTypes) {
-            _.extend(localeData, cldr.extractRbnfFunctionByType(targetLocaleId, rbnfTypes));
+            var rbnfFunctionByType = cldr.extractRbnfFunctionByType(targetLocaleId, rbnfTypes);
+            delete rbnfFunctionByType.renderNumber;
+            _.extend(localeData, rbnfFunctionByType);
         }
         if (commandLineOptions.timezones) {
             var timeZoneDisplayNames = cldr.extractTimeZoneDisplayNames(targetLocaleId);
