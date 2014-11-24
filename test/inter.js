@@ -14,6 +14,14 @@ describe('inter', function () {
             var timeZoneOffsetStr = d.toTimeString().match(/GMT([-+]\d\d\d\d)/)[1].replace(/(\d\d)$/, ':$1');
             expect(inter.renderDate(d), 'to equal', 'Friday, December 6, 2013 at 10:54:10 am ' + timeZoneOffsetStr);
         });
+
+        it('should accept a number (epoch milliseconds) instead of a Date instance', function () {
+            expect(inter.renderDate(5000, 'shortDate'), 'to equal', '1/1/1970');
+        });
+
+        it('should accept a parsable date string instead of a Date instance', function () {
+            expect(inter.renderDate('Nov 18 2014 18:00', 'shortDate'), 'to equal', '11/18/2014');
+        });
     });
 
     describe('#renderList()', function () {
