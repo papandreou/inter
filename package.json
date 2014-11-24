@@ -21,7 +21,8 @@
   },
   "main": "./build/root.js",
   "scripts": {
-    "prepublish": "rm -fr build && ./bin/buildInter --type node -o build --all --golf --jobsize 100"
+    "prepublish": "rm -fr build && ./bin/buildInter --type node -o build --all --golf --jobsize 100",
+    "test": "mocha"
   },
   "optionalDependencies": {}
 }
