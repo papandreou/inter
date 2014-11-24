@@ -13,7 +13,9 @@
     "uglify-js": "=1.3.3",
     "underscore": "=1.3.3"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "unexpected": "5.0.0-beta19"
+  },
   "directories": {
     "bin": "bin"
   },
