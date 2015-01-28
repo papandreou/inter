@@ -49,4 +49,24 @@ describe('inter', function () {
             expect(require('../build/da').renderNumber(10000000.23), 'to equal', '10,000,000.23');
         });
     });
+
+    describe('#renderUnit', function () {
+        it('should render a singular number of units', function () {
+            expect(inter.renderUnit(1, 'durationWeek'), 'to equal', '1 week');
+        });
+
+        it('should render a plural number of units', function () {
+            expect(inter.renderUnit(2, 'durationWeek'), 'to equal', '2 weeks');
+        });
+
+        it('should render in the narrow format', function () {
+            expect(inter.renderUnit(1, 'durationWeek', 'narrow'), 'to equal', '1w');
+        });
+    });
+
+    describe('#makeUnitRenderer', function () {
+        it('should render in the narrow format', function () {
+            expect(inter.makeUnitRenderer('durationWeek', 'narrow')(1), 'to equal', '1w');
+        });
+    });
 });
