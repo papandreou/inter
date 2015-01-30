@@ -81,7 +81,7 @@ require('inter').load('sv').getCountry('SE');
 inter.regions
 -------------
 
-An array of objects representing region display names. The array is
+An array of objects with region display names and some additional info. The array is
 ordered by display name. Superset of `inter.countries` and
 `inter.regions`.
 
@@ -114,7 +114,7 @@ require('inter').load('en_US').getRegion('018');
 inter.territories
 -----------------
 
-An array of objects representing country display names. The array is
+An array of objects with territory display names and some additional info. The array is
 ordered by display name and contains some additional
 properties. Superset of `inter.countries` and `inter.regions`.
 
