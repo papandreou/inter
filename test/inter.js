@@ -26,6 +26,14 @@ describe('inter', function () {
         it('should accept a parsable date string instead of a Date instance', function () {
             expect(inter.renderDate('Nov 18 2014 18:00', 'shortDate'), 'to equal', '11/18/2014');
         });
+
+        it('should use the regular month format when using the L format character', function () {
+            expect(require('../build/fi').renderDateFormat(new Date('Nov 18 2014 18:00'), 'MMMM'), 'to equal', 'marraskuuta');
+        });
+
+        it('should use the standalone month format when using the L format character', function () {
+            expect(require('../build/fi').renderDateFormat(new Date('Nov 18 2014 18:00'), 'LLLL'), 'to equal', 'marraskuu');
+        });
     });
 
     describe('#renderList()', function () {
