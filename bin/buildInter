@@ -299,8 +299,6 @@ if (commandLineOptions.jobsize && targetLocaleIds.length > commandLineOptions.jo
         if (!commandLineOptions.numbers && !commandLineOptions.rbnf) {
             omitByMethodName.makeNumberRendererSource = true;
             omitByMethodName.makeNumberRenderer = true;
-            omitByMethodName.renderCurrencyLong = true;
-            omitByMethodName.renderCurrencyShort = true;
         }
         if (!commandLineOptions.numbers) {
             omitByMethodName.makeFileSizeRenderer = true;
