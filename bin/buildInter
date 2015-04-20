@@ -277,6 +277,7 @@ if (commandLineOptions.jobsize && targetLocaleIds.length > commandLineOptions.jo
             omitByMethodName = {};
         if (!commandLineOptions.pluralrules) {
             omitByMethodName.trQuantity = true;
+            omitByMethodName.renderCurrencyLong = true;
         }
         if (!commandLineOptions.listpatterns) {
             omitByMethodName.renderList = true;
@@ -298,10 +299,17 @@ if (commandLineOptions.jobsize && targetLocaleIds.length > commandLineOptions.jo
         if (!commandLineOptions.numbers && !commandLineOptions.rbnf) {
             omitByMethodName.makeNumberRendererSource = true;
             omitByMethodName.makeNumberRenderer = true;
+            omitByMethodName.renderCurrencyLong = true;
+            omitByMethodName.renderCurrencyShort = true;
         }
         if (!commandLineOptions.numbers) {
             omitByMethodName.makeFileSizeRenderer = true;
             omitByMethodName.makePercentageRenderer = true;
+            omitByMethodName.renderCurrencyLong = true;
+            omitByMethodName.renderCurrencyShort = true;
+        }
+        if (!commandLineOptions.currencies) {
+            omitByMethodName.renderCurrencyLong = true;
         }
         if (!commandLineOptions.unitpatterns) {
             omitByMethodName.makeUnitRenderer = true;
