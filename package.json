@@ -1,7 +1,7 @@
 {
   "name": "inter",
-  "version": "1.7.3",
-  "author": "Andreas Lind <andreas@one.com>",
+  "version": "1.8.0",
+  "author": "Andreas Lind Petersen <andreas@one.com>",
   "dependencies": {
     "async": "=0.2.5",
     "cldr": "3.0.0",
