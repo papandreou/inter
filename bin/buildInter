@@ -13,7 +13,7 @@ var fs = require('fs'),
     normalizeLocaleId = require('../lib/normalizeLocaleId'),
     convertObjectsWithIntegerKeysToArrays = require('../lib/convertObjectsWithIntegerKeysToArrays'),
     ZoneInfo = require('../lib/ZoneInfo'),
-    optimist = require('optimist')
+    optimist = require('yargs')
         .usage('$0 [--cldrpath <pathToCldr>] [-o <outputFileName>] --locales localeId,localeId...')
         .wrap(72)
         .options('cldrpath', {
@@ -51,6 +51,8 @@ optimist = optimist
         if (argv.type !== 'bundle' && !argv.o) {
             throw new Error('-o is mandatory unless --type bundle is specified');
         }
+
+        return true;
     })
     .options('localeidvar', {
         describe: 'The name of the JavaScript identifier used to determine which locale to select (only applicable with --type bundle). If you don\'t use buildDevelopment (AssetGraph-builder) your own code must set this variable before the locale library is loaded',
