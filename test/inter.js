@@ -51,9 +51,7 @@ describe('inter', function () {
         it('should render a number in the Indian English locale (#11)', function () {
             expect(require('../build/en_in').renderNumber(10000000.23), 'to equal', '10,000,000.23');
         });
-    });
 
-    describe('#renderNumber', function () {
         it('should render a number in the Danish locale (#11)', function () {
             expect(require('../build/da').renderNumber(10000000.23), 'to equal', '10,000,000.23');
         });
@@ -80,6 +78,12 @@ describe('inter', function () {
 
         it('should render in the narrow format', function () {
             expect(inter.renderUnit(1, 'durationWeek', 'narrow'), 'to equal', '1w');
+        });
+    });
+
+    describe('#renderCurrencyShort', function () {
+        it('should render a float with a currency', function () {
+            expect(inter.renderCurrencyShort(134.40, '$'), 'to equal', '$134.40');
         });
     });
 
