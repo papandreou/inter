@@ -74,6 +74,10 @@ describe('inter', function () {
         it('should render a float with a currency', function () {
             expect(inter.renderCurrencyShort(134.40, '$'), 'to equal', '$134.40');
         });
+
+        it('should render a number in the Dutch locale', function () {
+            expect(require('../build/nl').renderCurrencyShort(134.40, '€'), 'to equal', '€ 134,40');
+        });
     });
 
     describe('#makeUnitRenderer', function () {
