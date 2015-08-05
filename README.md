@@ -51,8 +51,7 @@ for each locale.
 Reference
 =========
 
-inter.countries
----------------
+### inter.countries
 
 An array of objects representing country display names. The array is
 ordered by display name and contains some additional properties:
@@ -65,8 +64,8 @@ require('inter').load('da').countries[0];
   hasTimeZones: true }
 ```
 
-inter.getCountry(countryId)
----------------------------
+### inter.getCountry(countryId)
+
 
 Get info about a specific country (queried by ID):
 
@@ -78,8 +77,8 @@ require('inter').load('sv').getCountry('SE');
   hasTimeZones: true }
 ```
 
-inter.regions
--------------
+### inter.regions
+
 
 An array of objects with region display names and some additional info. The array is
 ordered by display name. Superset of `inter.countries` and
@@ -99,8 +98,7 @@ require('inter').load('en_US').regions;
     hasTimeZones: false } ]
 ```
 
-inter.getRegion(regionId)
--------------------------
+### inter.getRegion(regionId)
 
 Get info about a specific region, queried by ID:
 
@@ -111,8 +109,7 @@ require('inter').load('en_US').getRegion('018');
   hasTimeZones: false }
 ```
 
-inter.territories
------------------
+### inter.territories
 
 An array of objects with territory display names and some additional info. The array is
 ordered by display name and contains some additional
@@ -134,8 +131,7 @@ require('inter').load('en_US').territories;
     hasTimeZones: true } ]
 ```
 
-inter.getTerritory(territoryId)
--------------------------------
+### inter.getTerritory(territoryId)
 
 Get info about a specific territory, queried by ID (can be either a
 region or a country):
@@ -148,8 +144,7 @@ require('inter').load('en_US').getTerritory('US');
   hasTimeZones: true }
 ```
 
-inter.timeZones
----------------
+### inter.timeZones
 
 An array of objects representing all available time zone display names
 plus some additional info (Olson/tzdata ID, UTC offset, and the ID of
@@ -170,8 +165,7 @@ require('inter').load('da').timeZones;
     countryId: 'KI' } ]
 ```
 
-inter.getTimeZone(timeZoneId)
------------------------------
+### inter.getTimeZone(timeZoneId)
 
 Get info about a specific time zone (queried by its Olson/tzdata ID):
 
@@ -184,8 +178,7 @@ require('inter').load('da').getTimeZone('Europe/Copenhagen');
   countryId: 'DK' }
 ```
 
-inter.languages
----------------
+### inter.languages
 
 An array of objects representing all available language display names
 plus some additional info. The array is ordered by display name:
@@ -203,8 +196,7 @@ require('inter').load('en_US').languages;
   { id: 'zza', displayName: 'Zaza' } ]
 ```
 
-inter.getLanguage(languageId)
------------------------------
+### inter.getLanguage(languageId)
 
 Get info about a specific language, queried by its ID:
 
@@ -215,8 +207,7 @@ require('inter').load('en_US').getLanguage('zh_hans');
   nativeDisplayName: '简体中文' }
 ```
 
-inter.currencies
-----------------
+### inter.currencies
 
 An array of objects with all available currency display names,
 including ids and symbols and instructions for displaying different
@@ -240,8 +231,7 @@ require('inter').load('sv').currencies;
     other: 'östtyska mark' } ]
 ```
 
-inter.getCurrency(currencyId)
------------------------------
+### inter.getCurrency(currencyId)
 
 Get info about a specific time zone, queried by its ID:
 
@@ -258,8 +248,7 @@ require('inter').load('ar').getCurrency('ZRN');
   other: 'زائير زائيري جديد' }
 ```
 
-inter.scripts
--------------
+### inter.scripts
 
 An array of objects with all available script display names, including
 IDs:
@@ -274,8 +263,7 @@ require('inter').load('en_US').scripts;
   { id: 'Yiii', displayName: 'Yi' } ]
 ```
 
-inter.getScript(scriptId)
--------------------------
+### inter.getScript(scriptId)
 
 Get info about a specific script, queried by its ID:
 
@@ -284,8 +272,7 @@ require('inter').load('en_US').getScript('Sgnw');
 { id: 'Sgnw', displayName: 'SignWriting' }
 ```
 
-inter.renderSpelloutNumbering(number)
--------------------------------------
+### inter.renderSpelloutNumbering(number)
 
 ```javascript
 require('inter').load('en_US').renderSpelloutNumbering(53723);
@@ -294,8 +281,7 @@ require('inter').load('en_US').renderSpelloutNumbering(53723);
 
 The library must be built with the `--rbnf` switch.
 
-inter.renderDigitsOrdinal(number)
----------------------------------
+### inter.renderDigitsOrdinal(number)
 
 ```javascript
 require('inter').load('en_US').renderDigitsOrdinal(42);
@@ -304,9 +290,7 @@ require('inter').load('en_US').renderDigitsOrdinal(42);
 
 The library must be built with the `--rbnf` switch.
 
-
-inter.pluralRule(number)
-------------------------
+### inter.pluralRule(number)
 
 Determine the locale's plural form for a given number, eg. `"one"`,
 `"two"`, `"few"`, `"zero"`, `"many"`, or `"other"`.
@@ -317,8 +301,7 @@ spec</a> for more information.
 
 The library must be built with the `--pluralrules` switch.
 
-inter.renderList(itemArray[, 'unit'|'unitShort'|'unitNarrow'|'default'])
----------------------------
+### inter.renderList(itemArray[, 'unit'|'unitShort'|'unitNarrow'|'default'])
 
 Render a list of items using the list patterns. The locale library must be built with the `--listpatterns` switch.
 
@@ -328,11 +311,9 @@ Example:
 inter.renderList(['foo', 'bar', 'quux']); // "foo, bar, and quux" (en_US).
 ```
 
-inter.renderUnit(number, 'year'|'month'|'week'|'day'|'hour'|'minute')
----------------------------------------------------------------------
+### inter.renderUnit(number, 'year'|'month'|'week'|'day'|'hour'|'minute')
 
-inter.getUnitRenderer('year'|'month'|'week'|'day'|'hour'|'minute')
-------------------------------------------------------------------
+### inter.getUnitRenderer('year'|'month'|'week'|'day'|'hour'|'minute')
 
 Render (or get a renderer function for) a specific unit of time. The
 locale library must be built with the `--dateformats` switch.
@@ -345,11 +326,9 @@ inter.getUnitRenderer('month')(5); // '5 months' (en_US)
 inter.renderUnit(1, 'week'); // '1 week' (en_US)
 ```
 
-inter.renderNumber(number[, numberFormat[, numberSystemId]])
-------------------------------------------------------------
+### inter.renderNumber(number[, numberFormat[, numberSystemId]])
 
-inter.getNumberRenderer([numberFormat[, numberSystemId]])
----------------------------------------------------------
+### inter.getNumberRenderer([numberFormat[, numberSystemId]])
 
 Render (or get a renderer function for) a number according to the
 specified <a
@@ -357,11 +336,9 @@ href="http://www.unicode.org/reports/tr35/tr35-29.html#Number_Format_Patterns">I
 DecimalFormat</a> (defaults to the locale standard number format for
 the locale).
 
-inter.renderPercentage(number[, numDecimals[, numberSystemId]])
----------------------------------------------------------------
+### inter.renderPercentage(number[, numDecimals[, numberSystemId]])
 
-inter.getPercentageRenderer([numDecimals[, numberSystemId]])
-------------------------------------------------------------
+### inter.getPercentageRenderer([numDecimals[, numberSystemId]])
 
 Render (or get a renderer function for) a percentage according to the
 number format and percent char of the locale. The library must be
@@ -374,11 +351,9 @@ inter.getPercentageRenderer(1)(1.0056); // '105.6 %' (en_US)
 inter.renderPercentage(1.0056, 1); // '105.6 %' (en_US)
 ```
 
-inter.renderFileSize(number[, numDecimals])
--------------------------------------------
+### inter.renderFileSize(number[, numDecimals])
 
-inter.getFileSizeRenderer([numDecimals])
-----------------------------------------
+### inter.getFileSizeRenderer([numDecimals])
 
 Render (or get a renderer function for) a number of bytes according to
 the number format of the locale. The units themselves (bytes, KB, MB,
@@ -392,11 +367,9 @@ inter.getFileSizeRenderer(1)(100000); // '97.7 KB' (en_US)
 inter.renderFileSize(100000, 1); // '97.7 KB' (en_US)
 ```
 
-inter.renderDate(date, dateFormatId)
-------------------------------------
+### inter.renderDate(date, dateFormatId)
 
-inter.getDateRenderer(dateFormatId)
------------------------------------
+### inter.getDateRenderer(dateFormatId)
 
 Render (or get a renderer function for) one of the locale's standard
 full/long/medium/short time or date formats, or a locale-specifc
@@ -416,11 +389,9 @@ inter.renderDate(aprilFourth, 'shortTime'); // "12:00 am" (en_US)
 inter.renderDate(aprilFourth, 'MMMMEd'); // "Sun, April 4" (en_US)
 ```
 
-inter.renderDateInterval(dateInterval, dateFormatId)
-----------------------------------------------------
+### inter.renderDateInterval(dateInterval, dateFormatId)
 
-inter.getDateIntervalRenderer(dateFormatId)
--------------------------------------------
+### inter.getDateIntervalRenderer(dateFormatId)
 
 Render (or get a renderer function for) a date or date-time interval
 that uses one of the locale's standard full/long/medium/short time or
@@ -446,8 +417,7 @@ inter.renderDateInterval({
 Additional helper methods
 =========================
 
-inter.tokenizePattern(patternString)
-------------------------------------
+### inter.tokenizePattern(patternString)
 
 Helper function for tokenizing an ICU pattern with placeholders.
 
@@ -457,8 +427,7 @@ Example:
 inter.tokenizePattern('My name is {0}'); // [{type: 'text', value: 'My name is '}, {type: 'placeHolder', value: 0}]
 ```
 
-inter.getPatternRenderer(patternString)
----------------------------------------
+### inter.getPatternRenderer(patternString)
 
 Get an optimized function for rendering a specific pattern. The
 function accepts the placeholder values as arguments.
@@ -469,8 +438,7 @@ Example:
 inter.getPatternRenderer('My name is {0}')('George'); // 'My name is George'
 ```
 
-inter.tokenizeDateFormat(icuDateFormat)
----------------------------------------
+### inter.tokenizeDateFormat(icuDateFormat)
 
 Helper function for parse a date format into `text` and `field` tokens. The locale library must be built with the `--dateformats` switch.
 
@@ -480,8 +448,7 @@ Example:
 inter.tokenizeDateFormat('dddd-m')); // [{type: 'field', value: 'dddd'}, {type: 'text', value: '-'}, {type: 'field', value: 'm'}]
 ```
 
-inter.getDateFormat(formatId)
------------------------------
+### inter.getDateFormat(formatId)
 
 Get one of the locale's standard full/long/medium/short time or date
 formats, or a locale-specific format specified by a CLDR
