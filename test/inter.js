@@ -1,3 +1,4 @@
+/*global describe, it*/
 var expect = require('unexpected');
 
 describe('inter', function () {
@@ -55,6 +56,16 @@ describe('inter', function () {
     describe('#renderNumber', function () {
         it('should render a number in the Danish locale (#11)', function () {
             expect(require('../build/da').renderNumber(10000000.23), 'to equal', '10,000,000.23');
+        });
+    });
+
+    describe('#renderPercentage', function () {
+        it('should accept the number of decimals as the second parameter', function () {
+            expect(require('../build/da').renderPercentage(12.345678, 2), 'to equal', '1.234,57\xa0%');
+        });
+
+        it('should accept the number system as the third parameter', function () {
+            expect(require('../build/da').renderPercentage(12.345678, 2, 'mlym'), 'to equal', '൧.൨൩൪,൫൭\xa0%');
         });
     });
 

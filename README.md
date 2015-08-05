@@ -349,7 +349,7 @@ inter.renderNumber(number[, numberFormat[, numberSystemId]])
 ------------------------------------------------------------
 
 inter.getNumberRenderer([numberFormat[, numberSystemId]])
-------------------------------------------------------------
+---------------------------------------------------------
 
 Render (or get a renderer function for) a number according to the
 specified <a
@@ -357,11 +357,11 @@ href="http://www.unicode.org/reports/tr35/tr35-29.html#Number_Format_Patterns">I
 DecimalFormat</a> (defaults to the locale standard number format for
 the locale).
 
-inter.renderPercentage(number[, numDecimals])
----------------------------------------------
+inter.renderPercentage(number[, numDecimals[, numberSystemId]])
+---------------------------------------------------------------
 
-inter.getPercentageRenderer([numDecimals])
-------------------------------------------
+inter.getPercentageRenderer([numDecimals[, numberSystemId]])
+------------------------------------------------------------
 
 Render (or get a renderer function for) a percentage according to the
 number format and percent char of the locale. The library must be
