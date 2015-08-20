@@ -587,7 +587,7 @@ if (commandLineOptions.jobsize && targetLocaleIds.length > commandLineOptions.jo
             Array.prototype.splice.apply(factoryStatementAsts, [factoryStatementAsts.length - 1, 0].concat(statementAsts)); // Inject before "return inter;"
 
             var javaScriptString = uglifyJs.uglify.gen_code(interAst, {beautify: true});
-            if ('o' in commandLineOptions) {
+            if ('o' in commandLineOptions && commandLineOptions.o) {
                 fs.writeFile(commandLineOptions.o, javaScriptString, 'utf-8', function (err) {
                     if (err) {
                         throw err;
