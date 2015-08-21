@@ -83,11 +83,21 @@ describe('inter', function () {
 
     describe('#renderCurrencyShort', function () {
         it('should render a float with a currency', function () {
-            expect(inter.renderCurrencyShort(134.40, '$'), 'to equal', '$134.40');
+            expect(inter.renderCurrencyShort(134.40, 'USD'), 'to equal', '$134.40');
         });
 
         it('should render a number in the Dutch locale', function () {
-            expect(require('../build/nl').renderCurrencyShort(134.40, '€'), 'to equal', '€ 134,40');
+            expect(require('../build/nl').renderCurrencyShort(134.40, 'EUR'), 'to equal', '€ 134,40');
+        });
+    });
+
+    describe('#renderCurrencyLong', function () {
+        it('should render a float with a currency', function () {
+            expect(inter.renderCurrencyLong(134.40, 'USD'), 'to equal', 'USD 134.40');
+        });
+
+        it('should render a number in the Dutch locale', function () {
+            expect(require('../build/nl').renderCurrencyLong(134.40, 'EUR'), 'to equal', 'EUR 134,40');
         });
     });
 
