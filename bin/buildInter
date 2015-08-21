@@ -737,7 +737,7 @@ if (commandLineOptions.jobsize && targetLocaleIds.length > commandLineOptions.jo
                                 'var', [
                                     ['_', ['call', ['name', 'require'], [['string', 'underscore']]]],
                                     ['P', ['call', ['name', 'require'], [['string', './' + parentLocaleId]]]],
-                                    ['inter', ['call', ['dot', ['name', '_'], 'extend'], [[ 'object', [['renderers', ['object', []]]]], ['name', 'P']]]]
+                                    ['inter', ['call', ['dot', ['name', '_'], 'defaults'], [[ 'object', [['renderers', ['object', []]]]], ['name', 'P']]]]
                                 ]
                             ]
                         );

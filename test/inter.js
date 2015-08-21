@@ -52,7 +52,7 @@ describe('inter', function () {
             expect(require('../build/en_in').renderNumber(10000000.23), 'to equal', '10,000,000.23');
         });
 
-        it.skip('should render a number in the Danish locale (#11)', function () {
+        it('should render a number in the Danish locale (#11)', function () {
             expect(require('../build/da').renderNumber(10000000.23), 'to equal', '10.000.000,23');
         });
     });
