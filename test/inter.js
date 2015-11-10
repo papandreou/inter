@@ -86,6 +86,10 @@ describe('inter', function () {
             expect(inter.renderCurrencyShort(134.40, 'USD'), 'to equal', '$134.40');
         });
 
+        it('should render a float with a currency, with a different amount of decimals', function () {
+            expect(inter.renderCurrencyShort(134.40, 'USD', 'latn', 1), 'to equal', '$134.4');
+        });
+
         it('should render a number in the Dutch locale', function () {
             expect(require('../build/nl').renderCurrencyShort(134.40, 'EUR'), 'to equal', '€ 134,40');
         });
@@ -94,6 +98,10 @@ describe('inter', function () {
     describe('#renderCurrencyLong', function () {
         it('should render a float with a currency', function () {
             expect(inter.renderCurrencyLong(134.40, 'USD'), 'to equal', 'USD 134.40');
+        });
+
+        it('should render a float with a currency, with a different amount of decimals', function () {
+            expect(inter.renderCurrencyLong(134.40, 'USD', 'latn', 1), 'to equal', 'USD 134.4');
         });
 
         it('should render a number in the Dutch locale', function () {
