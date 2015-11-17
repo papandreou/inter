@@ -233,7 +233,7 @@ require('inter').load('sv').currencies;
 
 #### inter.getCurrency(currencyId)
 
-Get info about a specific time zone, queried by its ID:
+Get info about a specific currency, queried by its ID:
 
 ```javascript
 require('inter').load('ar').getCurrency('ZRN');
