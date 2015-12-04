@@ -11,10 +11,6 @@ describe('inter', function () {
             expect(inter.renderDate(d, 'mediumDateTime'), 'to equal', 'Dec 6, 2013, 10:54:10 am');
         });
 
-        it('should format a date according to the MMMM format (should adapt MMM=LLL to LLLL)', function () {
-            expect(inter.renderDate(d, 'MMMM'), 'to equal', 'December');
-        });
-
         it('should use the fullDateTime format if the formatId parameter is omitted', function () {
             var timeZoneOffsetStr = d.toTimeString().match(/GMT([-+]\d\d\d\d)/)[1].replace(/(\d\d)$/, ':$1');
             expect(inter.renderDate(d), 'to equal', 'Friday, December 6, 2013 at 10:54:10 am ' + timeZoneOffsetStr);
@@ -113,5 +109,15 @@ describe('inter', function () {
         it('should render in the narrow format', function () {
             expect(inter.makeUnitRenderer('durationWeek', 'narrow')(1), 'to equal', '1w');
         });
+    });
+
+    describe('#adaptICUFormat', function () {
+        it('should adapt a pattern that uses L correctly when the format id uses M', function () {
+            expect(require('../build/fi').adaptICUFormat('LLL', 'MMMM'), 'to equal', 'LLLL');
+        });
+    });
+
+    it('it should ', function () {
+        expect(require('../build/fi').renderDate(new Date(2015, 10, 1), 'MMMM'), 'to equal', 'marraskuu');
     });
 });
