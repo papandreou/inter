@@ -456,6 +456,8 @@ if (commandLineOptions.jobsize && targetLocaleIds.length > commandLineOptions.jo
                 territories = Object.keys(territoryDisplayNames).sort(function (a, b) {
                     return territoryDisplayNames[a] < territoryDisplayNames[b] ? -1 :
                         (territoryDisplayNames[a] > territoryDisplayNames[b] ? 1 : 0);
+                }).filter(function (territoryId) {
+                    return (territoryId in worldInfo.alpha2CodeByNumericTerritoryId || territoryId in worldInfo.territoryInfoByTerritoryId) ? true : false;
                 }).map(function (territoryId) {
                     return {
                         id: territoryId,
