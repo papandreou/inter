@@ -25,7 +25,7 @@ var fs = require('fs'),
         }),
     cldr = optimist.argv.cldrpath ? require('cldr').load(optimist.argv.cldrpath) : require('cldr'),
     zoneInfo = new ZoneInfo(optimist.argv.zoneinfopath),
-    worldInfo = cldr.extractWorldInfo(),
+    worldInfo = require('../lib/worldInfo'),
     targetLocaleIds;
 
 optimist = optimist
@@ -476,7 +476,7 @@ if (commandLineOptions.jobsize && targetLocaleIds.length > commandLineOptions.jo
             }
             if (commandLineOptions.countries) {
                 localeData.countries = territories.filter(function (territoryInfo) {
-                    var countryInfo = worldInfo.countryInfoByTerritoryId[territoryInfo.id];
+                    var countryInfo = worldInfo.territoryInfoByTerritoryId[territoryInfo.id];
                     return countryInfo && !countryInfo.isSubdivided;
                 });
             }
