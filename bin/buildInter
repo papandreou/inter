@@ -306,6 +306,7 @@ if (commandLineOptions.jobsize && targetLocaleIds.length > commandLineOptions.jo
             omitByMethodName.makeFileSizeRenderer = true;
             omitByMethodName.makePercentageRenderer = true;
             omitByMethodName.applySpacingToCurrencyString = true;
+            omitByMethodName.renderCurrency = true;
             omitByMethodName.renderCurrencyLong = true;
             omitByMethodName.renderCurrencyShort = true;
         }
