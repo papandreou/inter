@@ -116,8 +116,4 @@ describe('inter', function () {
             expect(require('../build/fi').adaptICUFormat('LLL', 'MMMM'), 'to equal', 'LLLL');
         });
     });
-
-    it('it should ', function () {
-        expect(require('../build/fi').renderDate(new Date(2015, 10, 1), 'MMMM'), 'to equal', 'marraskuu');
-    });
 });
