@@ -93,15 +93,15 @@ describe('inter', function () {
 
     describe('#renderCurrencyLong', function () {
         it('should render a float with a currency', function () {
-            expect(inter.renderCurrencyLong(134.40, 'USD'), 'to equal', 'USD 134.40');
+            expect(inter.renderCurrencyLong(134.40, 'USD'), 'to equal', 'USD\xa0134.40');
         });
 
         it('should render a float with a currency, with a different amount of decimals', function () {
-            expect(inter.renderCurrencyLong(134.40, 'USD', 'latn', 1), 'to equal', 'USD 134.4');
+            expect(inter.renderCurrencyLong(134.40, 'USD', 'latn', 1), 'to equal', 'USD\xa0134.4');
         });
 
         it('should render a number in the Dutch locale', function () {
-            expect(require('../build/nl').renderCurrencyLong(134.40, 'EUR'), 'to equal', 'EUR 134,40');
+            expect(require('../build/nl').renderCurrencyLong(134.40, 'EUR'), 'to equal', 'EUR\xa0134,40');
         });
     });
 
