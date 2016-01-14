@@ -1,5 +1,6 @@
 /*global describe, it, beforeEach, afterEach*/
 var expect = require('unexpected');
+var icalJs = require('ical.js');
 
 describe('inter', function () {
     var inter = require('../build/en_us');
@@ -61,6 +62,17 @@ describe('inter', function () {
 
         it('should use the standalone month format when using the L format character', function () {
             expect(require('../build/fi').renderDateFormat(new Date('Nov 18 2014 18:00'), 'LLLL'), 'to equal', 'marraskuu');
+        });
+
+        it('should support ical.js-ish objects as an alternative to Date instances', function () {
+            expect(inter.renderDate(new icalJs.Time({
+                year: 2016,
+                month: 1,
+                day: 14,
+                hour: 17,
+                minute: 48,
+                second: 4
+            }), 'mediumDateTime'), 'to equal', 'Jan 14, 2016, 5:48:04 pm');
         });
     });
 

@@ -14,6 +14,7 @@
     "yargs": "3.7.2"
   },
   "devDependencies": {
+    "ical.js": "1.1.2",
     "jshint": "2.8.0",
     "mocha": "2.2.5",
     "unexpected": "9.4.0"
