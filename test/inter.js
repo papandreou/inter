@@ -35,11 +35,11 @@ describe('inter', function () {
 
     describe('#renderList()', function () {
         it('should should render a list according to the unitNarrow pattern', function () {
-            expect(inter.renderList(['foo', 'bar', 'quux'], 'unitNarrow'), 'to equal', 'foo bar quux')
+            expect(inter.renderList(['foo', 'bar', 'quux'], 'unitNarrow'), 'to equal', 'foo bar quux');
         });
 
         it('should use the default format when the type parameter is omitted', function () {
-            expect(inter.renderList(['foo', 'bar', 'quux']), 'to equal', 'foo, bar, and quux')
+            expect(inter.renderList(['foo', 'bar', 'quux']), 'to equal', 'foo, bar, and quux');
         });
     });
 
