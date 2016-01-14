@@ -24,7 +24,7 @@
   "main": "./build/root.js",
   "scripts": {
     "preversion": "rm -fr build && ./bin/buildInter --type node -o build --all --golf --jobsize 100",
-    "test": "./bin/buildInter --type node -o build --all en_us,da,en_in,nl,fi && mocha && npm run lint",
+    "test": "./bin/buildInter --type node -o build --all --locales en_us,da,en_in,nl,fi && mocha && npm run lint",
     "lint": "jshint .",
     "travis": "npm test"
   },
