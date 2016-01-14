@@ -1,6 +1,11 @@
 inter
 =====
 
+[![NPM version](https://badge.fury.io/js/inter.svg)](http://badge.fury.io/js/inter)
+[![Build Status](https://travis-ci.org/papandreou/inter.svg?branch=master)](https://travis-ci.org/papandreou/inter)
+[![Coverage Status](https://coveralls.io/repos/papandreou/inter/badge.svg)](https://coveralls.io/r/papandreou/inter)
+[![Dependency Status](https://david-dm.org/papandreou/inter.svg)](https://david-dm.org/papandreou/inter)
+
 A JavaScript locale library that can be used to render dates, date and
 date-time intervals, numbers, lists, and more. Also contains localized
 display names for countries, regions, languages, time zones, and

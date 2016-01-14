@@ -14,6 +14,7 @@
     "yargs": "3.7.2"
   },
   "devDependencies": {
+    "jshint": "2.8.0",
     "mocha": "2.2.5",
     "unexpected": "9.4.0"
   },
@@ -22,8 +23,10 @@
   },
   "main": "./build/root.js",
   "scripts": {
-    "prepublish": "rm -fr build && ./bin/buildInter --type node -o build --all --golf --jobsize 100",
-    "test": "mocha"
+    "preversion": "rm -fr build && ./bin/buildInter --type node -o build --all --golf --jobsize 100",
+    "test": "./bin/buildInter --type node -o build --all en_us,da,en_in,nl,fi && mocha && npm run lint",
+    "lint": "jshint .",
+    "travis": "npm test"
   },
   "optionalDependencies": {}
 }
