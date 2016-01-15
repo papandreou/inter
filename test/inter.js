@@ -1,4 +1,4 @@
-/*global describe, it*/
+/*global describe, it, beforeEach, afterEach*/
 var expect = require('unexpected');
 
 describe('inter', function () {
@@ -14,6 +14,38 @@ describe('inter', function () {
         it('should use the fullDateTime format if the formatId parameter is omitted', function () {
             var timeZoneOffsetStr = d.toTimeString().match(/GMT([-+]\d\d\d\d)/)[1].replace(/(\d\d)$/, ':$1');
             expect(inter.renderDate(d), 'to equal', 'Friday, December 6, 2013 at 10:54:10 am ' + timeZoneOffsetStr);
+        });
+
+        describe('with a negative time zone offset (GMT-02:00)', function () {
+            var originalGetTimezoneOffset = Date.prototype.getTimezoneOffset;
+            beforeEach(function () {
+                Date.prototype.getTimezoneOffset = function () {
+                    return 120; // This is a bit of a wtf, I would expect it to return -120, but it doesn't
+                };
+            });
+            afterEach(function () {
+                Date.prototype.getTimezoneOffset = originalGetTimezoneOffset;
+            });
+
+            it('should render the time zone offset correctly', function () {
+                expect(inter.renderDate(new Date(2016, 0, 15, 11, 30), 'fullDateTime'), 'to equal', 'Friday, January 15, 2016 at 11:30:00 am -02:00');
+            });
+        });
+
+        describe('with a positive time zone offset (GMT+02:00)', function () {
+            var originalGetTimezoneOffset = Date.prototype.getTimezoneOffset;
+            beforeEach(function () {
+                Date.prototype.getTimezoneOffset = function () {
+                    return -120; // This is a bit of a wtf, I would expect it to return 120, but it doesn't
+                };
+            });
+            afterEach(function () {
+                Date.prototype.getTimezoneOffset = originalGetTimezoneOffset;
+            });
+
+            it('should render the time zone offset correctly', function () {
+                expect(inter.renderDate(new Date(2016, 0, 15, 11, 30), 'fullDateTime'), 'to equal', 'Friday, January 15, 2016 at 11:30:00 am +02:00');
+            });
         });
 
         it('should accept a number (epoch milliseconds) instead of a Date instance', function () {
