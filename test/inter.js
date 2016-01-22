@@ -64,15 +64,67 @@ describe('inter', function () {
             expect(require('../build/fi').renderDateFormat(new Date('Nov 18 2014 18:00'), 'LLLL'), 'to equal', 'marraskuu');
         });
 
-        it('should support ical.js-ish objects as an alternative to Date instances', function () {
-            expect(inter.renderDate(new icalJs.Time({
-                year: 2016,
-                month: 1,
-                day: 14,
-                hour: 17,
-                minute: 48,
-                second: 4
-            }), 'mediumDateTime'), 'to equal', 'Jan 14, 2016, 5:48:04 pm');
+        describe('with an ical.js-ish object passed instead of a Date instance', function () {
+            it('should render the basic fields correctly', function () {
+                expect(inter.renderDate(new icalJs.Time({
+                    year: 2016,
+                    month: 1,
+                    day: 14,
+                    hour: 17,
+                    minute: 48,
+                    second: 4
+                }), 'mediumDateTime'), 'to equal', 'Jan 14, 2016, 5:48:04 pm');
+            });
+
+            it('should render the time zone', function () {
+                var component = new icalJs.Component(icalJs.parse(
+                    "BEGIN:VCALENDAR\n" +
+                    "CALSCALE:GREGORIAN\n" +
+                    "METHOD:REQUEST\n" +
+                    "PRODID:-//Apple Inc.//iPhone 3.0//EN\n" +
+                    "VERSION:2.0\n" +
+                    "BEGIN:VTIMEZONE\n" +
+                    "TZID:Europe/Berlin\n" +
+                    "BEGIN:STANDARD\n" +
+                    "DTSTART:20151025T030000\n" +
+                    "RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU\n" +
+                    "TZNAME:CET\n" +
+                    "TZOFFSETFROM:+0200\n" +
+                    "TZOFFSETTO:+0100\n" +
+                    "END:STANDARD\n" +
+                    "BEGIN:DAYLIGHT\n" +
+                    "DTSTART:20160327T020000\n" +
+                    "RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU\n" +
+                    "TZNAME:CEST\n" +
+                    "TZOFFSETFROM:+0100\n" +
+                    "TZOFFSETTO:+0200\n" +
+                    "END:DAYLIGHT\n" +
+                    "END:VTIMEZONE\n" +
+                    "BEGIN:VEVENT\n" +
+                    "CLASS:PUBLIC\n" +
+                    "CREATED:20160121T221129Z\n" +
+                    "DTEND;TZID=Europe/Berlin:20160122T114500\n" +
+                    "DTSTAMP:20160121T221129Z\n" +
+                    "DTSTART;TZID=Europe/Berlin:20160122T113000\n" +
+                    "LAST-MODIFIED:20160121T221129Z\n" +
+                    "RECURRENCE-ID;TZID=Europe/Berlin:20160122T114500\n" +
+                    "SEQUENCE:0\n" +
+                    "SUMMARY:Test\n" +
+                    "TRANSP:OPAQUE\n" +
+                    "UID:07339337-06E2-47AA-92A6-33B4AA3D3046\n" +
+                    "END:VEVENT\n" +
+                    "END:VCALENDAR\n"
+                ));
+
+                component.getAllSubcomponents('vtimezone').forEach(function (vtimezone) {
+                    if (!(icalJs.TimezoneService.has(vtimezone.getFirstPropertyValue('tzid')))) {
+                        icalJs.TimezoneService.register(vtimezone);
+                    }
+                });
+
+                var vevent = new icalJs.Event(component.getFirstSubcomponent('vevent'));
+                expect(inter.renderDate(vevent.startDate, 'fullDateTime'), 'to equal', 'Friday, January 22, 2016 at 11:30:00 am +01:00');
+            });
         });
     });
 
