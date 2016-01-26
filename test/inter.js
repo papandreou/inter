@@ -87,6 +87,32 @@ describe('inter', function () {
                 });
             });
 
+            describe('to #renderDateInterval', function () {
+                it('should render a date in the MMMM y format (greatestDifferences)', function () {
+                    var dateInterval = {
+                        start: new icalJs.Time({ year: 2016, month: 1 }),
+                        end: new icalJs.Time({ year: 2016, month: 4 })
+                    };
+                    expect(
+                        inter.renderDateInterval(dateInterval, 'MMMMd'),
+                        'to equal',
+                        'January 1 – April 1'
+                    );
+                });
+
+                it('should render a date in the dateTime format', function () {
+                    var dateInterval = {
+                        start: new icalJs.Time({ year: 2016, month: 1, date: 12, hour: 10, minute: 4 }),
+                        end: new icalJs.Time({ year: 2016, month: 4, date: 12, hour: 10, minute: 4 })
+                    };
+                    expect(
+                        inter.renderDateInterval(dateInterval, 'yMM'),
+                        'to equal',
+                        '01/2016 – 04/2016'
+                    );
+                });
+            });
+
             it('should render the time zone', function () {
                 var component = new icalJs.Component(icalJs.parse(
                     "BEGIN:VCALENDAR\n" +
