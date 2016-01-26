@@ -76,6 +76,17 @@ describe('inter', function () {
                 }), 'mediumDateTime'), 'to equal', 'Jan 14, 2016, 5:48:04 pm');
             });
 
+            describe('to #renderDateFormat', function () {
+                it('should render a date in the MMMM y format', function () {
+                    var date = new icalJs.Time({ year: 2016, month: 1 });
+                    expect(
+                        inter.renderDateFormat(date, 'MMMM y'),
+                        'to equal',
+                        'January 2016'
+                    );
+                });
+            });
+
             it('should render the time zone', function () {
                 var component = new icalJs.Component(icalJs.parse(
                     "BEGIN:VCALENDAR\n" +
