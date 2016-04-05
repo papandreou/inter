@@ -4,7 +4,7 @@
   "author": "Andreas Lind <andreas@one.com>",
   "dependencies": {
     "async": "0.9.0",
-    "cldr": "3.4.1",
+    "cldr": "3.4.2",
     "passerror": "1.1.0",
     "seq": "=0.3.5",
     "time": "0.11.4",
