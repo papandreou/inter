@@ -28,6 +28,19 @@ var fs = require('fs'),
     worldInfo = require('../lib/worldInfo'),
     targetLocaleIds;
 
+function defaults(targetObj) { // ...
+    for (var i = 1 ; i < arguments.length ; i += 1) {
+        if (arguments[i] && typeof arguments[i] === 'object') {
+            for (var propertyName in arguments[i]) {
+                if (typeof targetObj[propertyName] === 'undefined') {
+                    targetObj[propertyName] = arguments[i][propertyName];
+                }
+            }
+        }
+    }
+    return targetObj;
+}
+
 optimist = optimist
     .options('o', {
         describe: 'Output directory (or output file if --type bundle is specified)'
@@ -735,11 +748,11 @@ if (commandLineOptions.jobsize && targetLocaleIds.length > commandLineOptions.jo
                         factoryStatementAsts.splice(0, factoryStatementAsts.length - 1);
 
                         statementAsts.unshift(
+                            uglifyJs.parser.parse(defaults.toString())[1][0],
                             [
                                 'var', [
-                                    ['_', ['call', ['name', 'require'], [['string', 'underscore']]]],
                                     ['P', ['call', ['name', 'require'], [['string', './' + parentLocaleId]]]],
-                                    ['inter', ['call', ['dot', ['name', '_'], 'defaults'], [[ 'object', [['renderers', ['object', []]]]], ['name', 'P']]]]
+                                    ['inter', ['call', ['name', 'defaults'], [[ 'object', [['renderers', ['object', []]]]], ['name', 'P']]]]
                                 ]
                             ]
                         );
