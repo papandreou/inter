@@ -768,6 +768,12 @@ if (commandLineOptions.jobsize && targetLocaleIds.length > commandLineOptions.jo
                     }
                     Array.prototype.splice.apply(factoryStatementAsts, [factoryStatementAsts.length - 1, 0].concat(statementAsts)); // Inject before "return inter;"
 
+                    if (commandLineOptions.type === 'node') {
+                        interAst = ['toplevel', factoryStatementAsts];
+                         // Replace 'return inter;' with 'module.exports = inter;'
+                        factoryStatementAsts.pop();
+                        factoryStatementAsts.push(['stat', ['assign', true, ['dot', ['name', 'module'], 'exports'], ['name', 'inter']]]);
+                    }
                     var javaScriptString = uglifyJs.uglify.gen_code(interAst, {beautify: true});
 
                     fsTools.mkpathAndWriteFile(Path.resolve(commandLineOptions.o, targetLocaleId + '.js'), javaScriptString, 'utf-8', this);
