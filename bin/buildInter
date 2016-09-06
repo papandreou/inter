@@ -751,7 +751,7 @@ if (commandLineOptions.jobsize && targetLocaleIds.length > commandLineOptions.jo
                             uglifyJs.parser.parse(defaults.toString())[1][0],
                             [
                                 'var', [
-                                    ['P', ['call', ['name', 'require'], [['string', './' + parentLocaleId]]]],
+                                    ['P', ['call', ['name', 'require'], [['string', './' + parentLocaleId + '.js']]]],
                                     ['inter', ['call', ['name', 'defaults'], [[ 'object', [['renderers', ['object', []]]]], ['name', 'P']]]]
                                 ]
                             ]
