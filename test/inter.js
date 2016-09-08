@@ -237,6 +237,59 @@ describe('inter', function () {
         });
     });
 
+    var basicInter = require('../lib/inter');
+    describe('#makePatternRenderer', function () {
+        it('should return a function that renders the given pattern', function () {
+            expect(basicInter.makePatternRenderer('{1} the {0} is even...')(['foo', 'what']), 'to equal', 'what the foo is even...');
+        });
+
+        it('should support predefined placeholder values', function () {
+            expect(basicInter.makePatternRenderer('{1} the {0} is even...', 'blah', 'yadda')(['foo', 'what']), 'to equal', 'yadda the blah is even...');
+        });
+
+        it('should support a predefined placeholder value combined with one provided to the renderer', function () {
+            expect(basicInter.makePatternRenderer('{1} the {0} is even...', 'blah')(['foo', 'what']), 'to equal', 'what the blah is even...');
+        });
+    });
+
+    describe('#makeFileSizeRenderer', function () {
+        it('should return a function that renders a file size < 1 KB', function () {
+            expect(inter.makeFileSizeRenderer()(959), 'to equal', '959 bytes');
+        });
+
+        it('should return a function that renders a KB value', function () {
+            expect(inter.makeFileSizeRenderer()(10000), 'to equal', '10 KB');
+        });
+
+        it('should return a function that renders a KB value with one decimal', function () {
+            expect(inter.makeFileSizeRenderer(1)(10000), 'to equal', '9.8 KB');
+        });
+
+        it('should return a function that renders a MB value', function () {
+            expect(inter.makeFileSizeRenderer()(10000000), 'to equal', '10 MB');
+        });
+
+        it('should return a function that renders a MB value with one decimal', function () {
+            expect(inter.makeFileSizeRenderer(1)(10000000), 'to equal', '9.5 MB');
+        });
+
+        it('should return a function that renders a GB value', function () {
+            expect(inter.makeFileSizeRenderer()(10000000000), 'to equal', '9 GB');
+        });
+
+        it('should return a function that renders a GB value with one decimal', function () {
+            expect(inter.makeFileSizeRenderer(1)(10000000000), 'to equal', '9.3 GB');
+        });
+
+        it('should return a function that renders a TB value', function () {
+            expect(inter.makeFileSizeRenderer()(10000000000000), 'to equal', '9 TB');
+        });
+
+        it('should return a function that renders a TB value with one decimal', function () {
+            expect(inter.makeFileSizeRenderer(1)(10000000000000), 'to equal', '9.1 TB');
+        });
+    });
+
     describe('#makeUnitRenderer', function () {
         it('should render in the narrow format', function () {
             expect(inter.makeUnitRenderer('durationWeek', 'narrow')(1), 'to equal', '1w');
