@@ -316,19 +316,19 @@ Example:
 inter.renderList(['foo', 'bar', 'quux']); // "foo, bar, and quux" (en_US).
 ```
 
-#### inter.renderUnit(number, 'year'|'month'|'week'|'day'|'hour'|'minute')
+#### inter.renderUnit(number, 'durationWeek'|'energyJoule'|'frequencyMegahertz'|...)
 
-#### inter.getUnitRenderer('year'|'month'|'week'|'day'|'hour'|'minute')
+#### inter.getUnitRenderer('durationWeek'|'energyJoule'|'frequencyMegahertz'|...)
 
-Render (or get a renderer function for) a specific unit of time. The
-locale library must be built with the `--dateformats` switch.
+Render (or get a renderer function for) a specific unit. The
+locale library must be built with the `--unitpatterns` switch.
 
 Example:
 
 ```javascript
-inter.getUnitRenderer('week')(1); // '1 week' (en_US)
-inter.getUnitRenderer('month')(5); // '5 months' (en_US)
-inter.renderUnit(1, 'week'); // '1 week' (en_US)
+inter.getUnitRenderer('durationWeek')(1); // '1 week' (en_US)
+inter.getUnitRenderer('durationMonth')(5); // '5 months' (en_US)
+inter.renderUnit(1, 'durationWeek'); // '1 week' (en_US)
 ```
 
 #### inter.renderNumber(number[, numberFormat[, numberSystemId]])
