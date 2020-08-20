@@ -5,9 +5,9 @@
   "dependencies": {
     "async": "0.9.0",
     "cldr": "3.5.0",
+    "moment-timezone": "^0.5.31",
     "passerror": "1.1.0",
     "seq": "=0.3.5",
-    "time": "0.12.0",
     "uglify-js": "1.3.3",
     "uglifyast": "0.2.1",
     "underscore": "1.8.3",
